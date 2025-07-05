@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradingNew - Инвестиционные сборки</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @font-face {
+            font-family: 'HONOR Sans Design Demibold DISP';
+            src: url('https://fonts.cdnfonts.com/s/95408/HONORSansDesign-BoldDISP.woff') format('woff');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: 'HONOR Sans Design Demibold DISP';
+            src: url('https://fonts.cdnfonts.com/s/95408/HONORSansDesign-DemiBoldDISP.woff') format('woff');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+        
+        /* Основные изменения */
+        .pack-metrics {
+            background: var(--dark-gray) !important;
+            color: white;
+        }
+        
+        .chart-toggle {
+            background: var(--dark-gray);
+            color: white;
+        }
+        
+        .card.chart-hidden {
+            padding: 15px 20px;
+            transition: padding 0.3s ease;
+        }
+        
+        /* Общие стили */
+        :root {
+            --primary: #2c3e50;
+            --primary-dark: #1a2530;
+            --secondary: #3498db;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --gray: #95a5a6;
+            --bg: #121212; /* Темный фон страницы */
+            --card-bg: #1e1e1e; /* Темный фон карточек */
+            --dark: #ffffff; /* Белый текст */
+            --gray: #b0b0b0; /* Светло-серый для второстепенного текста */
+            --dark-gray: #2d2d2d; /* Темнее предыдущего */
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        body {
+            max-width: 100vw;
+            max-height: 100vh;
+            aspect-ratio: 12/16;
+            margin: 0 auto;
+            position: relative;
+            overflow: auto;
+            background-color: var(--bg);
+            color: var(--dark);
+            line-height: 1.2;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 0;
+            box-shadow: 0 0 25px rgba(0,0,0,0.1);
+            font-size: 85%;
+        }
+        
+        .container {
+            max-width: 100%;
+            padding: 0;
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        header {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 0 15px;
+            height: 50px;
+            background: #121212;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        
+        .logo {
+            font-family: sans-serif;
+            font-weight: 600;
+            font-size: 2.5rem;
+            letter-spacing: 0.1px;
+            color: white;
+            padding: 5px 0;
+            line-height: 1;
+        }
+        
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border-radius: 4px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            color: var(--dark);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--dark);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-title i {
+            color: var(--secondary);
+        }
+        
+        .balance-container {
+            background: var(--dark-gray);
+            border-radius: 4px;
+            padding: 20px;
+            margin: 15px 0 25px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .balance-label {
+            position: absolute;
+            top: 10px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        
+        .balance-row {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-top: 30px;
+            gap: 10px;
+            padding-left: 100px;
+        }
+        
+        .balance-value {
+            font-family: 'Arial', sans-serif;
+            font-weight: 580;
+            font-size: 2.3rem;
+            color: white;
+            letter-spacing: 0.5px;
+        }
+        
+        .balance-change {
+            font-family: 'Arial', sans-serif;
+            font-weight: 580;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .balance-change.positive {
+            color: var(--success);
+        }
+        
+        .balance-change.negative {
+            color: var(--danger);
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin: 25px 0;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 16px;
+            border-radius: 4px;
+            border: none;
+            font-weight: 700;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--secondary), #2980b9);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2980b9, #1c5d8f);
+            box-shadow: 0 6px 15px rgba(41, 128, 185, 0.3);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #27ae60);
+        }
+        
+        .btn-success:hover {
+            background: linear-gradient(135deg, #27ae60, #219653);
+            box-shadow: 0 6px 15px rgba(46, 204, 113, 0.3);
+        }
+        
+        .chart-container {
+            height: 250px;
+            margin: 25px 0;
+            position: relative;
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            margin: 30px 0 20px;
+            font-weight: 700;
+            color: var(--dark);
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .transaction {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s;
+        }
+        
+        .transaction:hover {
+            background-color: rgba(236, 240, 241, 0.3);
+        }
+        
+        .transaction:last-child {
+            border-bottom: none;
+        }
+        
+        .transaction-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .transaction-title {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .transaction-date {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+        
+        .transaction-amount {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        
+        .pack {
+            background: transparent;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e0e6ed;
+            transition: transform 0.3s ease;
+        }
+        
+        .pack:hover {
+            transform: translateY(-3px);
+        }
+        
+        .pack-metrics {
+            background: var(--dark-gray);
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: white;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .metric {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .metric-value {
+            font-weight: 800;
+            font-size: 1.05rem;
+        }
+        
+        .metric-label {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 600;
+        }
+        
+        .assets-container {
+            height: 100px;
+            display: flex;
+            background: transparent;
+        }
+        
+        .asset {
+            position: relative;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .asset:hover {
+            transform: scale(1.05);
+            z-index: 2;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .asset-logo {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            font-size: 0.9rem;
+            backdrop-filter: blur(2px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .asset-name {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-weight: 700;
+            color: white;
+            font-size: 0.8rem;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+        
+        .asset-amount {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-weight: 800;
+            color: white;
+            font-size: 1rem;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* Обновленный футер */
+        .footer-nav {
+            display: flex;
+            background: var(--card-bg);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            padding: 0;
+            z-index: 100;
+            height: 60px;
+            flex-shrink: 0;
+        }
+        
+        .footer-nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 18px 0;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #95a5a6;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .footer-nav-item.active {
+            color: #3498db;
+            background: rgba(52, 152, 219, 0.1);
+        }
+        
+        .footer-nav-item.active::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #3498db;
+        }
+        
+        .chart-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--dark-gray);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+        
+        .chart-toggle:hover {
+            background: #2a2a2a;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .chart-hidden .chart-container {
+            display: none;
+        }
+        
+        .risk-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+        
+        .risk-low {
+            background: rgba(46, 204, 113, 0.15);
+            color: var(--success);
+        }
+        
+        .risk-moderate {
+            background: rgba(243, 156, 18, 0.15);
+            color: var(--warning);
+        }
+        
+        .risk-high {
+            background: rgba(231, 76, 60, 0.15);
+            color: var(--danger);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--gray);
+        }
+        
+        .empty-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+        
+        .empty-text {
+            font-size: 1.1rem;
+            margin-top: 10px;
+        }
+        
+        .filter-panel {
+            background: var(--card-bg);
+            border-radius: 4px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        }
+        
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .filter-group {
+            margin-bottom: 15px;
+        }
+        
+        .filter-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.95rem;
+        }
+        
+        .filter-input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 4px;
+            border: 1px solid #444;
+            font-size: 1rem;
+            background: var(--card-bg);
+            color: var(--dark);
+        }
+        
+        .filter-select {
+            width: 100%;
+            padding: 14px;
+            border-radius: 4px;
+            border: 1px solid #444;
+            font-size: 1rem;
+            background: var(--card-bg);
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 18px;
+            color: var(--dark);
+        }
+        
+        
+        .apply-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--secondary), #2980b9);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            cursor: pointer;
+            margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .apply-btn:hover {
+            background: linear-gradient(135deg, #2980b9, #1c5d8f);
+            box-shadow: 0 6px 15px rgba(41, 128, 185, 0.4);
+        }
+        
+        .search-container {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 16px 20px 16px 50px;
+            border-radius: 4px;
+            border: 1px solid #444;
+            font-size: 1rem;
+            background: var(--card-bg);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            color: var(--dark);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            font-size: 1.2rem;
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 480px) {
+            .metric-value {
+                font-size: 0.9rem;
+            }
+            
+            .metric-label {
+                font-size: 0.7rem;
+            }
+            
+            .balance-value {
+                font-size: 1.8rem;
+            }
+            
+            .btn {
+                font-size: 0.95rem;
+            }
+            
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .logo {
+                font-size: 2.8rem;
+            }
+            
+            .footer-nav-item {
+                padding: 15px 0;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">TradingNew</div>
+        </header>
+        
+        <!-- Страница 1: Дашборд -->
+        <div id="dashboard" class="page active">
+            <div class="balance-container">
+                <div class="balance-label">DEPOSIT VALUE</div>
+                <div class="balance-row">
+                    <div class="balance-value">23 544.05 $</div>
+                    <div class="balance-change positive">
+                        <i class="fas fa-arrow-up"></i> 490.74
+                    </div>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn btn-primary">
+                    <i class="fas fa-plus-circle"></i> Replenish
+                </button>
+                <button class="btn btn-success">
+                    <i class="fas fa-wallet"></i> Withdraw
+                </button>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-chart-line"></i> Balance changes
+                </div>
+                <div class="chart-toggle" onclick="toggleChart()">
+                    <i class="fas fa-eye-slash"></i> Hide the graph
+                </div>
+                <div class="chart-container">
+                    <canvas id="balanceChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="section-title">
+                <i class="fas fa-folder-open"></i> Current orders
+            </div>
+            
+            <div class="pack">
+                <div class="pack-metrics">
+                    <div class="metric">
+                        <span class="metric-value">+$245</span>
+                        <span class="metric-label">EV</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">18H 45M</span>
+                        <span class="metric-label">EET</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">2.75</span>
+                        <span class="metric-label">RR</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value risk-badge risk-low">LOW</span>
+                        <span class="metric-label">RL</span>
+                    </div>
+                </div>
+                <div class="assets-container">
+                    <div class="asset" style="width: 35%; background: linear-gradient(135deg, #f7931a, #ac6e04);">
+                        <div class="asset-logo">B</div>
+                        <div class="asset-name">BTC</div>
+                        <div class="asset-amount">$4,358</div>
+                    </div>
+                    <div class="asset" style="width: 45%; background: linear-gradient(135deg, #627eea, #3a56c0);">
+                        <div class="asset-logo">E</div>
+                        <div class="asset-name">ETH</div>
+                        <div class="asset-amount">$5,602</div>
+                    </div>
+                    <div class="asset" style="width: 20%; background: linear-gradient(135deg, #e31937, #a0122a);">
+                        <div class="asset-logo">T</div>
+                        <div class="asset-name">TSLA</div>
+                        <div class="asset-amount">$2,490</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section-title">
+                <i class="fas fa-history"></i> Recent transactions
+            </div>
+            
+            <div class="card">
+                <div class="transaction">
+                    <div class="transaction-info">
+                        <div class="transaction-title">
+                            <i class="fas fa-arrow-down positive"></i> Replenish
+                        </div>
+                        <div class="transaction-date">Today, 14:30</div>
+                    </div>
+                    <div class="transaction-amount positive">+$1,000.00</div>
+                </div>
+                <div class="transaction">
+                    <div class="transaction-info">
+                        <div class="transaction-title">
+                            <i class="fas fa-shopping-cart negative"></i> Order
+                        </div>
+                        <div class="transaction-date">Yesterday, 11:15</div>
+                    </div>
+                    <div class="transaction-amount negative">-$500.00</div>
+                </div>
+                <div class="transaction">
+                    <div class="transaction-info">
+                        <div class="transaction-title">
+                            <i class="fas fa-arrow-up positive"></i> Closed order
+                        </div>
+                        <div class="transaction-date">2 days ago</div>
+                    </div>
+                    <div class="transaction-amount positive">+$325.50</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Страница 2: Сборки -->
+        <div id="packs" class="page">
+            <div class="search-container">
+                <div class="search-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <input type="text" class="search-input" placeholder="Search orders...">
+            </div>
+            
+            <div class="filter-panel">
+                <div class="filter-grid">
+                    <div class="filter-group">
+                        <label class="filter-label">Expected profit (EP)</label>
+                        <input type="text" class="filter-input" placeholder="e.g. +$155">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">Expected expiration time (EET)</label>
+                        <input type="text" class="filter-input" placeholder="e.g. 2H 36MIN">
+                    </div>
+                    
+                    <!-- Замена Risk Reward на Bet size -->
+                    <div class="filter-group">
+                        <label class="filter-label">Bet size</label>
+                        <input type="text" class="filter-input" placeholder="e.g. $500">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">Risk level (RL)</label>
+                        <select class="filter-select">
+                            <option value="">Any</option>
+                            <option value="low">Low</option>
+                            <option value="moderate">Moderate</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button class="apply-btn">
+                    <i class="fas fa-filter"></i> Apply filters
+                </button>
+            </div>
+            
+            <div class="section-title">
+                <i class="fas fa-star"></i> Recommended orders
+            </div>
+            
+            <div class="pack">
+                <div class="pack-metrics">
+                    <div class="metric">
+                        <span class="metric-value">+$155</span>
+                        <span class="metric-label">EV</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">2H 36M</span>
+                        <span class="metric-label">EET</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">2.34</span>
+                        <span class="metric-label">RR</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value risk-badge risk-moderate">MODERATE</span>
+                        <span class="metric-label">RL</span>
+                    </div>
+                </div>
+                <div class="assets-container">
+                    <div class="asset" style="width: 30%; background: linear-gradient(135deg, #f7931a, #ac6e04);">
+                        <div class="asset-logo">B</div>
+                        <div class="asset-name">BTC</div>
+                        <div class="asset-amount">$1,500</div>
+                    </div>
+                    <div class="asset" style="width: 50%; background: linear-gradient(135deg, #627eea, #3a56c0);">
+                        <div class="asset-logo">E</div>
+                        <div class="asset-name">ETH</div>
+                        <div class="asset-amount">$900</div>
+                    </div>
+                    <div class="asset" style="width: 20%; background: linear-gradient(135deg, #e31937, #a0122a);">
+                        <div class="asset-logo">T</div>
+                        <div class="asset-name">TSLA</div>
+                        <div class="asset-amount">$600</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pack">
+                <div class="pack-metrics">
+                    <div class="metric">
+                        <span class="metric-value">+$320</span>
+                        <span class="metric-label">EV</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">8H 15M</span>
+                        <span class="metric-label">EET</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">3.15</span>
+                        <span class="metric-label">RR</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value risk-badge risk-high">HIGH</span>
+                        <span class="metric-label">RL</span>
+                    </div>
+                </div>
+                <div class="assets-container">
+                    <div class="asset" style="width: 40%; background: linear-gradient(135deg, #f7931a, #ac6e04);">
+                        <div class="asset-logo">B</div>
+                        <div class="asset-name">BTC</div>
+                        <div class="asset-amount">$2,000</div>
+                    </div>
+                    <div class="asset" style="width: 30%; background: linear-gradient(135deg, #627eea, #3a56c0);">
+                        <div class="asset-logo">E</div>
+                        <div class="asset-name">ETH</div>
+                        <div class="asset-amount">$1,500</div>
+                    </div>
+                    <div class="asset" style="width: 20%; background: linear-gradient(135deg, #00aaff, #0066cc);">
+                        <div class="asset-logo">A</div>
+                        <div class="asset-name">AAPL</div>
+                        <div class="asset-amount">$1,000</div>
+                    </div>
+                    <div class="asset" style="width: 10%; background: linear-gradient(135deg, #7b68ee, #5d4ac9);">
+                        <div class="asset-logo">S</div>
+                        <div class="asset-name">SOL</div>
+                        <div class="asset-amount">$500</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pack">
+                <div class="pack-metrics">
+                    <div class="metric">
+                        <span class="metric-value">+$98</span>
+                        <span class="metric-label">EV</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">24H 00M</span>
+                        <span class="metric-label">EET</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">1.75</span>
+                        <span class="metric-label">RR</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value risk-badge risk-low">LOW</span>
+                        <span class="metric-label">RL</span>
+                    </div>
+                </div>
+                <div class="assets-container">
+                    <div class="asset" style="width: 20%; background: linear-gradient(135deg, #f7931a, #ac6e04);">
+                        <div class="asset-logo">B</div>
+                        <div class="asset-name">BTC</div>
+                        <div class="asset-amount">$800</div>
+                    </div>
+                    <div class="asset" style="width: 30%; background: linear-gradient(135deg, #ffd700, #daa520);">
+                        <div class="asset-logo">G</div>
+                        <div class="asset-name">GOLD</div>
+                        <div class="asset-amount">$1,200</div>
+                    </div>
+                    <div class="asset" style="width: 25%; background: linear-gradient(135deg, #00cc66, #00994d);">
+                        <div class="asset-logo">M</div>
+                        <div class="asset-name">MSFT</div>
+                        <div class="asset-amount">$1,000</div>
+                    </div>
+                    <div class="asset" style="width: 25%; background: linear-gradient(135deg, #555555, #333333);">
+                        <div class="asset-logo">U</div>
+                        <div class="asset-name">US BOND</div>
+                        <div class="asset-amount">$1,000</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Обновленный футер -->
+    <div class="footer-nav">
+        <div class="footer-nav-item active" data-page="dashboard">
+            Portfolio
+        </div>
+        <div class="footer-nav-item" data-page="packs">
+            Orders
+        </div>
+    </div>
+
+    <script>
+        // Инициализация Telegram WebApp
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.enableClosingConfirmation();
+        
+        // Функция для форматирования чисел
+        function formatNumber(num) {
+            return num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+        }
+        
+        // Обновление баланса
+        function updateBalance() {
+            const balanceValue = 23544.05;
+            const changeValue = 490.74;
+            
+            document.querySelector('.balance-value').textContent = formatNumber(balanceValue) + " $";
+            
+            const changeElement = document.querySelector('.balance-change');
+            changeElement.innerHTML = `<i class="fas fa-arrow-up"></i> ${formatNumber(changeValue)}`;
+            changeElement.className = 'balance-change positive';
+        }
+        
+        // Функция переключения видимости графика
+        function toggleChart() {
+            const chartCard = document.querySelector('.card');
+            chartCard.classList.toggle('chart-hidden');
+            
+            const toggleBtn = document.querySelector('.chart-toggle');
+            if (chartCard.classList.contains('chart-hidden')) {
+                toggleBtn.innerHTML = '<i class="fas fa-eye"></i> Show graph';
+            } else {
+                toggleBtn.innerHTML = '<i class="fas fa-eye-slash"></i> Hide graph';
+            }
+        }
+        
+        if (window.Telegram && Telegram.WebApp.platform !== 'unknown') {
+          document.body.style.aspectRatio = 'none';
+          document.body.style.maxWidth = '100%';
+          document.body.style.boxShadow = 'none';
+        }
+        
+        // Инициализация графика баланса с Chart.js
+        function initChart() {
+            const ctx = document.getElementById('balanceChart').getContext('2d');
+            const balanceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['1M', '2W', '1W', '3D', '2D', '1D', 'Now'],
+                    datasets: [{
+                        label: 'Balance',
+                        data: [8500, 9200, 10000, 10800, 11200, 12000, 12450],
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#3498db',
+                        pointRadius: 4,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + formatNumber(value);
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Balance: $' + formatNumber(context.parsed.y);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Переключение страниц
+        document.querySelectorAll('.footer-nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // Удаляем активный класс у всех элементов
+                document.querySelectorAll('.footer-nav-item').forEach(i => {
+                    i.classList.remove('active');
+                });
+                
+                // Добавляем активный класс текущему элементу
+                this.classList.add('active');
+                
+                // Скрываем все страницы
+                document.querySelectorAll('.page').forEach(page => {
+                    page.classList.remove('active');
+                });
+                
+                // Показываем выбранную страницу
+                const pageId = this.getAttribute('data-page');
+                document.getElementById(pageId).classList.add('active');
+            });
+        });
+        
+        // Обработка кнопок пополнения/вывода
+        document.querySelectorAll('.btn-primary, .btn-success').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const isDeposit = this.classList.contains('btn-primary');
+                tg.showPopup({
+                    title: isDeposit ? 'Replenish account' : 'Withdraw funds',
+                    message: isDeposit ? 
+                        'You will be redirected to Telegram Wallet to replenish your account' : 
+                        'Specify the amount to withdraw to your wallet',
+                    buttons: [{
+                        id: 'confirm',
+                        type: 'ok',
+                        text: 'Continue'
+                    }, {
+                        type: 'cancel',
+                        text: 'Cancel'
+                    }]
+                }, function(btnId) {
+                    if (btnId === 'confirm') {
+                        if (isDeposit) {
+                            // Логика пополнения через Telegram Wallet
+                            tg.openInvoice('invoice_url_here');
+                        } else {
+                            // Логика вывода средств
+                            alert('Withdrawal request sent!');
+                        }
+                    }
+                });
+            });
+        });
+        
+        // Фильтрация сборок
+        document.querySelector('.apply-btn').addEventListener('click', function() {
+            const profit = document.querySelectorAll('.filter-input')[0].value;
+            const term = document.querySelectorAll('.filter-input')[1].value;
+            const betSize = document.querySelectorAll('.filter-input')[2].value;  // Изменено на Bet size
+            const risk = document.querySelector('.filter-select').value;
+            
+            alert(`Filters applied:\nProfit: ${profit}\nTerm: ${term}\nBet size: ${betSize}\nRisk: ${risk}`);
+        });
+        
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            updateBalance();
+            initChart();
+            
+            // Эмуляция Telegram WebApp
+            if (!window.Telegram) {
+                window.Telegram = {
+                    WebApp: {
+                        expand: function() { console.log('App expanded') },
+                        enableClosingConfirmation: function() { console.log('Closing confirmation enabled') },
+                        showPopup: function(options, callback) { 
+                            console.log('Popup shown:', options); 
+                            callback('confirm');
+                        },
+                        openInvoice: function(url) { 
+                            console.log('Opening invoice:', url); 
+                            alert('Opening Telegram Wallet payment form');
+                        }
+                    }
+                };
+            }
+        });
+    </script>
+</body>
+</html>
