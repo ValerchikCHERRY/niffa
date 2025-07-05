@@ -1330,6 +1330,70 @@
             });
         });
     });
+    // Функция для показа модального окна
+function showAmountModal(title, message, callback) {
+    const modal = document.getElementById('amountModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalMessage = document.getElementById('modalMessage');
+    const amountInput = document.getElementById('amountInput');
+    const modalCancel = document.getElementById('modalCancel');
+    const modalConfirm = document.getElementById('modalConfirm');
+    
+    modalTitle.textContent = title;
+    modalMessage.textContent = message;
+    amountInput.value = '';
+    
+    // Убираем предыдущие обработчики
+    modalConfirm.onclick = null;
+    modalCancel.onclick = null;
+    
+    modalConfirm.onclick = function() {
+        const amount = parseFloat(amountInput.value);
+        if (!isNaN(amount) && amount > 0) {
+            callback(amount);
+            modal.style.display = 'none';
+        } else {
+            tg.showAlert("Please enter a valid amount!");
+        }
+    };
+    
+    modalCancel.onclick = function() {
+        modal.style.display = 'none';
+    };
+    
+    modal.style.display = 'flex';
+    amountInput.focus();
+}
+
+// Обработка кнопок пополнения/вывода
+document.querySelectorAll('.btn-primary, .btn-success').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const isDeposit = this.classList.contains('btn-primary');
+        const action = isDeposit ? 'Replenish' : 'Withdraw';
+        
+        showAmountModal(
+            `${action} funds`,
+            `Enter the amount you want to ${action.toLowerCase()}:`,
+            (amount) => {
+                if (isDeposit) {
+                    state.balance += amount;
+                    addTransaction('Replenish', amount);
+                } else {
+                    if (amount > state.balance) {
+                        tg.showAlert("Insufficient funds!");
+                        return;
+                    }
+                    state.balance -= amount;
+                    addTransaction('Withdraw', -amount);
+                }
+                
+                updateBalance();
+                updateChart();
+                tg.showAlert(`${action} successful!`);
+            }
+        );
+    });
+});
     
     // Инициализация при загрузке
     document.addEventListener('DOMContentLoaded', function() {
@@ -1352,29 +1416,41 @@
         updateOpenOrdersList();
         
         // Эмуляция Telegram WebApp
-        if (!window.Telegram) {
-            window.Telegram = {
-                WebApp: {
-                    expand: function() { console.log('App expanded') },
-                    enableClosingConfirmation: function() { console.log('Closing confirmation enabled') },
-                    showPopup: function(options, callback) { 
-                        console.log('Popup shown:', options); 
-                        // Эмуляция ввода пользователя
-                        const amount = prompt(options.message + "\n\nEnter amount:");
-                        callback('confirm', amount);
-                    },
-                    showAlert: function(message) {
-                        alert(message);
-                    },
-                    MainButton: {
-                        showProgress: function() { console.log('Show progress') },
-                        hideProgress: function() { console.log('Hide progress') }
-                    }
-                }
-            };
+        // Эмуляция Telegram WebApp
+if (!window.Telegram) {
+    window.Telegram = {
+        WebApp: {
+            expand: function() { console.log('App expanded') },
+            enableClosingConfirmation: function() { console.log('Closing confirmation enabled') },
+            showPopup: function(options, callback) { 
+                console.log('Popup shown:', options);
+                // Для простоты используем confirm
+                const result = confirm(options.message);
+                callback(result ? 'confirm' : 'cancel');
+            },
+            showAlert: function(message) {
+                alert(message);
+            },
+            MainButton: {
+                showProgress: function() { console.log('Show progress') },
+                hideProgress: function() { console.log('Hide progress') }
+            }
         }
+    };
+}
     });
 </script>
-    
+<!-- Добавьте этот код перед закрывающим тегом </body> -->
+<div id="amountModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+    <div style="background-color: #1e1e1e; padding: 25px; border-radius: 12px; width: 80%; max-width: 400px;">
+        <h3 id="modalTitle" style="margin-top: 0; margin-bottom: 15px; color: white;"></h3>
+        <p id="modalMessage" style="margin-bottom: 20px; color: #b0b0b0;"></p>
+        <input type="number" id="amountInput" placeholder="Amount in USD" style="width: 100%; padding: 15px; margin-bottom: 20px; border-radius: 4px; border: 1px solid #444; background-color: #2d2d2d; color: white; font-size: 1rem;">
+        <div style="display: flex; justify-content: flex-end; gap: 15px;">
+            <button id="modalCancel" style="padding: 12px 20px; border: none; border-radius: 4px; background-color: #e74c3c; color: white; cursor: pointer;">Cancel</button>
+            <button id="modalConfirm" style="padding: 12px 20px; border: none; border-radius: 4px; background-color: #2ecc71; color: white; cursor: pointer;">Confirm</button>
+        </div>
+    </div>
+</div>
 </body>
 </html>
