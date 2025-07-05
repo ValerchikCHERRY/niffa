@@ -765,9 +765,21 @@
             <div class="section-title">
                 <i class="fas fa-folder-open"></i> Current orders
             </div>
+            <!-- Контейнер для ордеров (изначально пустой) -->
+            <div class="orders-container"> <!-- Новый контейнер -->
+                <div class="empty-state">
+                    <i class="fas fa-folder-open empty-icon"></i>
+                    <div class="empty-text">No active orders</div>
+                </div>
+            </div>
             
             <!-- Активные ордеры будут добавляться сюда автоматически -->
-            <div class="pack"></div>
+            <div class="pack" data-pack-id="pack1"> <!-- Добавлено здесь -->
+    ...
+                <div class="pack-footer">
+                    <button class="btn btn-order" data-pack-id="pack1" data-bet-size="100">
+                </div>
+            </div>
             
             <div class="section-title">
                 <i class="fas fa-history"></i> Recent transactions
@@ -1148,7 +1160,58 @@
     // Добавление ордера в портфель
     // Функция добавления ордера в портфель
 // Добавление ордера в портфель
+// Добавление ордера в портфель
 function addOrderToPortfolio(packId, betSize) {
+    console.log("Adding order to portfolio:");
+    console.log("Pack ID:", packId);
+    console.log("Bet Size:", betSize);
+    console.log("Orders container:", document.querySelector('#dashboard .section-title + .pack'));
+    console.log("Original pack:", document.querySelector(`#packs .pack[data-pack-id="${packId}"]`));
+    console.log(`Adding order ${packId} with bet size ${betSize}`);
+    
+    // 1. Находим контейнер для ордеров в портфеле
+    const ordersContainer = document.querySelector('#dashboard .section-title + .pack');
+    if (!ordersContainer) {
+        console.error("Orders container not found!");
+        return;
+    }
+    
+    // 2. Удаляем сообщение "No active orders" если оно есть
+    const emptyState = ordersContainer.querySelector('.empty-state');
+    if (emptyState) {
+        ordersContainer.removeChild(emptyState);
+    }
+    
+    // 3. Находим исходный пакет в разделе Orders
+    const originalPack = document.querySelector(`#packs .pack[data-pack-id="${packId}"]`);
+    if (!originalPack) {
+        console.error(`Pack with id ${packId} not found!`);
+        return;
+    }
+    
+    // 4. Клонируем пакет
+    const newOrder = originalPack.cloneNode(true);
+    
+    // 5. Удаляем кнопку Open Order
+    const orderBtn = newOrder.querySelector('.pack-footer');
+    if (orderBtn) {
+        orderBtn.remove();
+    }
+    
+    // 6. Обновляем суммы в активах
+    newOrder.querySelectorAll('.asset').forEach(asset => {
+        const width = parseFloat(asset.style.width);
+        const amount = (width / 100) * betSize;
+        const amountElement = asset.querySelector('.asset-amount');
+        if (amountElement) {
+            amountElement.textContent = `$${formatNumber(amount)}`;
+        }
+    });
+    
+    // 7. Добавляем в портфель
+    ordersContainer.appendChild(newOrder);
+    console.log(`Order ${packId} added to portfolio`);
+}
     // 1. Находим контейнер для ордеров
     const ordersContainer = document.querySelector('#dashboard .section-title + .pack');
     if (!ordersContainer) {
@@ -1184,7 +1247,7 @@ function addOrderToPortfolio(packId, betSize) {
     
     // 7. Добавляем в портфель
     ordersContainer.appendChild(newOrder);
-}
+
 
 // Функция обновления баланса
 function updateBalance() {
@@ -1301,7 +1364,6 @@ function updateOpenButtonState(packId) {
     
     // Обработчик для кнопок Open Order
     // Обработчик для кнопок Open Order
-// Обработчик для кнопок Open Order
 document.querySelectorAll('.btn-order').forEach(btn => {
     btn.addEventListener('click', function() {
         const packId = this.dataset.packId;
@@ -1325,11 +1387,15 @@ document.querySelectorAll('.btn-order').forEach(btn => {
         updateChart();
         
         addTransaction('Order opened', -betSize);
+        
+        // Добавляем в портфель
         addOrderToPortfolio(packId, betSize);
         
         tg.showAlert(`Order opened successfully!`);
     });
 });
+
+
     
     // Обработка кнопок пополнения/вывода
     // Обработка кнопок пополнения/вывода
