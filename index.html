@@ -1146,7 +1146,8 @@
     }
     
     // Добавление ордера в портфель
-    function addOrderToPortfolio(packId, betSize) {
+    // Функция добавления ордера в портфель
+function addOrderToPortfolio(packId, betSize) {
     // Находим исходный пакет для клонирования
     const originalPack = document.querySelector(`[data-pack-id="${packId}"]`);
     if (!originalPack) return;
@@ -1168,12 +1169,40 @@
     // Добавляем в портфель
     const ordersContainer = document.querySelector('#dashboard .section-title + .pack');
     ordersContainer.appendChild(newOrder);
+}
+
+// Функция обновления баланса
+function updateBalance() {
+    document.querySelector('.balance-value').textContent = formatNumber(state.balance) + " $";
+}
+
+// Функция обновления графика
+function updateChart() {
+    // Добавляем новую точку
+    state.chartLabels.push(new Date().toLocaleTimeString());
+    state.chartData.push(state.balance);
     
-    // Обновляем состояние открытых ордеров
-    updateOpenOrdersList();
+    // Обновляем график
+    if (balanceChart) {
+        balanceChart.update();
+    }
+}
+
+// Функция добавления транзакции
+function addTransaction(type, amount) {
+    const transaction = {
+        type: type,
+        amount: amount,
+        date: new Date().toLocaleString('ru-RU', {
+            day: 'numeric',
+            month: 'short',
+            hour: '2-digit',
+            minute: '2-digit'
+        })
+    };
     
-    // Обновляем кнопку в исходном пакете
-    updateOpenButtonState(packId);
+    state.transactions.push(transaction);
+    updateTransactionsList();
 }
 // Обновление состояния кнопки Open Order
 function updateOpenButtonState(packId) {
