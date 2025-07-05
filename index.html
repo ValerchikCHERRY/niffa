@@ -1147,27 +1147,42 @@
     
     // Добавление ордера в портфель
     // Функция добавления ордера в портфель
+// Добавление ордера в портфель
 function addOrderToPortfolio(packId, betSize) {
-    // Находим исходный пакет для клонирования
-    const originalPack = document.querySelector(`[data-pack-id="${packId}"]`);
-    if (!originalPack) return;
+    // 1. Находим контейнер для ордеров
+    const ordersContainer = document.querySelector('#dashboard .section-title + .pack');
+    if (!ordersContainer) {
+        console.error("Orders container not found!");
+        return;
+    }
     
-    // Клонируем пакет
+    // 2. Удаляем сообщение "No active orders" если оно есть
+    if (ordersContainer.querySelector('.empty-state')) {
+        ordersContainer.innerHTML = '';
+    }
+    
+    // 3. Находим исходный пакет
+    const originalPack = document.querySelector(`.pack[data-pack-id="${packId}"]`);
+    if (!originalPack) {
+        console.error(`Pack with id ${packId} not found!`);
+        return;
+    }
+    
+    // 4. Клонируем пакет
     const newOrder = originalPack.cloneNode(true);
     
-    // Удаляем кнопку Open Order
+    // 5. Удаляем кнопку Open Order
     const btn = newOrder.querySelector('.btn-order');
     if (btn) btn.remove();
     
-    // Обновляем суммы в активах
+    // 6. Обновляем суммы в активах
     newOrder.querySelectorAll('.asset').forEach(asset => {
         const width = parseFloat(asset.style.width);
         const amount = (width / 100) * betSize;
         asset.querySelector('.asset-amount').textContent = `$${formatNumber(amount)}`;
     });
     
-    // Добавляем в портфель
-    const ordersContainer = document.querySelector('#dashboard .section-title + .pack');
+    // 7. Добавляем в портфель
     ordersContainer.appendChild(newOrder);
 }
 
@@ -1286,51 +1301,33 @@ function updateOpenButtonState(packId) {
     
     // Обработчик для кнопок Open Order
     // Обработчик для кнопок Open Order
+// Обработчик для кнопок Open Order
 document.querySelectorAll('.btn-order').forEach(btn => {
     btn.addEventListener('click', function() {
         const packId = this.dataset.packId;
         const betSize = parseFloat(this.dataset.betSize);
         
-        tg.showPopup({
-            title: 'Confirm Order',
-            message: `Are you sure you want to open this order for $${formatNumber(betSize)}?`,
-            buttons: [{
-                id: 'confirm',
-                type: 'ok',
-                text: 'Confirm'
-            }, {
-                type: 'cancel',
-                text: 'Cancel'
-            }]
-        }, function(btnId) {
-            if (btnId === 'confirm') {
-                if (tg.MainButton) tg.MainButton.showProgress();
-                
-                // Проверяем баланс
-                if (state.balance < betSize) {
-                    tg.showAlert("Insufficient funds!");
-                    if (tg.MainButton) tg.MainButton.hideProgress();
-                    return;
-                }
-                
-                // Создаем ордер
-                state.balance -= betSize;
-                updateBalance();
-                updateChart();
-                
-                addTransaction('Order opened', -betSize);
-                addOrderToPortfolio(packId, betSize);
-                
-                // Обновляем кнопку
-                btn.innerHTML = '<i class="fas fa-check-circle"></i> Opened';
-                btn.classList.remove('btn-order');
-                btn.classList.add('btn-disabled');
-                btn.disabled = true;
-                
-                tg.showAlert(`Order opened successfully!`);
-                if (tg.MainButton) tg.MainButton.hideProgress();
-            }
-        });
+        // Проверяем баланс
+        if (state.balance < betSize) {
+            tg.showAlert("Insufficient funds!");
+            return;
+        }
+        
+        // Обновляем кнопку СРАЗУ ЖЕ после клика
+        this.innerHTML = '<i class="fas fa-check-circle"></i> Opened';
+        this.classList.remove('btn-order');
+        this.classList.add('btn-disabled');
+        this.disabled = true;
+        
+        // Создаем ордер
+        state.balance -= betSize;
+        updateBalance();
+        updateChart();
+        
+        addTransaction('Order opened', -betSize);
+        addOrderToPortfolio(packId, betSize);
+        
+        tg.showAlert(`Order opened successfully!`);
     });
 });
     
