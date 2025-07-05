@@ -765,21 +765,9 @@
             <div class="section-title">
                 <i class="fas fa-folder-open"></i> Current orders
             </div>
-            <!-- Контейнер для ордеров (изначально пустой) -->
-            <div class="orders-container"> <!-- Новый контейнер -->
-                <div class="empty-state">
-                    <i class="fas fa-folder-open empty-icon"></i>
-                    <div class="empty-text">No active orders</div>
-                </div>
-            </div>
             
             <!-- Активные ордеры будут добавляться сюда автоматически -->
-            <div class="pack" data-pack-id="pack1"> <!-- Добавлено здесь -->
-    ...
-                <div class="pack-footer">
-                    <button class="btn btn-order" data-pack-id="pack1" data-bet-size="100">
-                </div>
-            </div>
+            <div class="pack"></div>
             
             <div class="section-title">
                 <i class="fas fa-history"></i> Recent transactions
@@ -1162,11 +1150,6 @@
 // Добавление ордера в портфель
 // Добавление ордера в портфель
 function addOrderToPortfolio(packId, betSize) {
-    console.log("Adding order to portfolio:");
-    console.log("Pack ID:", packId);
-    console.log("Bet Size:", betSize);
-    console.log("Orders container:", document.querySelector('#dashboard .section-title + .pack'));
-    console.log("Original pack:", document.querySelector(`#packs .pack[data-pack-id="${packId}"]`));
     console.log(`Adding order ${packId} with bet size ${betSize}`);
     
     // 1. Находим контейнер для ордеров в портфеле
@@ -1364,6 +1347,7 @@ function updateOpenButtonState(packId) {
     
     // Обработчик для кнопок Open Order
     // Обработчик для кнопок Open Order
+// Обработчик для кнопок Open Order
 document.querySelectorAll('.btn-order').forEach(btn => {
     btn.addEventListener('click', function() {
         const packId = this.dataset.packId;
@@ -1387,15 +1371,11 @@ document.querySelectorAll('.btn-order').forEach(btn => {
         updateChart();
         
         addTransaction('Order opened', -betSize);
-        
-        // Добавляем в портфель
         addOrderToPortfolio(packId, betSize);
         
         tg.showAlert(`Order opened successfully!`);
     });
 });
-
-
     
     // Обработка кнопок пополнения/вывода
     // Обработка кнопок пополнения/вывода
