@@ -868,7 +868,7 @@
                 </div>
             </div>
             
-            <div class="pack">
+            <div class="pack" data-pack-id="pack1">
                 <div class="pack-metrics">
                     <div class="metric">
                         <span class="metric-value">+$320</span>
@@ -917,7 +917,7 @@
                 </div>
             </div>
             
-            <div class="pack">
+            <div class="pack" data-pack-id="pack1">
                 <div class="pack-metrics">
                     <div class="metric">
                         <span class="metric-value">+$98</span>
@@ -1147,29 +1147,58 @@
     
     // Добавление ордера в портфель
     // Функция добавления ордера в портфель
+
 function addOrderToPortfolio(packId, betSize) {
-    // Находим исходный пакет для клонирования
-    const originalPack = document.querySelector(`[data-pack-id="${packId}"]`);
-    if (!originalPack) return;
+    console.log("Adding order to portfolio for pack:", packId);
+    console.log("Original pack content:", originalPack.innerHTML);
+    console.log("Cloned pack content before modification:", newOrder.innerHTML);
+    // 1. Находим контейнер для ордеров
+    const ordersContainer = document.querySelector('#dashboard .section-title + .pack');
+    if (!ordersContainer) {
+        console.error("Orders container not found!");
+        return;
+    }
     
-    // Клонируем пакет
+    // 2. Находим исходный пакет в разделе Orders
+    const originalPack = document.querySelector(`#packs .pack[data-pack-id="${packId}"]`);
+    if (!originalPack) {
+        console.error(`Pack with id ${packId} not found!`);
+        return;
+    }
+    
+    // 3. Клонируем ВЕСЬ пакет
     const newOrder = originalPack.cloneNode(true);
     
-    // Удаляем кнопку Open Order
-    const btn = newOrder.querySelector('.btn-order');
-    if (btn) btn.remove();
+    // 4. Удаляем только кнопку Open Order, а не весь футер
+    const packFooter = newOrder.querySelector('.pack-footer');
+    if (packFooter) {
+        const btn = packFooter.querySelector('.btn-order');
+        if (btn) {
+            packFooter.removeChild(btn);
+        }
+        
+        // Если футер пуст - удаляем его полностью
+        if (packFooter.children.length === 0) {
+            packFooter.remove();
+        }
+    }
     
-    // Обновляем суммы в активах
+    // 5. Обновляем суммы в активах
     newOrder.querySelectorAll('.asset').forEach(asset => {
         const width = parseFloat(asset.style.width);
         const amount = (width / 100) * betSize;
-        asset.querySelector('.asset-amount').textContent = `$${formatNumber(amount)}`;
+        const amountElement = asset.querySelector('.asset-amount');
+        if (amountElement) {
+            amountElement.textContent = `$${formatNumber(amount)}`;
+        }
     });
     
-    // Добавляем в портфель
-    const ordersContainer = document.querySelector('#dashboard .section-title + .pack');
+    // 6. Добавляем в портфель
     ordersContainer.appendChild(newOrder);
+    console.log("Order added successfully!");
+    console.log("Cloned pack content after modification:", newOrder.innerHTML);
 }
+
 
 // Функция обновления баланса
 function updateBalance() {
@@ -1285,55 +1314,36 @@ function updateOpenButtonState(packId) {
     });
     
     // Обработчик для кнопок Open Order
-    // Обработчик для кнопок Open Order
 document.querySelectorAll('.btn-order').forEach(btn => {
     btn.addEventListener('click', function() {
         const packId = this.dataset.packId;
         const betSize = parseFloat(this.dataset.betSize);
         
-        tg.showPopup({
-            title: 'Confirm Order',
-            message: `Are you sure you want to open this order for $${formatNumber(betSize)}?`,
-            buttons: [{
-                id: 'confirm',
-                type: 'ok',
-                text: 'Confirm'
-            }, {
-                type: 'cancel',
-                text: 'Cancel'
-            }]
-        }, function(btnId) {
-            if (btnId === 'confirm') {
-                if (tg.MainButton) tg.MainButton.showProgress();
-                
-                // Проверяем баланс
-                if (state.balance < betSize) {
-                    tg.showAlert("Insufficient funds!");
-                    if (tg.MainButton) tg.MainButton.hideProgress();
-                    return;
-                }
-                
-                // Создаем ордер
-                state.balance -= betSize;
-                updateBalance();
-                updateChart();
-                
-                addTransaction('Order opened', -betSize);
-                addOrderToPortfolio(packId, betSize);
-                
-                // Обновляем кнопку
-                btn.innerHTML = '<i class="fas fa-check-circle"></i> Opened';
-                btn.classList.remove('btn-order');
-                btn.classList.add('btn-disabled');
-                btn.disabled = true;
-                
-                tg.showAlert(`Order opened successfully!`);
-                if (tg.MainButton) tg.MainButton.hideProgress();
-            }
-        });
+        // Проверяем баланс
+        if (state.balance < betSize) {
+            tg.showAlert("Insufficient funds!");
+            return;
+        }
+        
+        // Обновляем кнопку
+        this.innerHTML = '<i class="fas fa-check-circle"></i> Opened';
+        this.classList.remove('btn-order');
+        this.classList.add('btn-disabled');
+        this.disabled = true;
+        
+        // Обновляем состояние
+        state.balance -= betSize;
+        updateBalance();
+        updateChart();
+        
+        addTransaction('Order opened', -betSize);
+        
+        // Добавляем в портфель
+        addOrderToPortfolio(packId, betSize);
+        
+        tg.showAlert(`Order opened successfully!`);
     });
-});
-    
+});   
     // Обработка кнопок пополнения/вывода
     document.querySelectorAll('.btn-primary, .btn-success').forEach(btn => {
         btn.addEventListener('click', function() {
