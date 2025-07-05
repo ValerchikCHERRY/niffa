@@ -622,6 +622,41 @@
             font-size: 1.2rem;
         }
         
+        /* Новые стили для кнопки Open Order */
+        .pack-footer {
+            padding: 15px;
+            background: var(--dark-gray);
+            text-align: center;
+        }
+        
+        .btn-order {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-order:hover {
+            background: linear-gradient(135deg, #8e44ad, #732d91);
+            box-shadow: 0 4px 15px rgba(142, 68, 173, 0.4);
+        }
+        
+        .btn-disabled {
+            background: linear-gradient(135deg, #bdc3c7, #95a5a6) !important;
+            opacity: 0.9;
+            cursor: not-allowed;
+        }
+        
         /* Адаптивность */
         @media (max-width: 480px) {
             .metric-value {
@@ -854,6 +889,12 @@
                         <div class="asset-amount">$600</div>
                     </div>
                 </div>
+                <!-- НОВЫЙ БЛОК - КНОПКА ОТКРЫТИЯ -->
+                <div class="pack-footer">
+                    <button class="btn btn-order" data-pack-id="pack1" data-bet-size="100">
+                        <i class="fas fa-play-circle"></i> Open Order ($100)
+                    </button>
+                </div>
             </div>
             
             <div class="pack">
@@ -896,6 +937,12 @@
                         <div class="asset-name">SOL</div>
                         <div class="asset-amount">$500</div>
                     </div>
+                </div>
+                <!-- НОВЫЙ БЛОК - КНОПКА ОТКРЫТИЯ -->
+                <div class="pack-footer">
+                    <button class="btn btn-order" data-pack-id="pack2" data-bet-size="100">
+                        <i class="fas fa-play-circle"></i> Open Order ($100)
+                    </button>
                 </div>
             </div>
             
@@ -940,6 +987,12 @@
                         <div class="asset-amount">$1,000</div>
                     </div>
                 </div>
+                <!-- НОВЫЙ БЛОК - КНОПКА ОТКРЫТИЯ -->
+                <div class="pack-footer">
+                    <button class="btn btn-order" data-pack-id="pack3" data-bet-size="100">
+                        <i class="fas fa-play-circle"></i> Open Order ($100)
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -965,16 +1018,21 @@
             return num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
         }
         
-        // Обновление баланса
-        function updateBalance() {
-            const balanceValue = 23544.05;
-            const changeValue = 490.74;
+        // Обновленная функция updateBalance
+        function updateBalance(newBalance = null, changeValue = null) {
+            let balanceValue = newBalance || 23544.05;
+            let change = changeValue || 490.74;
             
             document.querySelector('.balance-value').textContent = formatNumber(balanceValue) + " $";
             
             const changeElement = document.querySelector('.balance-change');
-            changeElement.innerHTML = `<i class="fas fa-arrow-up"></i> ${formatNumber(changeValue)}`;
-            changeElement.className = 'balance-change positive';
+            if (change >= 0) {
+                changeElement.innerHTML = `<i class="fas fa-arrow-up"></i> ${formatNumber(change)}`;
+                changeElement.className = 'balance-change positive';
+            } else {
+                changeElement.innerHTML = `<i class="fas fa-arrow-down"></i> ${formatNumber(Math.abs(change))}`;
+                changeElement.className = 'balance-change negative';
+            }
         }
         
         // Функция переключения видимости графика
@@ -1074,6 +1132,82 @@
             });
         });
         
+        // Обработчик для кнопок Open Order
+        document.querySelectorAll('.btn-order').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const packId = this.dataset.packId;
+                const betSize = this.dataset.betSize;
+                
+                tg.showPopup({
+                    title: 'Confirm Order',
+                    message: `Are you sure you want to open this order for $${betSize}?`,
+                    buttons: [{
+                        id: 'confirm',
+                        type: 'ok',
+                        text: 'Confirm'
+                    }, {
+                        type: 'cancel',
+                        text: 'Cancel'
+                    }]
+                }, function(btnId) {
+                    if (btnId === 'confirm') {
+                        // Показываем индикатор загрузки
+                        if (tg.MainButton) tg.MainButton.showProgress();
+                        
+                        // Отправляем запрос на бэкенд
+                        openPackOrder(packId, betSize)
+                            .then(response => {
+                                tg.showAlert(`Order #${response.orderId} opened successfully!`);
+                                // Обновляем баланс
+                                updateBalance(response.newBalance, 0);
+                            })
+                            .catch(error => {
+                                tg.showAlert(`Error: ${error.message}`);
+                            })
+                            .finally(() => {
+                                if (tg.MainButton) tg.MainButton.hideProgress();
+                            });
+                    }
+                });
+            });
+        });
+        
+        // Функция для открытия ордера (заглушка)
+        async function openPackOrder(packId, betSize) {
+            return new Promise((resolve, reject) => {
+                // Эмуляция запроса к серверу
+                setTimeout(() => {
+                    // Проверка баланса
+                    const currentBalance = parseFloat(
+                        document.querySelector('.balance-value').textContent.replace(/\s|\$/g, '')
+                    );
+                    
+                    if (currentBalance < parseFloat(betSize)) {
+                        reject(new Error('Insufficient funds'));
+                        return;
+                    }
+                    
+                    // Временный код для тестирования: меняем кнопку
+                    document.querySelectorAll('.btn-order').forEach(btn => {
+                        if (btn.dataset.packId === packId) {
+                            btn.innerHTML = '<i class="fas fa-check-circle"></i> Order Active';
+                            btn.classList.remove('btn-order');
+                            btn.classList.add('btn-disabled');
+                            btn.disabled = true;
+                        }
+                    });
+                    
+                    // Успешное открытие
+                    const newBalance = currentBalance - parseFloat(betSize);
+                    resolve({
+                        success: true,
+                        orderId: 'ORD' + Date.now().toString().slice(-6),
+                        newBalance: newBalance
+                    });
+                }, 1500);
+            });
+        }
+        
         // Обработка кнопок пополнения/вывода
         document.querySelectorAll('.btn-primary, .btn-success').forEach(btn => {
             btn.addEventListener('click', function() {
@@ -1133,6 +1267,13 @@
                         openInvoice: function(url) { 
                             console.log('Opening invoice:', url); 
                             alert('Opening Telegram Wallet payment form');
+                        },
+                        showAlert: function(message) {
+                            alert(message);
+                        },
+                        MainButton: {
+                            showProgress: function() { console.log('Show progress') },
+                            hideProgress: function() { console.log('Hide progress') }
                         }
                     }
                 };
