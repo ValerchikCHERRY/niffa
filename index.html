@@ -1008,7 +1008,79 @@
             changeElement.innerHTML = `<i class="fas fa-arrow-up"></i> 0`;
             changeElement.className = 'balance-change positive';
         }
-        
+            // Функция для показа модального окна
+        function showAmountModal(title, message, callback) {
+            const modal = document.getElementById('amountModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalMessage = document.getElementById('modalMessage');
+            const amountInput = document.getElementById('amountInput');
+            const modalCancel = document.getElementById('modalCancel');
+            const modalConfirm = document.getElementById('modalConfirm');
+
+            // Устанавливаем заголовок и сообщение
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            
+            // Очищаем поле ввода
+            amountInput.value = '';
+            
+            // Показываем модальное окно
+            modal.style.display = 'flex';
+            
+            // Временные обработчики
+            const confirmHandler = function() {
+                const amount = parseFloat(amountInput.value);
+                if (isNaN(amount)) {
+                    tg.showAlert("Please enter a valid amount!");
+                    return;
+                }
+                if (amount <= 0) {
+                    tg.showAlert("Amount must be greater than zero!");
+                    return;
+                }
+                modal.style.display = 'none';
+                callback(amount);
+            };
+            
+            const cancelHandler = function() {
+                modal.style.display = 'none';
+            };
+            
+            // Назначаем обработчики
+            modalConfirm.onclick = confirmHandler;
+            modalCancel.onclick = cancelHandler;
+        }
+
+        // Обработка кнопок пополнения/вывода
+        document.querySelectorAll('.btn-primary, .btn-success').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const isDeposit = this.classList.contains('btn-primary');
+                const action = isDeposit ? 'Replenish' : 'Withdraw';
+                
+                showAmountModal(
+                    `${action} funds`,
+                    `Enter the amount you want to ${action.toLowerCase()}:`,
+                    (amount) => {
+                        if (isDeposit) {
+                            state.balance += amount;
+                            addTransaction('Replenish', amount);
+                        } else {
+                            if (amount > state.balance) {
+                                tg.showAlert("Insufficient funds!");
+                                return;
+                            }
+                            state.balance -= amount;
+                            addTransaction('Withdraw', -amount);
+                        }
+                        
+                        updateBalance();
+                        updateChart();
+                        tg.showAlert(`${action} successful!`);
+                    }
+                );
+            });
+        });
+
         // Переключение видимости графика
         function toggleChart() {
             const chartCard = document.querySelector('.card');
