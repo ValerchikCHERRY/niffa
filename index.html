@@ -8,6 +8,38 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Стили для модального окна */
+#amountModal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+#amountInput:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.3);
+}
+
+#modalCancel, #modalConfirm {
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+#modalCancel:hover {
+    background-color: #c0392b !important;
+}
+
+#modalConfirm:hover {
+    background-color: #27ae60 !important;
+}
         @font-face {
             font-family: 'HONOR Sans Design Demibold DISP';
             src: url('https://fonts.cdnfonts.com/s/95408/HONORSansDesign-BoldDISP.woff') format('woff');
@@ -1115,75 +1147,60 @@
     
     // Добавление ордера в портфель
     function addOrderToPortfolio(packId, betSize) {
-        const order = {
-            id: 'ORD' + Date.now().toString().slice(-6),
-            packId: packId,
-            betSize: betSize,
-            timestamp: new Date()
-        };
-        
-        state.openOrders.push(order);
-        updateOpenOrdersList();
-    }
+    // Находим исходный пакет для клонирования
+    const originalPack = document.querySelector(`[data-pack-id="${packId}"]`);
+    if (!originalPack) return;
+    
+    // Клонируем пакет
+    const newOrder = originalPack.cloneNode(true);
+    
+    // Удаляем кнопку Open Order
+    const btn = newOrder.querySelector('.btn-order');
+    if (btn) btn.remove();
+    
+    // Обновляем суммы в активах
+    newOrder.querySelectorAll('.asset').forEach(asset => {
+        const width = parseFloat(asset.style.width);
+        const amount = (width / 100) * betSize;
+        asset.querySelector('.asset-amount').textContent = `$${formatNumber(amount)}`;
+    });
+    
+    // Добавляем в портфель
+    const ordersContainer = document.querySelector('#dashboard .section-title + .pack');
+    ordersContainer.appendChild(newOrder);
+    
+    // Обновляем состояние открытых ордеров
+    updateOpenOrdersList();
+    
+    // Обновляем кнопку в исходном пакете
+    updateOpenButtonState(packId);
+}
+// Обновление состояния кнопки Open Order
+function updateOpenButtonState(packId) {
+    const btn = document.querySelector(`.btn-order[data-pack-id="${packId}"]`);
+    if (!btn) return;
+    
+    btn.innerHTML = '<i class="fas fa-check-circle"></i> Opened';
+    btn.classList.remove('btn-order');
+    btn.classList.add('btn-disabled');
+    btn.disabled = true;
+}
     
     // Обновление списка открытых ордеров
     function updateOpenOrdersList() {
-        const container = document.querySelector('#dashboard .section-title + .pack');
-        container.innerHTML = '';
-        
-        state.openOrders.forEach(order => {
-            // Здесь должна быть логика отображения конкретного ордера
-            // Для примера используем первый пакет из HTML
-            const orderEl = document.createElement('div');
-            orderEl.className = 'pack';
-            orderEl.innerHTML = `
-                <div class="pack-metrics">
-                    <div class="metric">
-                        <span class="metric-value">+$245</span>
-                        <span class="metric-label">EV</span>
-                    </div>
-                    <div class="metric">
-                        <span class="metric-value">18H 45M</span>
-                        <span class="metric-label">EET</span>
-                    </div>
-                    <div class="metric">
-                        <span class="metric-value">2.75</span>
-                        <span class="metric-label">RR</span>
-                    </div>
-                    <div class="metric">
-                        <span class="metric-value risk-badge risk-low">LOW</span>
-                        <span class="metric-label">RL</span>
-                    </div>
-                </div>
-                <div class="assets-container">
-                    <div class="asset" style="width: 35%; background: linear-gradient(135deg, #f7931a, #ac6e04);">
-                        <div class="asset-logo">B</div>
-                        <div class="asset-name">BTC</div>
-                        <div class="asset-amount">$${formatNumber(betSize * 0.35)}</div>
-                    </div>
-                    <div class="asset" style="width: 45%; background: linear-gradient(135deg, #627eea, #3a56c0);">
-                        <div class="asset-logo">E</div>
-                        <div class="asset-name">ETH</div>
-                        <div class="asset-amount">$${formatNumber(betSize * 0.45)}</div>
-                    </div>
-                    <div class="asset" style="width: 20%; background: linear-gradient(135deg, #e31937, #a0122a);">
-                        <div class="asset-logo">T</div>
-                        <div class="asset-name">TSLA</div>
-                        <div class="asset-amount">$${formatNumber(betSize * 0.20)}</div>
-                    </div>
-                </div>
-            `;
-            container.appendChild(orderEl);
-        });
-        
-        // Если ордеров нет
-        if (state.openOrders.length === 0) {
-            container.innerHTML = `<div class="empty-state">
+    const container = document.querySelector('#dashboard .section-title + .pack');
+    container.innerHTML = '';
+    
+    // Если ордеров нет - показываем сообщение
+    if (container.children.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
                 <i class="fas fa-folder-open empty-icon"></i>
                 <div class="empty-text">No active orders</div>
-            </div>`;
-        }
+            </div>
+        `;
     }
+}
     
     // Фильтрация сборок
     document.querySelector('.apply-btn').addEventListener('click', function() {
@@ -1239,53 +1256,54 @@
     });
     
     // Обработчик для кнопок Open Order
-    document.querySelectorAll('.btn-order').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const packId = this.dataset.packId;
-            const betSize = parseFloat(this.dataset.betSize);
-            
-            tg.showPopup({
-                title: 'Confirm Order',
-                message: `Are you sure you want to open this order for $${formatNumber(betSize)}?`,
-                buttons: [{
-                    id: 'confirm',
-                    type: 'ok',
-                    text: 'Confirm'
-                }, {
-                    type: 'cancel',
-                    text: 'Cancel'
-                }]
-            }, function(btnId) {
-                if (btnId === 'confirm') {
-                    if (tg.MainButton) tg.MainButton.showProgress();
-                    
-                    // Проверяем баланс
-                    if (state.balance < betSize) {
-                        tg.showAlert("Insufficient funds!");
-                        if (tg.MainButton) tg.MainButton.hideProgress();
-                        return;
-                    }
-                    
-                    // Создаем ордер
-                    state.balance -= betSize;
-                    updateBalance();
-                    updateChart();
-                    
-                    addTransaction('Order opened', -betSize);
-                    addOrderToPortfolio(packId, betSize);
-                    
-                    // Обновляем кнопку
-                    btn.innerHTML = '<i class="fas fa-check-circle"></i> Order Active';
-                    btn.classList.remove('btn-order');
-                    btn.classList.add('btn-disabled');
-                    btn.disabled = true;
-                    
-                    tg.showAlert(`Order opened successfully!`);
+    // Обработчик для кнопок Open Order
+document.querySelectorAll('.btn-order').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const packId = this.dataset.packId;
+        const betSize = parseFloat(this.dataset.betSize);
+        
+        tg.showPopup({
+            title: 'Confirm Order',
+            message: `Are you sure you want to open this order for $${formatNumber(betSize)}?`,
+            buttons: [{
+                id: 'confirm',
+                type: 'ok',
+                text: 'Confirm'
+            }, {
+                type: 'cancel',
+                text: 'Cancel'
+            }]
+        }, function(btnId) {
+            if (btnId === 'confirm') {
+                if (tg.MainButton) tg.MainButton.showProgress();
+                
+                // Проверяем баланс
+                if (state.balance < betSize) {
+                    tg.showAlert("Insufficient funds!");
                     if (tg.MainButton) tg.MainButton.hideProgress();
+                    return;
                 }
-            });
+                
+                // Создаем ордер
+                state.balance -= betSize;
+                updateBalance();
+                updateChart();
+                
+                addTransaction('Order opened', -betSize);
+                addOrderToPortfolio(packId, betSize);
+                
+                // Обновляем кнопку
+                btn.innerHTML = '<i class="fas fa-check-circle"></i> Opened';
+                btn.classList.remove('btn-order');
+                btn.classList.add('btn-disabled');
+                btn.disabled = true;
+                
+                tg.showAlert(`Order opened successfully!`);
+                if (tg.MainButton) tg.MainButton.hideProgress();
+            }
         });
     });
+});
     
     // Обработка кнопок пополнения/вывода
     document.querySelectorAll('.btn-primary, .btn-success').forEach(btn => {
