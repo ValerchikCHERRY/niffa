@@ -1332,49 +1332,38 @@ document.querySelectorAll('.btn-order').forEach(btn => {
 });
     
     // Обработка кнопок пополнения/вывода
-    document.querySelectorAll('.btn-primary, .btn-success').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const isDeposit = this.classList.contains('btn-primary');
-            
-            tg.showPopup({
-                title: isDeposit ? 'Replenish account' : 'Withdraw funds',
-                message: `Enter amount:`,
-                buttons: [{
-                    id: 'confirm',
-                    type: 'ok',
-                    text: 'Continue'
-                }, {
-                    type: 'cancel',
-                    text: 'Cancel'
-                }],
-                input: {
-                    type: 'number',
-                    placeholder: 'Amount in USD'
-                }
-            }, function(btnId, inputValue) {
-                if (btnId === 'confirm' && inputValue) {
-                    const amount = parseFloat(inputValue);
-                    
-                    if (isDeposit) {
-                        state.balance += amount;
-                        addTransaction('Replenish', amount);
-                    } else {
-                        if (amount > state.balance) {
-                            tg.showAlert("Insufficient funds!");
-                            return;
-                        }
-                        state.balance -= amount;
-                        addTransaction('Withdraw', -amount);
+    // Обработка кнопок пополнения/вывода
+document.querySelectorAll('.btn-primary, .btn-success').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const isDeposit = this.classList.contains('btn-primary');
+        const action = isDeposit ? 'Replenish' : 'Withdraw';
+        
+        // Показываем наше кастомное окно
+        showAmountModal(
+            `${action} funds`,
+            `Enter the amount you want to ${action.toLowerCase()}:`,
+            (amount) => {
+                if (isDeposit) {
+                    state.balance += amount;
+                    addTransaction('Replenish', amount);
+                } else {
+                    if (amount > state.balance) {
+                        tg.showAlert("Insufficient funds!");
+                        return;
                     }
-                    
-                    updateBalance();
-                    updateChart();
-                    tg.showAlert(`Operation successful!`);
+                    state.balance -= amount;
+                    addTransaction('Withdraw', -amount);
                 }
-            });
-        });
+                
+                updateBalance();
+                updateChart();
+                tg.showAlert(`${action} successful!`);
+            }
+        );
     });
+});
     // Функция для показа модального окна
+// Функция для показа модального окна
 function showAmountModal(title, message, callback) {
     const modal = document.getElementById('amountModal');
     const modalTitle = document.getElementById('modalTitle');
@@ -1387,11 +1376,12 @@ function showAmountModal(title, message, callback) {
     modalMessage.textContent = message;
     amountInput.value = '';
     
-    // Убираем предыдущие обработчики
-    modalConfirm.onclick = null;
-    modalCancel.onclick = null;
+    // Показываем модальное окно
+    modal.style.display = 'flex';
+    amountInput.focus();
     
-    modalConfirm.onclick = function() {
+    // Обработчик подтверждения
+    modalConfirm.onclick = () => {
         const amount = parseFloat(amountInput.value);
         if (!isNaN(amount) && amount > 0) {
             callback(amount);
@@ -1401,13 +1391,11 @@ function showAmountModal(title, message, callback) {
         }
     };
     
-    modalCancel.onclick = function() {
+    // Обработчик отмены
+    modalCancel.onclick = () => {
         modal.style.display = 'none';
     };
-    
-    modal.style.display = 'flex';
-    amountInput.focus();
-}
+}   
 
 // Обработка кнопок пополнения/вывода
 document.querySelectorAll('.btn-primary, .btn-success').forEach(btn => {
