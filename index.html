@@ -8,6 +8,15 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        .auth-authorized {
+              background: #95a5a6 !important;
+              cursor: not-allowed;
+            }
+            
+            #app-container {
+              display: none;
+              height: 100%;
+            }
         /* Добавим стили для страницы авторизации */
         #auth-page {
             display: flex;
@@ -791,9 +800,7 @@
 </head>
 <body>
     <div class="container">
-        <header>
-            <div class="logo">TradingNew</div>
-        </header>
+        
         
         <div id="auth-page" class="active">
             <div class="auth-card">
@@ -814,261 +821,258 @@
         </div>
         
         <!-- Страница 1: Дашборд -->
-        <div id="dashboard">
-            <div class="balance-container">
-                <div class="balance-label">DEPOSIT VALUE</div>
-                <div class="balance-row">
-                    <div class="balance-value">0 $</div>
-                    <div class="balance-change positive">
-                        <i class="fas fa-arrow-up"></i> 0
+        <div id="app-container" style="display:none">
+            <div id="dashboard" class="page">
+                <div class="balance-container">
+                    <div class="balance-label">DEPOSIT VALUE</div>
+                    <div class="balance-row">
+                        <div class="balance-value">0 $</div>
+                        <div class="balance-change positive">
+                            <i class="fas fa-arrow-up"></i> 0
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="btn-group">
-                <button class="btn btn-primary">
-                    <i class="fas fa-plus-circle"></i> Replenish
-                </button>
-                <button class="btn btn-success">
-                    <i class="fas fa-wallet"></i> Withdraw
-                </button>
-            </div>
-            
-            <div class="card">
-                <div class="card-title">
-                    <i class="fas fa-chart-line"></i> Balance changes
+                <header>
+                    <div class="logo">TradingNew</div>
+                </header>
+                <div class="btn-group">
+                    <button class="btn btn-primary">
+                        <i class="fas fa-plus-circle"></i> Replenish
+                    </button>
+                    <button class="btn btn-success">
+                        <i class="fas fa-wallet"></i> Withdraw
+                    </button>
                 </div>
-                <div class="chart-toggle" onclick="toggleChart()">
-                    <i class="fas fa-eye-slash"></i> Hide the graph
-                </div>
-                <div class="chart-container">
-                    <canvas id="balanceChart"></canvas>
-                </div>
-            </div>
-            
-            <div class="section-title">
-                <i class="fas fa-folder-open"></i> Current orders
-            </div>
-            
-            <!-- Активные ордеры будут добавляться сюда автоматически -->
-            <div class="pack"></div>
-            
-            <div class="section-title">
-                <i class="fas fa-history"></i> Recent transactions
-            </div>
-            
-            <!-- Транзакции будут добавляться сюда автоматически -->
-            <div class="card"></div>
-        </div>
-        
-        <!-- Страница 2: Сборки -->
-        <div id="packs" class="page">
-            <div class="search-container">
-                <div class="search-icon">
-                    <i class="fas fa-search"></i>
-                </div>
-                <input type="text" class="search-input" placeholder="Search orders...">
-            </div>
-            
-            <div class="filter-panel">
-                <div class="filter-grid">
-                    <div class="filter-group">
-                        <label class="filter-label">Expected profit (EP)</label>
-                        <input type="text" class="filter-input" placeholder="e.g. +$155">
+                
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-chart-line"></i> Balance changes
                     </div>
-                    
-                    <div class="filter-group">
-                        <label class="filter-label">Expected expiration time (EET)</label>
-                        <input type="text" class="filter-input" placeholder="e.g. 2H 36MIN">
+                    <div class="chart-toggle" onclick="toggleChart()">
+                        <i class="fas fa-eye-slash"></i> Hide the graph
                     </div>
-                    
-                    <!-- Замена Risk Reward на Bet size -->
-                    <div class="filter-group">
-                        <label class="filter-label">Bet size</label>
-                        <input type="text" class="filter-input" placeholder="e.g. $500">
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label class="filter-label">Risk level (RL)</label>
-                        <select class="filter-select">
-                            <option value="">Any</option>
-                            <option value="low">Low</option>
-                            <option value="moderate">Moderate</option>
-                            <option value="high">High</option>
-                        </select>
+                    <div class="chart-container">
+                        <canvas id="balanceChart"></canvas>
                     </div>
                 </div>
                 
-                <button class="apply-btn">
-                    <i class="fas fa-filter"></i> Apply filters
-                </button>
+                <div class="section-title">
+                    <i class="fas fa-folder-open"></i> Current orders
+                </div>
+                
+                <!-- Активные ордеры будут добавляться сюда автоматически -->
+                <div class="pack"></div>
+                
+                <div class="section-title">
+                    <i class="fas fa-history"></i> Recent transactions
+                </div>
+                
+                <!-- Транзакции будут добавляться сюда автоматически -->
+                <div class="card"></div>
             </div>
             
-            <div class="section-title">
-                <i class="fas fa-star"></i> Recommended orders
-            </div>
-            
-            <div class="pack" data-pack-id="pack1">
-                <div class="pack-metrics">
-                    <div class="metric">
-                        <span class="metric-value">+$155</span>
-                        <span class="metric-label">EV</span>
+            <!-- Страница 2: Сборки -->
+            <div id="packs" class="page">
+                <div class="search-container">
+                    <div class="search-icon">
+                        <i class="fas fa-search"></i>
                     </div>
-                    <div class="metric">
-                        <span class="metric-value">2H 36M</span>
-                        <span class="metric-label">EET</span>
-                    </div>
-                    <div class="metric">
-                        <span class="metric-value">2.34</span>
-                        <span class="metric-label">RR</span>
-                    </div>
-                    <div class="metric">
-                        <span class="metric-value risk-badge risk-moderate">MODERATE</span>
-                        <span class="metric-label">RL</span>
-                    </div>
+                    <input type="text" class="search-input" placeholder="Search orders...">
                 </div>
-                <div class="assets-container">
-                    <div class="asset" style="width: 30%; background: linear-gradient(135deg, #f7931a, #ac6e04);">
-                        <div class="asset-logo">B</div>
-                        <div class="asset-name">BTC</div>
-                        <div class="asset-amount">$1,500</div>
+                
+                <div class="filter-panel">
+                    <div class="filter-grid">
+                        <div class="filter-group">
+                            <label class="filter-label">Expected profit (EP)</label>
+                            <input type="text" class="filter-input" placeholder="e.g. +$155">
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label class="filter-label">Expected expiration time (EET)</label>
+                            <input type="text" class="filter-input" placeholder="e.g. 2H 36MIN">
+                        </div>
+                        
+                        <!-- Замена Risk Reward на Bet size -->
+                        <div class="filter-group">
+                            <label class="filter-label">Bet size</label>
+                            <input type="text" class="filter-input" placeholder="e.g. $500">
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label class="filter-label">Risk level (RL)</label>
+                            <select class="filter-select">
+                                <option value="">Any</option>
+                                <option value="low">Low</option>
+                                <option value="moderate">Moderate</option>
+                                <option value="high">High</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="asset" style="width: 50%; background: linear-gradient(135deg, #627eea, #3a56c0);">
-                        <div class="asset-logo">E</div>
-                        <div class="asset-name">ETH</div>
-                        <div class="asset-amount">$900</div>
-                    </div>
-                    <div class="asset" style="width: 20%; background: linear-gradient(135deg, #e31937, #a0122a);">
-                        <div class="asset-logo">T</div>
-                        <div class="asset-name">TSLA</div>
-                        <div class="asset-amount">$600</div>
-                    </div>
-                </div>
-                <!-- НОВЫЙ БЛОК - КНОПКА ОТКРЫТИЯ -->
-                <div class="pack-footer">
-                    <button class="btn btn-order" data-pack-id="pack1" data-bet-size="100">
-                        <i class="fas fa-play-circle"></i> Open Order ($100)
+                    
+                    <button class="apply-btn">
+                        <i class="fas fa-filter"></i> Apply filters
                     </button>
                 </div>
-            </div>
-            
-            <div class="pack" data-pack-id="pack2">
-                <div class="pack-metrics">
-                    <div class="metric">
-                        <span class="metric-value">+$320</span>
-                        <span class="metric-label">EV</span>
+                
+                <div class="section-title">
+                    <i class="fas fa-star"></i> Recommended orders
+                </div>
+                
+                <div class="pack" data-pack-id="pack1">
+                    <div class="pack-metrics">
+                        <div class="metric">
+                            <span class="metric-value">+$155</span>
+                            <span class="metric-label">EV</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">2H 36M</span>
+                            <span class="metric-label">EET</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">2.34</span>
+                            <span class="metric-label">RR</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value risk-badge risk-moderate">MODERATE</span>
+                            <span class="metric-label">RL</span>
+                        </div>
                     </div>
-                    <div class="metric">
-                        <span class="metric-value">8H 15M</span>
-                        <span class="metric-label">EET</span>
+                    <div class="assets-container">
+                        <div class="asset" style="width: 30%; background: linear-gradient(135deg, #f7931a, #ac6e04);">
+                            <div class="asset-logo">B</div>
+                            <div class="asset-name">BTC</div>
+                            <div class="asset-amount">$1,500</div>
+                        </div>
+                        <div class="asset" style="width: 50%; background: linear-gradient(135deg, #627eea, #3a56c0);">
+                            <div class="asset-logo">E</div>
+                            <div class="asset-name">ETH</div>
+                            <div class="asset-amount">$900</div>
+                        </div>
+                        <div class="asset" style="width: 20%; background: linear-gradient(135deg, #e31937, #a0122a);">
+                            <div class="asset-logo">T</div>
+                            <div class="asset-name">TSLA</div>
+                            <div class="asset-amount">$600</div>
+                        </div>
                     </div>
-                    <div class="metric">
-                        <span class="metric-value">3.15</span>
-                        <span class="metric-label">RR</span>
-                    </div>
-                    <div class="metric">
-                        <span class="metric-value risk-badge risk-high">HIGH</span>
-                        <span class="metric-label">RL</span>
+                    <!-- НОВЫЙ БЛОК - КНОПКА ОТКРЫТИЯ -->
+                    <div class="pack-footer">
+                        <button class="btn btn-order" data-pack-id="pack1" data-bet-size="100">
+                            <i class="fas fa-play-circle"></i> Open Order ($100)
+                        </button>
                     </div>
                 </div>
-                <div class="assets-container">
-                    <div class="asset" style="width: 40%; background: linear-gradient(135deg, #f7931a, #ac6e04);">
-                        <div class="asset-logo">B</div>
-                        <div class="asset-name">BTC</div>
-                        <div class="asset-amount">$2,000</div>
+                
+                <div class="pack" data-pack-id="pack2">
+                    <div class="pack-metrics">
+                        <div class="metric">
+                            <span class="metric-value">+$320</span>
+                            <span class="metric-label">EV</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">8H 15M</span>
+                            <span class="metric-label">EET</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">3.15</span>
+                            <span class="metric-label">RR</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value risk-badge risk-high">HIGH</span>
+                            <span class="metric-label">RL</span>
+                        </div>
                     </div>
-                    <div class="asset" style="width: 30%; background: linear-gradient(135deg, #627eea, #3a56c0);">
-                        <div class="asset-logo">E</div>
-                        <div class="asset-name">ETH</div>
-                        <div class="asset-amount">$1,500</div>
+                    <div class="assets-container">
+                        <div class="asset" style="width: 40%; background: linear-gradient(135deg, #f7931a, #ac6e04);">
+                            <div class="asset-logo">B</div>
+                            <div class="asset-name">BTC</div>
+                            <div class="asset-amount">$2,000</div>
+                        </div>
+                        <div class="asset" style="width: 30%; background: linear-gradient(135deg, #627eea, #3a56c0);">
+                            <div class="asset-logo">E</div>
+                            <div class="asset-name">ETH</div>
+                            <div class="asset-amount">$1,500</div>
+                        </div>
+                        <div class="asset" style="width: 20%; background: linear-gradient(135deg, #00aaff, #0066cc);">
+                            <div class="asset-logo">A</div>
+                            <div class="asset-name">AAPL</div>
+                            <div class="asset-amount">$1,000</div>
+                        </div>
+                        <div class="asset" style="width: 10%; background: linear-gradient(135deg, #7b68ee, #5d4ac9);">
+                            <div class="asset-logo">S</div>
+                            <div class="asset-name">SOL</div>
+                            <div class="asset-amount">$500</div>
+                        </div>
                     </div>
-                    <div class="asset" style="width: 20%; background: linear-gradient(135deg, #00aaff, #0066cc);">
-                        <div class="asset-logo">A</div>
-                        <div class="asset-name">AAPL</div>
-                        <div class="asset-amount">$1,000</div>
-                    </div>
-                    <div class="asset" style="width: 10%; background: linear-gradient(135deg, #7b68ee, #5d4ac9);">
-                        <div class="asset-logo">S</div>
-                        <div class="asset-name">SOL</div>
-                        <div class="asset-amount">$500</div>
-                    </div>
-                </div>
-                <!-- НОВЫЙ БЛОК - КНОПКА ОТКРЫТИЯ -->
-                <div class="pack-footer">
-                    <button class="btn btn-order" data-pack-id="pack2" data-bet-size="100">
-                        <i class="fas fa-play-circle"></i> Open Order ($100)
-                    </button>
-                </div>
-            </div>
-            
-            <div class="pack" data-pack-id="pack3">
-                <div class="pack-metrics">
-                    <div class="metric">
-                        <span class="metric-value">+$98</span>
-                        <span class="metric-label">EV</span>
-                    </div>
-                    <div class="metric">
-                        <span class="metric-value">24H 00M</span>
-                        <span class="metric-label">EET</span>
-                    </div>
-                    <div class="metric">
-                        <span class="metric-value">1.75</span>
-                        <span class="metric-label">RR</span>
-                    </div>
-                    <div class="metric">
-                        <span class="metric-value risk-badge risk-low">LOW</span>
-                        <span class="metric-label">RL</span>
-                    </div>
-                </div>
-                <div class="assets-container">
-                    <div class="asset" style="width: 20%; background: linear-gradient(135deg, #f7931a, #ac6e04);">
-                        <div class="asset-logo">B</div>
-                        <div class="asset-name">BTC</div>
-                        <div class="asset-amount">$800</div>
-                    </div>
-                    <div class="asset" style="width: 30%; background: linear-gradient(135deg, #ffd700, #daa520);">
-                        <div class="asset-logo">G</div>
-                        <div class="asset-name">GOLD</div>
-                        <div class="asset-amount">$1,200</div>
-                    </div>
-                    <div class="asset" style="width: 25%; background: linear-gradient(135deg, #00cc66, #00994d);">
-                        <div class="asset-logo">M</div>
-                        <div class="asset-name">MSFT</div>
-                        <div class="asset-amount">$1,000</div>
-                    </div>
-                    <div class="asset" style="width: 25%; background: linear-gradient(135deg, #555555, #333333);">
-                        <div class="asset-logo">U</div>
-                        <div class="asset-name">US BOND</div>
-                        <div class="asset-amount">$1,000</div>
+                    <!-- НОВЫЙ БЛОК - КНОПКА ОТКРЫТИЯ -->
+                    <div class="pack-footer">
+                        <button class="btn btn-order" data-pack-id="pack2" data-bet-size="100">
+                            <i class="fas fa-play-circle"></i> Open Order ($100)
+                        </button>
                     </div>
                 </div>
-                <!-- НОВЫЙ БЛОК - КНОПКА ОТКРЫТИЯ -->
-                <div class="pack-footer">
-                    <button class="btn btn-order" data-pack-id="pack3" data-bet-size="100">
-                        <i class="fas fa-play-circle"></i> Open Order ($100)
-                    </button>
+                
+                <div class="pack" data-pack-id="pack3">
+                    <div class="pack-metrics">
+                        <div class="metric">
+                            <span class="metric-value">+$98</span>
+                            <span class="metric-label">EV</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">24H 00M</span>
+                            <span class="metric-label">EET</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">1.75</span>
+                            <span class="metric-label">RR</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value risk-badge risk-low">LOW</span>
+                            <span class="metric-label">RL</span>
+                        </div>
+                    </div>
+                    <div class="assets-container">
+                        <div class="asset" style="width: 20%; background: linear-gradient(135deg, #f7931a, #ac6e04);">
+                            <div class="asset-logo">B</div>
+                            <div class="asset-name">BTC</div>
+                            <div class="asset-amount">$800</div>
+                        </div>
+                        <div class="asset" style="width: 30%; background: linear-gradient(135deg, #ffd700, #daa520);">
+                            <div class="asset-logo">G</div>
+                            <div class="asset-name">GOLD</div>
+                            <div class="asset-amount">$1,200</div>
+                        </div>
+                        <div class="asset" style="width: 25%; background: linear-gradient(135deg, #00cc66, #00994d);">
+                            <div class="asset-logo">M</div>
+                            <div class="asset-name">MSFT</div>
+                            <div class="asset-amount">$1,000</div>
+                        </div>
+                        <div class="asset" style="width: 25%; background: linear-gradient(135deg, #555555, #333333);">
+                            <div class="asset-logo">U</div>
+                            <div class="asset-name">US BOND</div>
+                            <div class="asset-amount">$1,000</div>
+                        </div>
+                    </div>
+                    <!-- НОВЫЙ БЛОК - КНОПКА ОТКРЫТИЯ -->
+                    <div class="pack-footer">
+                        <button class="btn btn-order" data-pack-id="pack3" data-bet-size="100">
+                            <i class="fas fa-play-circle"></i> Open Order ($100)
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <!-- Обновленный футер -->
-    <div class="footer-nav" style="display: none;">
-        <div class="footer-nav-item active" data-page="dashboard">
-            Portfolio
-        </div>
-        <div class="footer-nav-item" data-page="packs">
-            Orders
-        </div>
-    </div>
-
-    <script>
-        // Обновим состояние приложения
-        // Инициализация состояния приложения
         
-
-        // Инициализация Telegram WebApp
-        const tg = window.Telegram.WebApp;
+        <!-- Обновленный футер -->
+        <div class="footer-nav" style="display: none;">
+            <div class="footer-nav-item active" data-page="dashboard">
+                Portfolio
+            </div>
+            <div class="footer-nav-item" data-page="packs">
+                Orders
+            </div>
+        </div>
+    </div>
+    <script>
         const state = {
             isAuthenticated: false,
             user: null,
@@ -1078,6 +1082,13 @@
             chartData: [],    // Добавлено для графика
             betSize: 100      // Добавлено для размера ставки
         };
+        // Обновим состояние приложения
+        // Инициализация состояния приложения
+        
+
+        // Инициализация Telegram WebApp
+        const tg = window.Telegram.WebApp;
+        
         tg.expand();
         tg.enableClosingConfirmation();
         
@@ -1104,46 +1115,66 @@
 
         // Обработчик кнопки авторизации
         document.getElementById('auth-button').addEventListener('click', function() {
-            // Если в Telegram - используем встроенную авторизацию
-            if (window.Telegram && window.Telegram.WebApp) {
-                // Авторизуем пользователя
-                if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                    const userData = tg.initDataUnsafe.user;
-                    state.user = {
-                        id: userData.id,
-                        firstName: userData.first_name,
-                        lastName: userData.last_name || '',
-                        username: userData.username || `user${userData.id}`
-                    };
-                    state.isAuthenticated = true;
-                    showMainApp();
-                } else {
-                    tg.showAlert("Authorization failed. Please try again.");
-                }
+                   const authButton = this;
+          
+          // 1. Блокируем кнопку
+          authButton.disabled = true;
+          authButton.classList.add('auth-authorized');
+          
+          // 2. Меняем текст и иконку
+          authButton.innerHTML = '<i class="fas fa-check-circle"></i> Authorized';
+          
+          // 3. Для Telegram
+          if (window.Telegram && window.Telegram.WebApp) {
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+              const userData = tg.initDataUnsafe.user;
+              state.user = {
+                id: userData.id,
+                firstName: userData.first_name,
+                lastName: userData.last_name || '',
+                username: userData.username || `user${userData.id}`
+              };
+              
+              // 4. Показываем уведомление
+              tg.showAlert("Authorized successfully!");
+              
+              // 5. Через 1 секунду показываем основное приложение
+              setTimeout(showMainApp, 1000);
             } else {
-                // Для разработки вне Telegram
-                state.user = {
-                    id: 123456789,
-                    firstName: 'John',
-                    lastName: 'Doe',
-                    username: 'johndoe'
-                };
-                state.isAuthenticated = true;
-                showMainApp();
+              tg.showAlert("Authorization failed. Please try again.");
             }
+          } 
+          // Для локальной разработки
+          else {
+            state.user = {
+              id: 123456789,
+              firstName: 'John',
+              lastName: 'Doe',
+              username: 'johndoe'
+            };
+            
+            // 4. Показываем уведомление
+            alert("Authorized successfully!");
+            
+            // 5. Через 1 секунду показываем основное приложение
+            setTimeout(showMainApp, 1000);
+          }
         });
 
         // Показать основное приложение после авторизации
         function showMainApp() {
-            document.getElementById('auth-page').classList.remove('active');
-            document.getElementById('dashboard').classList.add('active');
-            document.querySelector('.footer-nav').style.display = 'flex';
-            
-            // Обновим интерфейс с данными пользователя
-            document.querySelector('.logo').innerHTML = `TradingNew <span style="font-size: 1rem; color: #3498db;">@${state.user.username}</span>`;
-            
-            // Инициализация остального приложения
-            initApp();
+                    // 1. Скрываем страницу авторизации
+          document.getElementById('auth-page').style.display = 'none';
+          
+          // 2. Показываем основное приложение
+          document.getElementById('app-container').style.display = 'block';
+          
+          // 3. Добавляем имя пользователя в шапку
+          document.querySelector('.logo').innerHTML = 
+            `TradingNew <span style="font-size: 1rem; color: #3498db;">@${state.user.username}</span>`;
+          
+          // 4. Инициализируем приложение
+          initApp();
         }
 
         // Инициализация приложения (перенесем сюда код из DOMContentLoaded)
