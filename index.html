@@ -795,7 +795,7 @@
             <div class="logo">TradingNew</div>
         </header>
         
-        <div id="auth-page" class="page active">
+        <div id="auth-page">
             <div class="auth-card">
                 <div class="auth-logo">
                     <i class="fab fa-telegram"></i>
@@ -1588,49 +1588,6 @@
                     }
                 );
             });
-        });
-        
-        // Инициализация при загрузке
-        document.addEventListener('DOMContentLoaded', function() {
-            // Очищаем начальные данные
-            document.querySelector('#dashboard .section-title + .pack').innerHTML = '';
-            document.querySelector('#dashboard .card:last-child').innerHTML = `
-                <div class="card-title">
-                    <i class="fas fa-history"></i> Recent transactions
-                </div>
-            `;
-            
-            // Скрываем пакеты изначально
-            document.querySelectorAll('#packs .pack').forEach(pack => {
-                pack.style.display = 'none';
-            });
-            
-            updateBalance();
-            initChart();
-            updateTransactionsList();
-            updateOpenOrdersList();
-            
-            // Эмуляция Telegram WebApp
-            if (!window.Telegram) {
-                window.Telegram = {
-                    WebApp: {
-                        expand: function() { console.log('App expanded') },
-                        enableClosingConfirmation: function() { console.log('Closing confirmation enabled') },
-                        showPopup: function(options, callback) { 
-                            console.log('Popup shown:', options);
-                            const result = confirm(options.message);
-                            callback(result ? 'confirm' : 'cancel');
-                        },
-                        showAlert: function(message) {
-                            alert(message);
-                        },
-                        MainButton: {
-                            showProgress: function() { console.log('Show progress') },
-                            hideProgress: function() { console.log('Hide progress') }
-                        }
-                    }
-                };
-            }
         });
 
 </script>
