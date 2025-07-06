@@ -29,6 +29,22 @@
               left: 0;
               z-index: 1000;
         }
+       
+        /* ДОБАВИТЬ в секцию стилей */
+        header {
+            order: -1; /* Переместить в начало контейнера */
+            margin-bottom: 0; /* Убрать нижний отступ */
+        }
+        
+        .balance-container {
+            margin-top: 15px; /* Добавить верхний отступ */
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+        }
+      
         /* ДОБАВИТЬ в CSS */
         body {
             background-color: var(--bg) !important; /* Приоритет для фона */
@@ -813,6 +829,22 @@
                 font-size: 0.9rem;
             }
         }
+        /* ДОБАВИТЬ в конец стилей */
+        #dashboard {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .page {
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .page.active {
+            display: flex;
+        }
     </style>
 </head>
 <body>
@@ -840,7 +872,7 @@
                 <header>
                         <div class="logo">TradingNew</div>
                     </header>
-                <div id="dashboard" class="page">
+                <div id="dashboard" class="page active">
                     <div class="balance-container">
                         <div class="balance-label">DEPOSIT VALUE</div>
                         <div class="balance-row">
@@ -1090,41 +1122,45 @@
         </div>
     <script>
         // ДОБАВИТЬ в начало скрипта
-        document.addEventListener('DOMContentLoaded', function() {
-            if (window.Telegram && window.Telegram.WebApp) {
-                Telegram.WebApp.onEvent('webAppReady', checkAuth);
-            } else {
-                setTimeout(checkAuth, 300); // Fallback для браузера
-            }
-        });
+// ЗАМЕНИТЬ весь блок скрипта после "const state = {...}" на:
+let tg;
+document.addEventListener('DOMContentLoaded', function() {
+    // Проверяем доступность Telegram WebApp
+    if (window.Telegram && window.Telegram.WebApp) {
+        tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
         
-        const state = {
-            isAuthenticated: false,
-            user: null,
-            balance: 0,
-            transactions: [], // Добавлено для хранения транзакций
-            chartLabels: [],  // Добавлено для графика
-            chartData: [],    // Добавлено для графика
-            betSize: 100      // Добавлено для размера ставки
-        };
-        // Обновим состояние приложения
-        // Инициализация состояния приложения
-        
+        // Если пользователь уже авторизован
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            const userData = tg.initDataUnsafe.user;
+            state.user = {
+                id: userData.id,
+                firstName: userData.first_name,
+                lastName: userData.last_name || '',
+                username: userData.username || `user${userData.id}`
+            };
+            state.isAuthenticated = true;
+            showMainApp();
+        }
+    } else {
+        console.warn("Telegram WebApp environment not detected");
+        // Для локальной разработки
+        document.getElementById('auth-page').style.display = 'flex';
+    }
+});
 
-        // Инициализация Telegram WebApp
-        // ЗАМЕНИТЬ текущую инициализацию на:
-            let tg;
-            if (window.Telegram && window.Telegram.WebApp) {
-                tg = window.Telegram.WebApp;
-                tg.expand();
-                tg.enableClosingConfirmation();
-            } else {
-                console.warn("Telegram WebApp environment not detected");
-            }
-        
-        // Проверка авторизации при загрузке
-        function checkAuth() {
-            // Если мы в Telegram WebApp, проверяем данные пользователя
+// Обработчик кнопки авторизации
+document.getElementById('auth-button').addEventListener('click', function() {
+    const authButton = this;
+    authButton.disabled = true;
+    authButton.classList.add('auth-authorized');
+    authButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authorizing...';
+    
+    // Эмуляция процесса авторизации
+    setTimeout(() => {
+        // Для Telegram
+        if (window.Telegram && window.Telegram.WebApp) {
             if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
                 const userData = tg.initDataUnsafe.user;
                 state.user = {
@@ -1133,81 +1169,40 @@
                     lastName: userData.last_name || '',
                     username: userData.username || `user${userData.id}`
                 };
-                state.isAuthenticated = true;
+                tg.showAlert("Authorized successfully!");
                 showMainApp();
             } else {
-                // Скрываем футер
-                document.querySelector('.footer-nav').style.display = 'none';
+                tg.showAlert("Authorization failed. Please try again.");
+                authButton.innerHTML = '<i class="fab fa-telegram"></i> Sign in with Telegram';
+                authButton.disabled = false;
+                authButton.classList.remove('auth-authorized');
             }
-        }
-
-        // Обработчик кнопки авторизации
-        document.getElementById('auth-button').addEventListener('click', function() {
-                   const authButton = this;
-          
-          // 1. Блокируем кнопку
-          authButton.disabled = true;
-          authButton.classList.add('auth-authorized');
-          
-          // 2. Меняем текст и иконку
-          authButton.innerHTML = '<i class="fas fa-check-circle"></i> Authorized';
-          
-          // 3. Для Telegram
-          if (window.Telegram && window.Telegram.WebApp) {
-            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-              const userData = tg.initDataUnsafe.user;
-              state.user = {
-                id: userData.id,
-                firstName: userData.first_name,
-                lastName: userData.last_name || '',
-                username: userData.username || `user${userData.id}`
-              };
-              
-              // 4. Показываем уведомление
-              tg.showAlert("Authorized successfully!");
-              
-              // 5. Через 1 секунду показываем основное приложение
-              setTimeout(showMainApp, 1000);
-            } else {
-              tg.showAlert("Authorization failed. Please try again.");
-            }
-          } 
-          // Для локальной разработки
-          else {
+        } else {
+            // Для локальной разработки
             state.user = {
-              id: 123456789,
-              firstName: 'John',
-              lastName: 'Doe',
-              username: 'johndoe'
+                id: 123456789,
+                firstName: 'John',
+                lastName: 'Doe',
+                username: 'johndoe'
             };
-            
-            // 4. Показываем уведомление
             alert("Authorized successfully!");
-            
-            // 5. Через 1 секунду показываем основное приложение
-            setTimeout(showMainApp, 1000);
-          }
-        });
-
-        // Показать основное приложение после авторизации
-        function showMainApp() {
-         // В функции showMainApp ДОБАВИТЬ:
-            document.querySelector('.footer-nav').style.display = 'flex'; // Показать навигацию
-            document.body.style.backgroundColor = 'var(--bg)'; // Гарантировать фон
-                    // 1. Скрываем страницу авторизации
-          document.getElementById('auth-page').style.display = 'none';
-          
-          // 2. Показываем основное приложение
-          document.getElementById('app-container').style.display = 'block';
-          
-          // 3. Добавляем имя пользователя в шапку
-          document.querySelector('.logo').innerHTML = 
-            `TradingNew <span style="font-size: 1rem; color: #3498db;">@${state.user.username}</span>`;
-          
-          // 4. Инициализируем приложение
-          initApp();
+            showMainApp();
         }
+    }, 1500);
+});
 
+// Показать основное приложение
+function showMainApp() {
+    document.getElementById('auth-page').style.display = 'none';
+    document.getElementById('app-container').style.display = 'block';
+    document.querySelector('.footer-nav').style.display = 'flex';
+    
+    // Обновляем имя пользователя
+    document.querySelector('.logo').innerHTML = 
+        `TradingNew <span style="font-size: 1rem; color: #3498db;">@${state.user.username}</span>`;
+    
+    initApp();
+}
         // Инициализация приложения (перенесем сюда код из DOMContentLoaded)
         function initApp() {
             // Очищаем начальные данные
