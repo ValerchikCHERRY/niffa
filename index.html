@@ -1088,6 +1088,10 @@
             </div>
         </div>
     <script>
+        if (!window.Telegram) {
+            console.error("Telegram WebApp SDK not loaded!");
+            document.getElementById('auth-page').style.display = 'flex'; // Показать auth
+        }
         // ДОБАВИТЬ в начало скрипта
         document.addEventListener('DOMContentLoaded', function() {
             if (window.Telegram && window.Telegram.WebApp) {
@@ -1096,6 +1100,7 @@
                 setTimeout(checkAuth, 300); // Fallback для браузера
             }
         });
+        
         const state = {
             isAuthenticated: false,
             user: null,
