@@ -19,22 +19,19 @@
             }
         /* Добавим стили для страницы авторизации */
         #auth-page {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            padding: 20px;
-            text-align: center;
+              justify-content: center;
+              align-items: center;
+              background-color: var(--bg);
+              width: 100%;
+              position: fixed;
+              top: 0;
+              left: 0;
+              z-index: 1000;
         }
         
         .auth-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 40px 30px;
             max-width: 400px;
-            width: 100%;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 90%;
         }
         
         .auth-logo {
@@ -802,7 +799,7 @@
     <div class="container">
         
         
-        <div id="auth-page" class="active">
+        <div id="auth-page" style="display: flex; height: 100vh;">
             <div class="auth-card">
                 <div class="auth-logo">
                     <i class="fab fa-telegram"></i>
