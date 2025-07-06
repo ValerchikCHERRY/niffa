@@ -837,6 +837,9 @@
         <!-- Страница 1: Дашборд -->
         <div id="app-container" style="display:none">
             <div class="container">
+                <header>
+                        <div class="logo">TradingNew</div>
+                    </header>
                 <div id="dashboard" class="page">
                     <div class="balance-container">
                         <div class="balance-label">DEPOSIT VALUE</div>
@@ -847,9 +850,7 @@
                             </div>
                         </div>
                     </div>
-                    <header>
-                        <div class="logo">TradingNew</div>
-                    </header>
+                    
                     <div class="btn-group">
                         <button class="btn btn-primary">
                             <i class="fas fa-plus-circle"></i> Replenish
@@ -1088,10 +1089,6 @@
             </div>
         </div>
     <script>
-        if (!window.Telegram) {
-            console.error("Telegram WebApp SDK not loaded!");
-            document.getElementById('auth-page').style.display = 'flex'; // Показать auth
-        }
         // ДОБАВИТЬ в начало скрипта
         document.addEventListener('DOMContentLoaded', function() {
             if (window.Telegram && window.Telegram.WebApp) {
