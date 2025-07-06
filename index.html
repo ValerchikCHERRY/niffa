@@ -1121,88 +1121,75 @@
             </div>
         </div>
     <script>
-        // ДОБАВИТЬ в начало скрипта
-// ЗАМЕНИТЬ весь блок скрипта после "const state = {...}" на:
-let tg;
-document.addEventListener('DOMContentLoaded', function() {
-    // Проверяем доступность Telegram WebApp
-    if (window.Telegram && window.Telegram.WebApp) {
-        tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand();
-        
-        // Если пользователь уже авторизован
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            const userData = tg.initDataUnsafe.user;
-            state.user = {
-                id: userData.id,
-                firstName: userData.first_name,
-                lastName: userData.last_name || '',
-                username: userData.username || `user${userData.id}`
-            };
-            state.isAuthenticated = true;
-            showMainApp();
-        }
-    } else {
-        console.warn("Telegram WebApp environment not detected");
-        // Для локальной разработки
-        document.getElementById('auth-page').style.display = 'flex';
-    }
-});
+ let tg;
 
-// Обработчик кнопки авторизации
-document.getElementById('auth-button').addEventListener('click', function() {
-    const authButton = this;
-    authButton.disabled = true;
-    authButton.classList.add('auth-authorized');
-    authButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authorizing...';
-    
-    // Эмуляция процесса авторизации
-    setTimeout(() => {
-        // Для Telegram
+    document.addEventListener('DOMContentLoaded', function() {
+        // Проверяем доступность Telegram WebApp
         if (window.Telegram && window.Telegram.WebApp) {
-            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                const userData = tg.initDataUnsafe.user;
-                state.user = {
-                    id: userData.id,
-                    firstName: userData.first_name,
-                    lastName: userData.last_name || '',
-                    username: userData.username || `user${userData.id}`
-                };
-                tg.showAlert("Authorized successfully!");
+            tg = window.Telegram.WebApp;
+            tg.ready();
+            tg.expand();
+            
+            // Если пользователь уже авторизован
+            if (tg.initDataUnsafe?.user) {
+                handleTelegramUser(tg.initDataUnsafe.user);
                 showMainApp();
             } else {
-                tg.showAlert("Authorization failed. Please try again.");
-                authButton.innerHTML = '<i class="fab fa-telegram"></i> Sign in with Telegram';
-                authButton.disabled = false;
-                authButton.classList.remove('auth-authorized');
+                // Показываем кнопку авторизации только если данных пользователя нет
+                document.getElementById('auth-page').style.display = 'flex';
             }
         } else {
             // Для локальной разработки
-            state.user = {
-                id: 123456789,
-                firstName: 'John',
-                lastName: 'Doe',
-                username: 'johndoe'
-            };
-            alert("Authorized successfully!");
-            showMainApp();
+            document.getElementById('auth-page').style.display = 'flex';
         }
-    }, 1500);
-});
+    });
 
-// Показать основное приложение
-function showMainApp() {
-    document.getElementById('auth-page').style.display = 'none';
-    document.getElementById('app-container').style.display = 'block';
-    document.querySelector('.footer-nav').style.display = 'flex';
-    
-    // Обновляем имя пользователя
-    document.querySelector('.logo').innerHTML = 
-        `TradingNew <span style="font-size: 1rem; color: #3498db;">@${state.user.username}</span>`;
-    
-    initApp();
-}
+    // Обработчик кнопки авторизации
+    document.getElementById('auth-button').addEventListener('click', function() {
+        const authButton = this;
+        authButton.disabled = true;
+        authButton.classList.add('auth-authorized');
+        authButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authorizing...';
+        
+        setTimeout(() => {
+            if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
+                handleTelegramUser(window.Telegram.WebApp.initDataUnsafe.user);
+                showMainApp();
+            } else {
+                // Для локальной разработки
+                state.user = {
+                    id: 123456789,
+                    firstName: 'John',
+                    lastName: 'Doe',
+                    username: 'johndoe'
+                };
+                showMainApp();
+            }
+        }, 1500);
+    });
+
+    // Обработка данных пользователя Telegram
+    function handleTelegramUser(userData) {
+        state.user = {
+            id: userData.id,
+            firstName: userData.first_name,
+            lastName: userData.last_name || '',
+            username: userData.username || `user${userData.id}`
+        };
+    }
+
+    // Показать основное приложение
+    function showMainApp() {
+        document.getElementById('auth-page').style.display = 'none';
+        document.getElementById('app-container').style.display = 'block';
+        document.querySelector('.footer-nav').style.display = 'flex';
+        
+        // Обновляем имя пользователя
+        document.querySelector('.logo').innerHTML = 
+            `TradingNew <span style="font-size: 1rem; color: #3498db;">@${state.user.username}</span>`;
+        
+        initApp();
+    }
         // Инициализация приложения (перенесем сюда код из DOMContentLoaded)
         function initApp() {
             // Очищаем начальные данные
