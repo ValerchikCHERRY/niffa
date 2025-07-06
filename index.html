@@ -795,7 +795,7 @@
             <div class="logo">TradingNew</div>
         </header>
         
-        <div id="auth-page">
+        <div id="auth-page" class="active">
             <div class="auth-card">
                 <div class="auth-logo">
                     <i class="fab fa-telegram"></i>
@@ -1064,15 +1064,20 @@
 
     <script>
         // Обновим состояние приложения
+        // Инициализация состояния приложения
+        
+
+        // Инициализация Telegram WebApp
+        const tg = window.Telegram.WebApp;
         const state = {
             isAuthenticated: false,
             user: null,
             balance: 0,
-            // ... остальные поля
+            transactions: [], // Добавлено для хранения транзакций
+            chartLabels: [],  // Добавлено для графика
+            chartData: [],    // Добавлено для графика
+            betSize: 100      // Добавлено для размера ставки
         };
-
-        // Инициализация Telegram WebApp
-        const tg = window.Telegram.WebApp;
         tg.expand();
         tg.enableClosingConfirmation();
         
@@ -1089,6 +1094,11 @@
                 };
                 state.isAuthenticated = true;
                 showMainApp();
+            } else {
+                // Показываем страницу авторизации
+                document.getElementById('auth-page').classList.add('active');
+                // Скрываем футер
+                document.querySelector('.footer-nav').style.display = 'none';
             }
         }
 
@@ -1096,15 +1106,20 @@
         document.getElementById('auth-button').addEventListener('click', function() {
             // Если в Telegram - используем встроенную авторизацию
             if (window.Telegram && window.Telegram.WebApp) {
-                tg.showPopup({
-                    title: 'Login Required',
-                    message: 'Please authorize in Telegram',
-                    buttons: [{ type: 'default', text: 'OK' }]
-                }, function(buttonId) {
-                    if (buttonId === 'ok') {
-                        checkAuth(); // Повторная проверка после подтверждения
-                    }
-                });
+                // Авторизуем пользователя
+                if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                    const userData = tg.initDataUnsafe.user;
+                    state.user = {
+                        id: userData.id,
+                        firstName: userData.first_name,
+                        lastName: userData.last_name || '',
+                        username: userData.username || `user${userData.id}`
+                    };
+                    state.isAuthenticated = true;
+                    showMainApp();
+                } else {
+                    tg.showAlert("Authorization failed. Please try again.");
+                }
             } else {
                 // Для разработки вне Telegram
                 state.user = {
@@ -1559,37 +1574,6 @@
         
         // Функция для показа модального окна
         
-        
-        // Обработка кнопок пополнения/вывода
-        document.querySelectorAll('.btn-primary, .btn-success').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const isDeposit = this.classList.contains('btn-primary');
-                const action = isDeposit ? 'Replenish' : 'Withdraw';
-                
-                showAmountModal(
-                    `${action} funds`,
-                    `Enter the amount you want to ${action.toLowerCase()}:`,
-                    (amount) => {
-                        if (isDeposit) {
-                            state.balance += amount;
-                            addTransaction('Replenish', amount);
-                        } else {
-                            if (amount > state.balance) {
-                                tg.showAlert("Insufficient funds!");
-                                return;
-                            }
-                            state.balance -= amount;
-                            addTransaction('Withdraw', -amount);
-                        }
-                        
-                        updateBalance();
-                        updateChart();
-                        tg.showAlert(`${action} successful!`);
-                    }
-                );
-            });
-        });
-
 </script>
 
 <!-- Модальное окно для ввода суммы -->
