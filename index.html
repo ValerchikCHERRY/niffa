@@ -8,6 +8,73 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Добавим стили для страницы авторизации */
+        #auth-page {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .auth-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 40px 30px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .auth-logo {
+            font-size: 3.5rem;
+            margin-bottom: 25px;
+            color: #3498db;
+        }
+        
+        .auth-title {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .auth-description {
+            color: var(--gray);
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+        
+        .auth-button {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 18px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+        }
+        
+        .auth-button:hover {
+            background: linear-gradient(135deg, #27ae60, #219653);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.5);
+        }
+        
+        .auth-footer {
+            margin-top: 30px;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
         /* Стили для модального окна */
 #amountModal {
     display: none;
@@ -728,9 +795,26 @@
             <div class="logo">TradingNew</div>
         </header>
         
+        <div id="auth-page" class="page active">
+            <div class="auth-card">
+                <div class="auth-logo">
+                    <i class="fab fa-telegram"></i>
+                </div>
+                <h1 class="auth-title">Welcome to TradingNew</h1>
+                <p class="auth-description">
+                    Sign in with your Telegram account to access your investment portfolio and start trading.
+                </p>
+                <button id="auth-button" class="auth-button">
+                    <i class="fab fa-telegram"></i> Sign in with Telegram
+                </button>
+                <div class="auth-footer">
+                    By signing in, you agree to our Terms of Service and Privacy Policy
+                </div>
+            </div>
+        </div>
         
         <!-- Страница 1: Дашборд -->
-        <div id="dashboard" class="page active">
+        <div id="dashboard" class ="page">
             <div class="balance-container">
                 <div class="balance-label">DEPOSIT VALUE</div>
                 <div class="balance-row">
@@ -969,7 +1053,7 @@
     </div>
     
     <!-- Обновленный футер -->
-    <div class="footer-nav">
+    <div class="footer-nav" style="display: none;">
         <div class="footer-nav-item active" data-page="dashboard">
             Portfolio
         </div>
@@ -979,20 +1063,121 @@
     </div>
 
     <script>
-        // Инициализация состояния приложения
+        // Обновим состояние приложения
         const state = {
+            isAuthenticated: false,
+            user: null,
             balance: 0,
-            transactions: [],
-            chartData: [0],
-            chartLabels: ['Start'],
-            betSize: null,
-            openOrders: []
+            // ... остальные поля
         };
 
         // Инициализация Telegram WebApp
         const tg = window.Telegram.WebApp;
         tg.expand();
         tg.enableClosingConfirmation();
+        
+        // Проверка авторизации при загрузке
+        function checkAuth() {
+            // Если мы в Telegram WebApp, проверяем данные пользователя
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                const userData = tg.initDataUnsafe.user;
+                state.user = {
+                    id: userData.id,
+                    firstName: userData.first_name,
+                    lastName: userData.last_name || '',
+                    username: userData.username || `user${userData.id}`
+                };
+                state.isAuthenticated = true;
+                showMainApp();
+            }
+        }
+
+        // Обработчик кнопки авторизации
+        document.getElementById('auth-button').addEventListener('click', function() {
+            // Если в Telegram - используем встроенную авторизацию
+            if (window.Telegram && window.Telegram.WebApp) {
+                tg.showPopup({
+                    title: 'Login Required',
+                    message: 'Please authorize in Telegram',
+                    buttons: [{ type: 'default', text: 'OK' }]
+                }, function(buttonId) {
+                    if (buttonId === 'ok') {
+                        checkAuth(); // Повторная проверка после подтверждения
+                    }
+                });
+            } else {
+                // Для разработки вне Telegram
+                state.user = {
+                    id: 123456789,
+                    firstName: 'John',
+                    lastName: 'Doe',
+                    username: 'johndoe'
+                };
+                state.isAuthenticated = true;
+                showMainApp();
+            }
+        });
+
+        // Показать основное приложение после авторизации
+        function showMainApp() {
+            document.getElementById('auth-page').classList.remove('active');
+            document.getElementById('dashboard').classList.add('active');
+            document.querySelector('.footer-nav').style.display = 'flex';
+            
+            // Обновим интерфейс с данными пользователя
+            document.querySelector('.logo').innerHTML = `TradingNew <span style="font-size: 1rem; color: #3498db;">@${state.user.username}</span>`;
+            
+            // Инициализация остального приложения
+            initApp();
+        }
+
+        // Инициализация приложения (перенесем сюда код из DOMContentLoaded)
+        function initApp() {
+            // Очищаем начальные данные
+            document.querySelector('#dashboard .section-title + .pack').innerHTML = '';
+            document.querySelector('#dashboard .card:last-child').innerHTML = `
+                <div class="card-title">
+                    <i class="fas fa-history"></i> Recent transactions
+                </div>
+            `;
+            
+            // Скрываем пакеты изначально
+            document.querySelectorAll('#packs .pack').forEach(pack => {
+                pack.style.display = 'none';
+            });
+            
+            updateBalance();
+            initChart();
+            updateTransactionsList();
+            updateOpenOrdersList();
+            
+            // Эмуляция Telegram WebApp
+            if (!window.Telegram) {
+                window.Telegram = {
+                    WebApp: {
+                        expand: function() { console.log('App expanded') },
+                        enableClosingConfirmation: function() { console.log('Closing confirmation enabled') },
+                        showPopup: function(options, callback) { 
+                            console.log('Popup shown:', options);
+                            const result = confirm(options.message);
+                            callback(result ? 'confirm' : 'cancel');
+                        },
+                        showAlert: function(message) {
+                            alert(message);
+                        },
+                        MainButton: {
+                            showProgress: function() { console.log('Show progress') },
+                            hideProgress: function() { console.log('Hide progress') }
+                        }
+                    }
+                };
+            }
+        }
+
+        // Проверим авторизацию при загрузке
+        document.addEventListener('DOMContentLoaded', checkAuth);
+        // Инициализация состояния приложения
+        
         
         // Функция для форматирования чисел
         function formatNumber(num) {
