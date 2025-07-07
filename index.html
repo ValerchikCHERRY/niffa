@@ -998,57 +998,87 @@
 
         async function fetchBalance() {
             const user = Telegram.WebApp.initDataUnsafe.user;
-            if (!user) return;
+            if (!user) {
+                tg.showAlert("User not identified");
+                return;
+            }
             
-            const response = await fetch(`${BACKEND_URL}/balance/${user.id}`);
-            const data = await response.json();
-            state.balance = data.balance;
-            updateBalance();
+            try {
+                const response = await fetch(`${BACKEND_URL}/balance/${user.id}`);
+                if (!response.ok) throw new Error('Balance fetch failed');
+                const data = await response.json();
+                state.balance = data.balance;
+                updateBalance();
+            } catch (error) {
+                console.error('Balance fetch error:', error);
+                tg.showAlert("Failed to load balance");
+            }
         }
         
         async function createDeposit(amount) {
             const user = Telegram.WebApp.initDataUnsafe.user;
-            const response = await fetch(`${BACKEND_URL}/deposit`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    user_id: user.id,
-                    amount: amount
-                })
-            });
-            
-            const result = await response.json();
-            
-            tg.showPopup({
-                title: 'Deposit Instructions',
-                message: `Send ${amount} USDT to:\n${result.address}\n\n${result.message}`,
-                buttons: [{type: 'ok', text: 'OK'}]
-            });
-        }
-        
-        async function createWithdrawal(amount, address) {
-            const user = Telegram.WebApp.initDataUnsafe.user;
-            const response = await fetch(`${BACKEND_URL}/withdraw`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    user_id: user.id,
-                    amount: amount,
-                    address: address
-                })
-            });
-            
-            if (!response.ok) {
-                const error = await response.json();
-                tg.showAlert(error.error);
+            if (!user) {
+                tg.showAlert("User not identified");
                 return;
             }
             
-            const result = await response.json();
-            state.balance = result.new_balance;
-            updateBalance();
-            addTransaction('Withdraw', -amount);
-            tg.showAlert("Withdrawal successful!");
+            try {
+                const response = await fetch(`${BACKEND_URL}/deposit`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        user_id: user.id,
+                        amount: amount
+                    })
+                });
+                
+                if (!response.ok) throw new Error('Deposit creation failed');
+                const result = await response.json();
+                
+                tg.showPopup({
+                    title: 'Deposit Instructions',
+                    message: `Send ${amount} USDT to:\n${result.address}\n\n${result.message}`,
+                    buttons: [{type: 'ok', text: 'OK'}]
+                });
+            } catch (error) {
+                console.error('Deposit error:', error);
+                tg.showAlert("Deposit failed: " + error.message);
+            }
+        }
+
+         async function createWithdrawal(amount, address) {
+            const user = Telegram.WebApp.initDataUnsafe.user;
+            if (!user) {
+                tg.showAlert("User not identified");
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/withdraw`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        user_id: user.id,
+                        amount: amount,
+                        address: address
+                    })
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Withdrawal failed');
+                }
+                
+                const result = await response.json();
+                state.balance = result.new_balance;
+                updateBalance();
+                addTransaction('Withdraw', -amount);
+                updateChart();
+                tg.showAlert("Withdrawal successful!");
+            } catch (error) {
+                console.error('Withdrawal error:', error);
+                tg.showAlert("Withdrawal failed: " + error.message);
+            }
         }
                 
         // Функция для форматирования чисел
@@ -1469,7 +1499,7 @@
         });
         
         // Инициализация при загрузке
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             // Очищаем начальные данные
             document.querySelector('#dashboard .section-title + .pack').innerHTML = '';
             document.querySelector('#dashboard .card:last-child').innerHTML = `
@@ -1509,6 +1539,7 @@
                     }
                 };
             }
+            await fetchBalance();
         });
 
 </script>
