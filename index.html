@@ -994,7 +994,7 @@
         tg.expand();
         tg.enableClosingConfirmation();
 
-        const BACKEND_URL = "https://192.168.0.215:5000";
+        const BACKEND_URL = "http://localhost:5000";
 
         async function fetchBalance() {
             const user = Telegram.WebApp.initDataUnsafe.user;
@@ -1540,6 +1540,7 @@
                 };
             }
             await fetchBalance();
+            updateBalance();
         });
 
 </script>
