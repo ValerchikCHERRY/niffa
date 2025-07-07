@@ -993,7 +993,64 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
         tg.enableClosingConfirmation();
+
+        const BACKEND_URL = "https://ВАШ_DOMAIN:5000";
+
+        async function fetchBalance() {
+            const user = Telegram.WebApp.initDataUnsafe.user;
+            if (!user) return;
+            
+            const response = await fetch(`${BACKEND_URL}/balance/${user.id}`);
+            const data = await response.json();
+            state.balance = data.balance;
+            updateBalance();
+        }
         
+        async function createDeposit(amount) {
+            const user = Telegram.WebApp.initDataUnsafe.user;
+            const response = await fetch(`${BACKEND_URL}/deposit`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    user_id: user.id,
+                    amount: amount
+                })
+            });
+            
+            const result = await response.json();
+            
+            tg.showPopup({
+                title: 'Deposit Instructions',
+                message: `Send ${amount} USDT to:\n${result.address}\n\n${result.message}`,
+                buttons: [{type: 'ok', text: 'OK'}]
+            });
+        }
+        
+        async function createWithdrawal(amount, address) {
+            const user = Telegram.WebApp.initDataUnsafe.user;
+            const response = await fetch(`${BACKEND_URL}/withdraw`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    user_id: user.id,
+                    amount: amount,
+                    address: address
+                })
+            });
+            
+            if (!response.ok) {
+                const error = await response.json();
+                tg.showAlert(error.error);
+                return;
+            }
+            
+            const result = await response.json();
+            state.balance = result.new_balance;
+            updateBalance();
+            addTransaction('Withdraw', -amount);
+            tg.showAlert("Withdrawal successful!");
+        }
+                
         // Функция для форматирования чисел
         function formatNumber(num) {
             return num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
@@ -1052,34 +1109,40 @@
         }
 
         // Обработка кнопок пополнения/вывода
-        document.querySelectorAll('.btn-primary, .btn-success').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const isDeposit = this.classList.contains('btn-primary');
-                const action = isDeposit ? 'Replenish' : 'Withdraw';
-                
-                showAmountModal(
-                    `${action} funds`,
-                    `Enter the amount you want to ${action.toLowerCase()}:`,
-                    (amount) => {
-                        if (isDeposit) {
-                            state.balance += amount;
-                            addTransaction('Replenish', amount);
-                        } else {
-                            if (amount > state.balance) {
-                                tg.showAlert("Insufficient funds!");
-                                return;
-                            }
-                            state.balance -= amount;
-                            addTransaction('Withdraw', -amount);
-                        }
-                        
-                        updateBalance();
-                        updateChart();
-                        tg.showAlert(`${action} successful!`);
-                    }
-                );
-            });
+        document.querySelector('.btn-primary').addEventListener('click', async function() {
+            showAmountModal(
+                "Replenish Account", 
+                "Enter deposit amount:", 
+                async (amount) => {
+                    await createDeposit(amount);
+                }
+            );
         });
+        // Для вывода
+        document.querySelector('.btn-success').addEventListener('click', async function() {
+            showWithdrawModal();
+        });
+        
+        // Новая функция для вывода
+        function showWithdrawModal() {
+            tg.showPopup({
+                title: 'Withdraw Funds',
+                message: 'Enter withdrawal details:',
+                buttons: [{
+                    id: 'confirm',
+                    type: 'ok',
+                    text: 'Confirm'
+                }],
+                inputs: [
+                    {type: 'text', placeholder: 'USDT Address'},
+                    {type: 'number', placeholder: 'Amount'}
+                ]
+            }, async (btnId, inputs) => {
+                if (btnId === 'confirm' && inputs[0] && inputs[1]) {
+                    await createWithdrawal(parseFloat(inputs[1]), inputs[0]);
+                }
+            });
+        }       
 
         // Переключение видимости графика
         function toggleChart() {
