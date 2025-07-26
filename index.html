@@ -3,1559 +3,1068 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TradingNew - Инвестиционные сборки</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>CryptoBuilds - Инвестиционные сборки</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Стили для модального окна */
-#amountModal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.7);
-    z-index: 1000;
-    justify-content: center;
-    align-items: center;
-}
-
-#amountInput:focus {
-    outline: none;
-    border-color: #3498db;
-    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.3);
-}
-
-#modalCancel, #modalConfirm {
-    transition: all 0.3s ease;
-    font-weight: 600;
-}
-
-#modalCancel:hover {
-    background-color: #c0392b !important;
-}
-
-#modalConfirm:hover {
-    background-color: #27ae60 !important;
-}
-        @font-face {
-            font-family: 'HONOR Sans Design Demibold DISP';
-            src: url('https://fonts.cdnfonts.com/s/95408/HONORSansDesign-BoldDISP.woff') format('woff');
-            font-weight: 400;
-            font-style: normal;
-            font-display: swap;
-        }
-
-        @font-face {
-            font-family: 'HONOR Sans Design Demibold DISP';
-            src: url('https://fonts.cdnfonts.com/s/95408/HONORSansDesign-DemiBoldDISP.woff') format('woff');
-            font-weight: 400;
-            font-style: normal;
-            font-display: swap;
-        }
-        
-        /* Основные изменения */
-        .pack-metrics {
-            background: var(--dark-gray) !important;
-            color: white;
-        }
-        
-        .chart-toggle {
-            background: var(--dark-gray);
-            color: white;
-        }
-        
-        .card.chart-hidden {
-            padding: 15px 20px;
-            transition: padding 0.3s ease;
-        }
-        
-        /* Общие стили */
         :root {
-            --primary: #2c3e50;
-            --primary-dark: #1a2530;
-            --secondary: #3498db;
-            --success: #2ecc71;
-            --warning: #f39c12;
-            --danger: #e74c3c;
-            --dark: #2c3e50;
-            --light: #ecf0f1;
-            --gray: #95a5a6;
-            --bg: #121212; /* Темный фон страницы */
-            --card-bg: #1e1e1e; /* Темный фон карточек */
-            --dark: #ffffff; /* Белый текст */
-            --gray: #b0b0b0; /* Светло-серый для второстепенного текста */
-            --dark-gray: #2d2d2d; /* Темнее предыдущего */
+            --primary-dark: #0a0e17;
+            --primary: #0f172a;
+            --secondary: #1e293b;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --positive: #10b981;
+            --negative: #ef4444;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-tertiary: #94a3b8;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
         }
         
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-        }
-        
-        html, body {
-            height: 100%;
-            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
-            max-width: 100vw;
-            max-height: 100vh;
-            aspect-ratio: 12/16;
+            background-color: var(--primary-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+        
+        .app-container {
+            max-width: 480px;
             margin: 0 auto;
             position: relative;
-            overflow: auto;
-            background-color: var(--bg);
-            color: var(--dark);
-            line-height: 1.2;
-            display: flex;
-            flex-direction: column;
-            padding-bottom: 0;
-            box-shadow: 0 0 25px rgba(0,0,0,0.1);
-            font-size: 85%;
+            min-height: 100vh;
+            background-color: var(--primary);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
         }
         
-        .container {
-            max-width: 100%;
-            padding: 0;
-            flex: 1;
-            overflow-y: auto;
-        }
-        
-        header {
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            padding: 0 15px;
-            height: 50px;
-            background: #121212;
-            color: white;
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            border-radius: 4px;
-            margin-bottom: 15px;
-        }
-        
-        .logo {
-            font-family: sans-serif;
-            font-weight: 600;
-            font-size: 2.5rem;
-            letter-spacing: 0.1px;
-            color: white;
-            padding: 5px 0;
-            line-height: 1;
-        }
-        
-        .page {
-            display: none;
-            animation: fadeIn 0.5s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .page.active {
-            display: block;
-        }
-        
-        .card {
-            background: var(--card-bg);
-            border-radius: 4px;
-            padding: 25px;
-            margin-bottom: 25px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            position: relative;
-            color: var(--dark);
-        }
-        
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        }
-        
-        .card-title {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            color: var(--dark);
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .card-title i {
-            color: var(--secondary);
-        }
-        
-        .balance-container {
-            background: var(--dark-gray);
-            border-radius: 4px;
-            padding: 20px;
-            margin: 15px 0 25px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .balance-label {
-            position: absolute;
-            top: 10px;
-            left: 0;
-            right: 0;
-            text-align: center;
-            font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.8);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 600;
-        }
-        
-        .balance-row {
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            margin-top: 30px;
-            gap: 10px;
-            padding-left: 100px;
-        }
-        
-        .balance-value {
-            font-family: 'Arial', sans-serif;
-            font-weight: 580;
-            font-size: 2.3rem;
-            color: white;
-            letter-spacing: 0.5px;
-        }
-        
-        .balance-change {
-            font-family: 'Arial', sans-serif;
-            font-weight: 580;
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .balance-change.positive {
-            color: var(--success);
-        }
-        
-        .balance-change.negative {
-            color: var(--danger);
-        }
-        
-        .btn-group {
-            display: flex;
-            gap: 15px;
-            margin: 25px 0;
-        }
-        
-        .btn {
-            flex: 1;
-            padding: 16px;
-            border-radius: 4px;
-            border: none;
-            font-weight: 700;
-            font-size: 1.05rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, var(--secondary), #2980b9);
-        }
-        
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #2980b9, #1c5d8f);
-            box-shadow: 0 6px 15px rgba(41, 128, 185, 0.3);
-        }
-        
-        .btn-success {
-            background: linear-gradient(135deg, var(--success), #27ae60);
-        }
-        
-        .btn-success:hover {
-            background: linear-gradient(135deg, #27ae60, #219653);
-            box-shadow: 0 6px 15px rgba(46, 204, 113, 0.3);
-        }
-        
-        .chart-container {
-            height: 250px;
-            margin: 25px 0;
-            position: relative;
-        }
-        
-        .section-title {
-            font-size: 1.25rem;
-            margin: 30px 0 20px;
-            font-weight: 700;
-            color: var(--dark);
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--secondary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .transaction {
-            display: flex;
-            justify-content: space-between;
-            padding: 15px 0;
-            border-bottom: 1px solid #f0f0f0;
-            transition: background-color 0.2s;
-        }
-        
-        .transaction:hover {
-            background-color: rgba(236, 240, 241, 0.3);
-        }
-        
-        .transaction:last-child {
-            border-bottom: none;
-        }
-        
-        .transaction-info {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-        
-        .transaction-title {
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .transaction-date {
-            font-size: 0.85rem;
-            color: var(--gray);
-        }
-        
-        .transaction-amount {
-            font-weight: 700;
-            font-size: 1.1rem;
-        }
-        
-        .pack {
-            background: transparent;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 25px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e0e6ed;
-            transition: transform 0.3s ease;
-        }
-        
-        .pack:hover {
-            transform: translateY(-3px);
-        }
-        
-        .pack-metrics {
-            background: var(--dark-gray);
+        /* Header Styles */
+        .header {
+            background-color: var(--primary-dark);
             padding: 16px 20px;
             display: flex;
             justify-content: space-between;
-            font-weight: 700;
-            font-size: 0.95rem;
-            color: white;
-            border-bottom: 1px solid #eee;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(56, 66, 85, 0.5);
         }
         
-        .metric {
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: 1px;
+        }
+        
+        .balance-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .balance-amount {
+            font-size: 18px;
+            font-weight: 600;
+            background: linear-gradient(90deg, var(--accent), #60a5fa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .balance-change {
+            font-size: 14px;
+            font-weight: 500;
+            padding: 2px 8px;
+            border-radius: 12px;
+            background-color: rgba(16, 185, 129, 0.15);
+            color: var(--positive);
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-around;
+            background-color: var(--primary-dark);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 12px 0;
+            border-top: 1px solid rgba(56, 66, 85, 0.5);
+            z-index: 100;
+        }
+        
+        .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 5px;
-        }
-        
-        .metric-value {
-            font-weight: 800;
-            font-size: 1.05rem;
-        }
-        
-        .metric-label {
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.7);
-            font-weight: 600;
-        }
-        
-        .assets-container {
-            height: 100px;
-            display: flex;
-            background: transparent;
-        }
-        
-        .asset {
-            position: relative;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-        
-        .asset:hover {
-            transform: scale(1.05);
-            z-index: 2;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .asset-logo {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            color: white;
-            font-size: 0.9rem;
-            backdrop-filter: blur(2px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .asset-name {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-weight: 700;
-            color: white;
-            font-size: 0.8rem;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-        }
-        
-        .asset-amount {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            font-weight: 800;
-            color: white;
-            font-size: 1rem;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-        }
-        
-        /* Обновленный футер */
-        .footer-nav {
-            display: flex;
-            background: var(--card-bg);
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-            padding: 0;
-            z-index: 100;
-            height: 60px;
-            flex-shrink: 0;
-        }
-        
-        .footer-nav-item {
-            flex: 1;
-            text-align: center;
-            padding: 18px 0;
-            font-weight: 700;
-            font-size: 1rem;
-            color: #95a5a6;
+            gap: 4px;
+            font-size: 12px;
+            color: var(--text-secondary);
             cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
+            transition: var(--transition);
+            padding: 8px 16px;
+            border-radius: 8px;
         }
         
-        .footer-nav-item.active {
-            color: #3498db;
-            background: rgba(52, 152, 219, 0.1);
+        .nav-item.active {
+            color: var(--accent);
+            background-color: rgba(59, 130, 246, 0.1);
         }
         
-        .footer-nav-item.active::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: #3498db;
+        .nav-item i {
+            font-size: 20px;
         }
         
-        .chart-toggle {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: var(--dark-gray);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            z-index: 10;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s;
-        }
-        
-        .chart-toggle:hover {
-            background: #2a2a2a;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-        }
-        
-        .chart-hidden .chart-container {
+        /* Page Content Styles */
+        .page-content {
+            padding: 20px;
             display: none;
         }
         
-        .risk-badge {
-            display: inline-block;
-            padding: 5px 12px;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            font-weight: 700;
+        .page-content.active {
+            display: block;
         }
         
-        .risk-low {
-            background: rgba(46, 204, 113, 0.15);
-            color: var(--success);
-        }
-        
-        .risk-moderate {
-            background: rgba(243, 156, 18, 0.15);
-            color: var(--warning);
-        }
-        
-        .risk-high {
-            background: rgba(231, 76, 60, 0.15);
-            color: var(--danger);
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 50px 20px;
-            color: var(--gray);
-        }
-        
-        .empty-icon {
-            font-size: 3.5rem;
+        .section-title {
+            font-size: 22px;
             margin-bottom: 20px;
-            opacity: 0.3;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
-        .empty-text {
-            font-size: 1.1rem;
-            margin-top: 10px;
+        .section-title i {
+            color: var(--accent);
         }
         
-        .filter-panel {
-            background: var(--card-bg);
-            border-radius: 4px;
-            padding: 25px;
-            margin-bottom: 25px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        /* Portfolio Page */
+        .balance-card {
+            background: linear-gradient(135deg, var(--secondary), #1a2438);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(59, 130, 246, 0.2);
         }
         
-        .filter-grid {
+        .balance-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .balance-title {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+        
+        .actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .btn {
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .btn-primary {
+            background-color: var(--accent);
+            color: white;
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+        }
+        
+        .btn-outline:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+        
+        .chart-placeholder {
+            height: 150px;
+            background-color: rgba(30, 41, 59, 0.5);
+            border-radius: 12px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-tertiary);
+        }
+        
+        .open-builds-title {
+            font-size: 18px;
+            margin: 30px 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .builds-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+        
+        .build-card {
+            background-color: var(--secondary);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: var(--card-shadow);
+            border-left: 4px solid var(--accent);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        
+        .build-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .build-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        
+        .build-name {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .build-status {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-active {
+            background-color: rgba(59, 130, 246, 0.2);
+            color: var(--accent);
+        }
+        
+        .build-details {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
+            gap: 12px;
+            margin-bottom: 16px;
         }
         
-        .filter-group {
-            margin-bottom: 15px;
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .detail-label {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-bottom: 4px;
+        }
+        
+        .detail-value {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .positive-value {
+            color: var(--positive);
+        }
+        
+        .negative-value {
+            color: var(--negative);
+        }
+        
+        .build-assets {
+            display: flex;
+            height: 28px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        
+        .asset {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .asset-1 { background-color: #3b82f6; }
+        .asset-2 { background-color: #8b5cf6; }
+        .asset-3 { background-color: #ec4899; }
+        
+        .build-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 12px;
+        }
+        
+        .history-title {
+            font-size: 18px;
+            margin: 24px 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .history-item {
+            background-color: var(--secondary);
+            border-radius: 12px;
+            padding: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .history-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .history-type {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .history-date {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+        
+        .history-amount {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        /* Marketplace Page */
+        .search-container {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        
+        .search-input {
+            flex: 1;
+            background-color: var(--secondary);
+            border: none;
+            border-radius: 12px;
+            padding: 14px 16px;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+        
+        .search-input::placeholder {
+            color: var(--text-tertiary);
+        }
+        
+        .filter-btn {
+            background-color: var(--secondary);
+            border: none;
+            border-radius: 12px;
+            width: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .filter-btn:hover {
+            background-color: #2d3748;
+        }
+        
+        .filter-container {
+            background-color: var(--secondary);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .filter-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .filter-item {
+            flex: 1;
         }
         
         .filter-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--dark);
-            font-size: 0.95rem;
-        }
-        
-        .filter-input {
-            width: 100%;
-            padding: 14px;
-            border-radius: 4px;
-            border: 1px solid #444;
-            font-size: 1rem;
-            background: var(--card-bg);
-            color: var(--dark);
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-bottom: 6px;
         }
         
         .filter-select {
             width: 100%;
-            padding: 14px;
-            border-radius: 4px;
-            border: 1px solid #444;
-            font-size: 1rem;
-            background: var(--card-bg);
-            appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 14px center;
-            background-size: 18px;
-            color: var(--dark);
+            background-color: var(--primary);
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 10px;
+            color: var(--text-primary);
+            font-size: 14px;
         }
         
+        .recommended-title {
+            font-size: 18px;
+            margin: 16px 0;
+        }
         
-        .apply-btn {
-            width: 100%;
+        /* Settings Page */
+        .settings-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .settings-item {
+            background-color: var(--secondary);
+            border-radius: 16px;
             padding: 16px;
-            background: linear-gradient(135deg, var(--secondary), #2980b9);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-weight: 700;
-            font-size: 1.05rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             cursor: pointer;
-            margin-top: 10px;
-            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
-            transition: all 0.3s ease;
+            transition: var(--transition);
         }
         
-        .apply-btn:hover {
-            background: linear-gradient(135deg, #2980b9, #1c5d8f);
-            box-shadow: 0 6px 15px rgba(41, 128, 185, 0.4);
+        .settings-item:hover {
+            background-color: #2d3748;
         }
         
-        .search-container {
-            position: relative;
-            margin-bottom: 25px;
+        .settings-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
         
-        .search-input {
-            width: 100%;
-            padding: 16px 20px 16px 50px;
-            border-radius: 4px;
-            border: 1px solid #444;
-            font-size: 1rem;
-            background: var(--card-bg);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-            color: var(--dark);
-        }
-        
-        .search-icon {
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray);
-            font-size: 1.2rem;
-        }
-        
-        /* Новые стили для кнопки Open Order */
-        .pack-footer {
-            padding: 15px;
-            background: var(--dark-gray);
-            text-align: center;
-        }
-        
-        .btn-order {
-            background: linear-gradient(135deg, #9b59b6, #8e44ad);
-            color: white;
-            border: none;
-            width: 100%;
-            padding: 12px;
-            border-radius: 4px;
-            font-weight: 700;
-            font-size: 1.05rem;
-            cursor: pointer;
+        .settings-icon {
+            width: 36px;
+            height: 36px;
+            background-color: var(--primary);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            transition: all 0.3s ease;
+            color: var(--accent);
         }
         
-        .btn-order:hover {
-            background: linear-gradient(135deg, #8e44ad, #732d91);
-            box-shadow: 0 4px 15px rgba(142, 68, 173, 0.4);
+        .settings-title {
+            font-weight: 500;
+            font-size: 16px;
         }
         
-        .btn-disabled {
-            background: linear-gradient(135deg, #bdc3c7, #95a5a6) !important;
-            opacity: 0.9;
-            cursor: not-allowed;
+        .settings-arrow {
+            color: var(--text-tertiary);
         }
         
-        /* Адаптивность */
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(10, 14, 23, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+        
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background-color: var(--primary);
+            width: 90%;
+            max-width: 400px;
+            border-radius: 20px;
+            padding: 24px;
+            position: relative;
+            transform: translateY(20px);
+            transition: var(--transition);
+        }
+        
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-tertiary);
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        /* Responsive */
         @media (max-width: 480px) {
-            .metric-value {
-                font-size: 0.9rem;
+            .app-container {
+                max-width: 100%;
             }
             
-            .metric-label {
-                font-size: 0.7rem;
-            }
-            
-            .balance-value {
-                font-size: 1.8rem;
-            }
-            
-            .btn {
-                font-size: 0.95rem;
-            }
-            
-            .filter-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .logo {
-                font-size: 2.8rem;
-            }
-            
-            .footer-nav-item {
-                padding: 15px 0;
-                font-size: 0.9rem;
+            .filter-row {
+                flex-direction: column;
+                gap: 16px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="logo">TradingNew</div>
-        </header>
-        
-        
-        <!-- Страница 1: Дашборд -->
-        <div id="dashboard" class="page active">
+    <div class="app-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">CryptoBuilds</div>
             <div class="balance-container">
-                <div class="balance-label">DEPOSIT VALUE</div>
-                <div class="balance-row">
-                    <div class="balance-value">0 $</div>
-                    <div class="balance-change positive">
-                        <i class="fas fa-arrow-up"></i> 0
-                    </div>
-                </div>
+                <div class="balance-amount">$1,245.80</div>
+                <div class="balance-change">+2.3%</div>
             </div>
-            
-            <div class="btn-group">
-                <button class="btn btn-primary">
-                    <i class="fas fa-plus-circle"></i> Replenish
-                </button>
-                <button class="btn btn-success">
-                    <i class="fas fa-wallet"></i> Withdraw
-                </button>
-            </div>
-            
-            <div class="card">
-                <div class="card-title">
-                    <i class="fas fa-chart-line"></i> Balance changes
-                </div>
-                <div class="chart-toggle" onclick="toggleChart()">
-                    <i class="fas fa-eye-slash"></i> Hide the graph
-                </div>
-                <div class="chart-container">
-                    <canvas id="balanceChart"></canvas>
-                </div>
-            </div>
-            
-            <div class="section-title">
-                <i class="fas fa-folder-open"></i> Current orders
-            </div>
-            
-            <!-- Активные ордеры будут добавляться сюда автоматически -->
-            <div class="pack"></div>
-            
-            <div class="section-title">
-                <i class="fas fa-history"></i> Recent transactions
-            </div>
-            
-            <!-- Транзакции будут добавляться сюда автоматически -->
-            <div class="card"></div>
         </div>
         
-        <!-- Страница 2: Сборки -->
-        <div id="packs" class="page">
-            <div class="search-container">
-                <div class="search-icon">
-                    <i class="fas fa-search"></i>
+        <!-- Page Content -->
+        <div id="portfolio-page" class="page-content active">
+            <h2 class="section-title"><i class="fas fa-chart-line"></i> Портфель</h2>
+            
+            <div class="balance-card">
+                <div class="balance-header">
+                    <div class="balance-title">Общий баланс</div>
+                    <div class="actions">
+                        <button class="btn btn-primary"><i class="fas fa-plus"></i> Пополнить</button>
+                        <button class="btn btn-outline"><i class="fas fa-arrow-right"></i> Вывести</button>
+                    </div>
                 </div>
-                <input type="text" class="search-input" placeholder="Search orders...">
+                
+                <div class="chart-placeholder">
+                    <i class="fas fa-chart-line"></i> График баланса
+                </div>
             </div>
             
-            <div class="filter-panel">
-                <div class="filter-grid">
-                    <div class="filter-group">
-                        <label class="filter-label">Expected profit (EP)</label>
-                        <input type="text" class="filter-input" placeholder="e.g. +$155">
+            <h3 class="open-builds-title"><i class="fas fa-folder-open"></i> Открытые сборки</h3>
+            
+            <div class="builds-list">
+                <div class="build-card">
+                    <div class="build-header">
+                        <div class="build-name">Крипто-индекс</div>
+                        <div class="build-status status-active">Активна</div>
                     </div>
-                    
-                    <div class="filter-group">
-                        <label class="filter-label">Expected expiration time (EET)</label>
-                        <input type="text" class="filter-input" placeholder="e.g. 2H 36MIN">
+                    <div class="build-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Срок</div>
+                            <div class="detail-value">4 часа</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Цель</div>
+                            <div class="detail-value positive-value">+2.8%</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Риск</div>
+                            <div class="detail-value">Средний</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Инвестиция</div>
+                            <div class="detail-value">$350.00</div>
+                        </div>
                     </div>
-                    
-                    <!-- Замена Risk Reward на Bet size -->
-                    <div class="filter-group">
-                        <label class="filter-label">Bet size</label>
-                        <input type="text" class="filter-input" placeholder="e.g. $500">
+                    <div class="build-assets">
+                        <div class="asset asset-1" style="width: 50%">BTC 50%</div>
+                        <div class="asset asset-2" style="width: 30%">ETH 30%</div>
+                        <div class="asset asset-3" style="width: 20%">SOL 20%</div>
                     </div>
-                    
-                    <div class="filter-group">
-                        <label class="filter-label">Risk level (RL)</label>
+                    <div class="build-actions">
+                        <button class="btn btn-outline close-btn">Закрыть</button>
+                    </div>
+                </div>
+                
+                <div class="build-card">
+                    <div class="build-header">
+                        <div class="build-name">Дефи-комбо</div>
+                        <div class="build-status status-active">Активна</div>
+                    </div>
+                    <div class="build-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Срок</div>
+                            <div class="detail-value">8 часов</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Цель</div>
+                            <div class="detail-value positive-value">+4.2%</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Риск</div>
+                            <div class="detail-value">Высокий</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Инвестиция</div>
+                            <div class="detail-value">$210.00</div>
+                        </div>
+                    </div>
+                    <div class="build-assets">
+                        <div class="asset asset-1" style="width: 40%">UNI 40%</div>
+                        <div class="asset asset-2" style="width: 35%">AAVE 35%</div>
+                        <div class="asset asset-3" style="width: 25%">MKR 25%</div>
+                    </div>
+                    <div class="build-actions">
+                        <button class="btn btn-outline close-btn">Закрыть</button>
+                    </div>
+                </div>
+            </div>
+            
+            <h3 class="history-title"><i class="fas fa-history"></i> История операций</h3>
+            
+            <div class="history-list">
+                <div class="history-item">
+                    <div class="history-info">
+                        <div class="history-type">Пополнение</div>
+                        <div class="history-date">Сегодня, 14:30</div>
+                    </div>
+                    <div class="history-amount positive-value">+$500.00</div>
+                </div>
+                
+                <div class="history-item">
+                    <div class="history-info">
+                        <div class="history-type">Инвестиция</div>
+                        <div class="history-date">Сегодня, 14:45</div>
+                    </div>
+                    <div class="history-amount negative-value">-$350.00</div>
+                </div>
+                
+                <div class="history-item">
+                    <div class="history-info">
+                        <div class="history-type">Инвестиция</div>
+                        <div class="history-date">Сегодня, 15:20</div>
+                    </div>
+                    <div class="history-amount negative-value">-$210.00</div>
+                </div>
+                
+                <div class="history-item">
+                    <div class="history-info">
+                        <div class="history-type">Доход</div>
+                        <div class="history-date">Вчера, 18:40</div>
+                    </div>
+                    <div class="history-amount positive-value">+$86.50</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="marketplace-page" class="page-content">
+            <h2 class="section-title"><i class="fas fa-store"></i> Маркетплейс</h2>
+            
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Поиск сборок...">
+                <button class="filter-btn"><i class="fas fa-sliders-h"></i></button>
+            </div>
+            
+            <div class="filter-container">
+                <div class="filter-row">
+                    <div class="filter-item">
+                        <div class="filter-label">Ожидаемая прибыль</div>
                         <select class="filter-select">
-                            <option value="">Any</option>
-                            <option value="low">Low</option>
-                            <option value="moderate">Moderate</option>
-                            <option value="high">High</option>
+                            <option>Любая</option>
+                            <option>+10% и выше</option>
+                            <option>+20% и выше</option>
+                            <option>+30% и выше</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <div class="filter-label">Срок закрытия</div>
+                        <select class="filter-select">
+                            <option>Любой</option>
+                            <option>До 1 часа</option>
+                            <option>До 4 часов</option>
+                            <option>До 12 часов</option>
                         </select>
                     </div>
                 </div>
                 
-                <button class="apply-btn">
-                    <i class="fas fa-filter"></i> Apply filters
-                </button>
-            </div>
-            
-            <div class="section-title">
-                <i class="fas fa-star"></i> Recommended orders
-            </div>
-            
-            <div class="pack" data-pack-id="pack1">
-                <div class="pack-metrics">
-                    <div class="metric">
-                        <span class="metric-value">+$155</span>
-                        <span class="metric-label">EV</span>
+                <div class="filter-row">
+                    <div class="filter-item">
+                        <div class="filter-label">Уровень риска</div>
+                        <select class="filter-select">
+                            <option>Любой</option>
+                            <option>Низкий</option>
+                            <option>Средний</option>
+                            <option>Высокий</option>
+                        </select>
                     </div>
-                    <div class="metric">
-                        <span class="metric-value">2H 36M</span>
-                        <span class="metric-label">EET</span>
+                    <div class="filter-item">
+                        <div class="filter-label">Размер вложений</div>
+                        <select class="filter-select">
+                            <option>Любой</option>
+                            <option>До $100</option>
+                            <option>$100 - $500</option>
+                            <option>$500+</option>
+                        </select>
                     </div>
-                    <div class="metric">
-                        <span class="metric-value">2.34</span>
-                        <span class="metric-label">RR</span>
-                    </div>
-                    <div class="metric">
-                        <span class="metric-value risk-badge risk-moderate">MODERATE</span>
-                        <span class="metric-label">RL</span>
-                    </div>
-                </div>
-                <div class="assets-container">
-                    <div class="asset" style="width: 30%; background: linear-gradient(135deg, #f7931a, #ac6e04);">
-                        <div class="asset-logo">B</div>
-                        <div class="asset-name">BTC</div>
-                        <div class="asset-amount">$1,500</div>
-                    </div>
-                    <div class="asset" style="width: 50%; background: linear-gradient(135deg, #627eea, #3a56c0);">
-                        <div class="asset-logo">E</div>
-                        <div class="asset-name">ETH</div>
-                        <div class="asset-amount">$900</div>
-                    </div>
-                    <div class="asset" style="width: 20%; background: linear-gradient(135deg, #e31937, #a0122a);">
-                        <div class="asset-logo">T</div>
-                        <div class="asset-name">TSLA</div>
-                        <div class="asset-amount">$600</div>
-                    </div>
-                </div>
-                <!-- НОВЫЙ БЛОК - КНОПКА ОТКРЫТИЯ -->
-                <div class="pack-footer">
-                    <button class="btn btn-order" data-pack-id="pack1" data-bet-size="100">
-                        <i class="fas fa-play-circle"></i> Open Order ($100)
-                    </button>
                 </div>
             </div>
             
-            <div class="pack" data-pack-id="pack2">
-                <div class="pack-metrics">
-                    <div class="metric">
-                        <span class="metric-value">+$320</span>
-                        <span class="metric-label">EV</span>
+            <h3 class="recommended-title">Рекомендованные сборки</h3>
+            
+            <div class="builds-list">
+                <div class="build-card">
+                    <div class="build-header">
+                        <div class="build-name">Биткоин-профит</div>
+                        <div class="build-status status-active">Доступна</div>
                     </div>
-                    <div class="metric">
-                        <span class="metric-value">8H 15M</span>
-                        <span class="metric-label">EET</span>
+                    <div class="build-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Срок</div>
+                            <div class="detail-value">3 часа</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Цель</div>
+                            <div class="detail-value positive-value">+3.5%</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Риск</div>
+                            <div class="detail-value">Низкий</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Инвестиция</div>
+                            <div class="detail-value">от $100</div>
+                        </div>
                     </div>
-                    <div class="metric">
-                        <span class="metric-value">3.15</span>
-                        <span class="metric-label">RR</span>
+                    <div class="build-assets">
+                        <div class="asset asset-1" style="width: 70%">BTC 70%</div>
+                        <div class="asset asset-2" style="width: 20%">ETH 20%</div>
+                        <div class="asset asset-3" style="width: 10%">BNB 10%</div>
                     </div>
-                    <div class="metric">
-                        <span class="metric-value risk-badge risk-high">HIGH</span>
-                        <span class="metric-label">RL</span>
-                    </div>
-                </div>
-                <div class="assets-container">
-                    <div class="asset" style="width: 40%; background: linear-gradient(135deg, #f7931a, #ac6e04);">
-                        <div class="asset-logo">B</div>
-                        <div class="asset-name">BTC</div>
-                        <div class="asset-amount">$2,000</div>
-                    </div>
-                    <div class="asset" style="width: 30%; background: linear-gradient(135deg, #627eea, #3a56c0);">
-                        <div class="asset-logo">E</div>
-                        <div class="asset-name">ETH</div>
-                        <div class="asset-amount">$1,500</div>
-                    </div>
-                    <div class="asset" style="width: 20%; background: linear-gradient(135deg, #00aaff, #0066cc);">
-                        <div class="asset-logo">A</div>
-                        <div class="asset-name">AAPL</div>
-                        <div class="asset-amount">$1,000</div>
-                    </div>
-                    <div class="asset" style="width: 10%; background: linear-gradient(135deg, #7b68ee, #5d4ac9);">
-                        <div class="asset-logo">S</div>
-                        <div class="asset-name">SOL</div>
-                        <div class="asset-amount">$500</div>
+                    <div class="build-actions">
+                        <button class="btn btn-primary invest-btn">Инвестировать</button>
                     </div>
                 </div>
-                <!-- НОВЫЙ БЛОК - КНОПКА ОТКРЫТИЯ -->
-                <div class="pack-footer">
-                    <button class="btn btn-order" data-pack-id="pack2" data-bet-size="100">
-                        <i class="fas fa-play-circle"></i> Open Order ($100)
-                    </button>
+                
+                <div class="build-card">
+                    <div class="build-header">
+                        <div class="build-name">Эфириум-буст</div>
+                        <div class="build-status status-active">Доступна</div>
+                    </div>
+                    <div class="build-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Срок</div>
+                            <div class="detail-value">6 часов</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Цель</div>
+                            <div class="detail-value positive-value">+4.8%</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Риск</div>
+                            <div class="detail-value">Средний</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Инвестиция</div>
+                            <div class="detail-value">от $50</div>
+                        </div>
+                    </div>
+                    <div class="build-assets">
+                        <div class="asset asset-1" style="width: 60%">ETH 60%</div>
+                        <div class="asset asset-2" style="width: 25%">MATIC 25%</div>
+                        <div class="asset asset-3" style="width: 15%">LDO 15%</div>
+                    </div>
+                    <div class="build-actions">
+                        <button class="btn btn-primary invest-btn">Инвестировать</button>
+                    </div>
+                </div>
+                
+                <div class="build-card">
+                    <div class="build-header">
+                        <div class="build-name">Альткоин-раннеры</div>
+                        <div class="build-status status-active">Доступна</div>
+                    </div>
+                    <div class="build-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Срок</div>
+                            <div class="detail-value">2 часа</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Цель</div>
+                            <div class="detail-value positive-value">+5.2%</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Риск</div>
+                            <div class="detail-value">Высокий</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Инвестиция</div>
+                            <div class="detail-value">от $150</div>
+                        </div>
+                    </div>
+                    <div class="build-assets">
+                        <div class="asset asset-1" style="width: 40%">SOL 40%</div>
+                        <div class="asset asset-2" style="width: 35%">ADA 35%</div>
+                        <div class="asset asset-3" style="width: 25%">DOT 25%</div>
+                    </div>
+                    <div class="build-actions">
+                        <button class="btn btn-primary invest-btn">Инвестировать</button>
+                    </div>
                 </div>
             </div>
+        </div>
+        
+        <div id="settings-page" class="page-content">
+            <h2 class="section-title"><i class="fas fa-cog"></i> Настройки</h2>
             
-            <div class="pack" data-pack-id="pack3">
-                <div class="pack-metrics">
-                    <div class="metric">
-                        <span class="metric-value">+$98</span>
-                        <span class="metric-label">EV</span>
+            <div class="settings-list">
+                <div class="settings-item">
+                    <div class="settings-info">
+                        <div class="settings-icon"><i class="fas fa-user"></i></div>
+                        <div class="settings-title">Профиль</div>
                     </div>
-                    <div class="metric">
-                        <span class="metric-value">24H 00M</span>
-                        <span class="metric-label">EET</span>
-                    </div>
-                    <div class="metric">
-                        <span class="metric-value">1.75</span>
-                        <span class="metric-label">RR</span>
-                    </div>
-                    <div class="metric">
-                        <span class="metric-value risk-badge risk-low">LOW</span>
-                        <span class="metric-label">RL</span>
-                    </div>
+                    <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
                 </div>
-                <div class="assets-container">
-                    <div class="asset" style="width: 20%; background: linear-gradient(135deg, #f7931a, #ac6e04);">
-                        <div class="asset-logo">B</div>
-                        <div class="asset-name">BTC</div>
-                        <div class="asset-amount">$800</div>
+                
+                <div class="settings-item">
+                    <div class="settings-info">
+                        <div class="settings-icon"><i class="fas fa-shield-alt"></i></div>
+                        <div class="settings-title">Безопасность</div>
                     </div>
-                    <div class="asset" style="width: 30%; background: linear-gradient(135deg, #ffd700, #daa520);">
-                        <div class="asset-logo">G</div>
-                        <div class="asset-name">GOLD</div>
-                        <div class="asset-amount">$1,200</div>
-                    </div>
-                    <div class="asset" style="width: 25%; background: linear-gradient(135deg, #00cc66, #00994d);">
-                        <div class="asset-logo">M</div>
-                        <div class="asset-name">MSFT</div>
-                        <div class="asset-amount">$1,000</div>
-                    </div>
-                    <div class="asset" style="width: 25%; background: linear-gradient(135deg, #555555, #333333);">
-                        <div class="asset-logo">U</div>
-                        <div class="asset-name">US BOND</div>
-                        <div class="asset-amount">$1,000</div>
-                    </div>
+                    <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
                 </div>
-                <!-- НОВЫЙ БЛОК - КНОПКА ОТКРЫТИЯ -->
-                <div class="pack-footer">
-                    <button class="btn btn-order" data-pack-id="pack3" data-bet-size="100">
-                        <i class="fas fa-play-circle"></i> Open Order ($100)
-                    </button>
+                
+                <div class="settings-item">
+                    <div class="settings-info">
+                        <div class="settings-icon"><i class="fas fa-globe"></i></div>
+                        <div class="settings-title">Язык</div>
+                    </div>
+                    <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
+                </div>
+                
+                <div class="settings-item">
+                    <div class="settings-info">
+                        <div class="settings-icon"><i class="fas fa-mobile-alt"></i></div>
+                        <div class="settings-title">Устройства</div>
+                    </div>
+                    <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
+                </div>
+                
+                <div class="settings-item">
+                    <div class="settings-info">
+                        <div class="settings-icon"><i class="fas fa-bell"></i></div>
+                        <div class="settings-title">Уведомления</div>
+                    </div>
+                    <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
+                </div>
+                
+                <div class="settings-item">
+                    <div class="settings-info">
+                        <div class="settings-icon"><i class="fas fa-info-circle"></i></div>
+                        <div class="settings-title">О нас</div>
+                    </div>
+                    <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
+                </div>
+                
+                <div class="settings-item">
+                    <div class="settings-info">
+                        <div class="settings-icon"><i class="fas fa-question-circle"></i></div>
+                        <div class="settings-title">FAQ</div>
+                    </div>
+                    <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
+                </div>
+                
+                <div class="settings-item">
+                    <div class="settings-info">
+                        <div class="settings-icon"><i class="fas fa-file-alt"></i></div>
+                        <div class="settings-title">Условия использования</div>
+                    </div>
+                    <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
+                </div>
+                
+                <div class="settings-item">
+                    <div class="settings-info">
+                        <div class="settings-icon"><i class="fas fa-headset"></i></div>
+                        <div class="settings-title">Обратная связь</div>
+                    </div>
+                    <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Navigation -->
+        <div class="nav-container">
+            <div class="nav-item active" data-page="portfolio-page">
+                <i class="fas fa-chart-line"></i>
+                <span>Портфель</span>
+            </div>
+            <div class="nav-item" data-page="marketplace-page">
+                <i class="fas fa-store"></i>
+                <span>Маркетплейс</span>
+            </div>
+            <div class="nav-item" data-page="settings-page">
+                <i class="fas fa-cog"></i>
+                <span>Настройки</span>
+            </div>
+        </div>
+        
+        <!-- Modals -->
+        <div class="modal" id="invest-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">Инвестировать в сборку</div>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>Вы собираетесь инвестировать в сборку:</p>
+                    <p class="build-name-modal" style="font-weight: 600; margin: 10px 0;">Биткоин-профит</p>
+                    <div style="margin: 20px 0;">
+                        <label style="display: block; margin-bottom: 8px;">Сумма инвестиции (USDT):</label>
+                        <input type="number" class="search-input" value="100" style="width: 100%;">
+                    </div>
+                    <button class="btn btn-primary" style="width: 100%;">Подтвердить инвестицию</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal" id="close-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">Закрыть сборку</div>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>Вы уверены, что хотите закрыть сборку?</p>
+                    <p class="build-name-modal" style="font-weight: 600; margin: 10px 0;">Крипто-индекс</p>
+                    <div style="margin: 20px 0; padding: 15px; background-color: var(--secondary); border-radius: 12px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span>Текущая прибыль:</span>
+                            <span class="positive-value">+$12.50</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Сумма к возврату:</span>
+                            <span>$362.50</span>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-outline" style="flex: 1;">Отмена</button>
+                        <button class="btn btn-primary" style="flex: 1;">Закрыть</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     
-    <!-- Обновленный футер -->
-    <div class="footer-nav">
-        <div class="footer-nav-item active" data-page="dashboard">
-            Portfolio
-        </div>
-        <div class="footer-nav-item" data-page="packs">
-            Orders
-        </div>
-    </div>
-
     <script>
-        // Инициализация состояния приложения
-        const state = {
-            balance: 0,
-            transactions: [],
-            chartData: [0],
-            chartLabels: ['Start'],
-            betSize: null,
-            openOrders: []
-        };
-
-        // Инициализация Telegram WebApp
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.enableClosingConfirmation();
-
-        const BACKEND_URL = "http://localhost:5000";
-
-        async function fetchBalance() {
-            const user = Telegram.WebApp.initDataUnsafe.user;
-            if (!user) {
-                tg.showAlert("User not identified");
-                return;
-            }
-            
-            try {
-                const response = await fetch(`${BACKEND_URL}/balance/${user.id}`);
-                if (!response.ok) throw new Error('Balance fetch failed');
-                const data = await response.json();
-                state.balance = data.balance;
-                updateBalance();
-            } catch (error) {
-                console.error('Balance fetch error:', error);
-                tg.showAlert("Failed to load balance");
-            }
-        }
-        
-        async function createDeposit(amount) {
-            const user = Telegram.WebApp.initDataUnsafe.user;
-            if (!user) {
-                tg.showAlert("User not identified");
-                return;
-            }
-            
-            try {
-                const response = await fetch(`${BACKEND_URL}/deposit`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        user_id: user.id,
-                        amount: amount
-                    })
-                });
-                
-                if (!response.ok) throw new Error('Deposit creation failed');
-                const result = await response.json();
-                
-                tg.showPopup({
-                    title: 'Deposit Instructions',
-                    message: `Send ${amount} USDT to:\n${result.address}\n\n${result.message}`,
-                    buttons: [{type: 'ok', text: 'OK'}]
-                });
-            } catch (error) {
-                console.error('Deposit error:', error);
-                tg.showAlert("Deposit failed: " + error.message);
-            }
-        }
-
-         async function createWithdrawal(amount, address) {
-            const user = Telegram.WebApp.initDataUnsafe.user;
-            if (!user) {
-                tg.showAlert("User not identified");
-                return;
-            }
-            
-            try {
-                const response = await fetch(`${BACKEND_URL}/withdraw`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        user_id: user.id,
-                        amount: amount,
-                        address: address
-                    })
-                });
-                
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error || 'Withdrawal failed');
-                }
-                
-                const result = await response.json();
-                state.balance = result.new_balance;
-                updateBalance();
-                addTransaction('Withdraw', -amount);
-                updateChart();
-                tg.showAlert("Withdrawal successful!");
-            } catch (error) {
-                console.error('Withdrawal error:', error);
-                tg.showAlert("Withdrawal failed: " + error.message);
-            }
-        }
-                
-        // Функция для форматирования чисел
-        function formatNumber(num) {
-            return num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-        }
-        
-        // Обновление баланса
-        function updateBalance() {
-            document.querySelector('.balance-value').textContent = formatNumber(state.balance) + " $";
-            
-            // Обновляем изменение (пока всегда 0)
-            const changeElement = document.querySelector('.balance-change');
-            changeElement.innerHTML = `<i class="fas fa-arrow-up"></i> 0`;
-            changeElement.className = 'balance-change positive';
-        }
-            // Функция для показа модального окна
-        function showAmountModal(title, message, callback) {
-            const modal = document.getElementById('amountModal');
-            const modalTitle = document.getElementById('modalTitle');
-            const modalMessage = document.getElementById('modalMessage');
-            const amountInput = document.getElementById('amountInput');
-            const modalCancel = document.getElementById('modalCancel');
-            const modalConfirm = document.getElementById('modalConfirm');
-
-            // Устанавливаем заголовок и сообщение
-            modalTitle.textContent = title;
-            modalMessage.textContent = message;
-            
-            // Очищаем поле ввода
-            amountInput.value = '';
-            
-            // Показываем модальное окно
-            modal.style.display = 'flex';
-            
-            // Временные обработчики
-            const confirmHandler = function() {
-                const amount = parseFloat(amountInput.value);
-                if (isNaN(amount)) {
-                    tg.showAlert("Please enter a valid amount!");
-                    return;
-                }
-                if (amount <= 0) {
-                    tg.showAlert("Amount must be greater than zero!");
-                    return;
-                }
-                modal.style.display = 'none';
-                callback(amount);
-            };
-            
-            const cancelHandler = function() {
-                modal.style.display = 'none';
-            };
-            
-            // Назначаем обработчики
-            modalConfirm.onclick = confirmHandler;
-            modalCancel.onclick = cancelHandler;
-        }
-
-        // Обработка кнопок пополнения/вывода
-        document.querySelector('.btn-primary').addEventListener('click', async function() {
-            showAmountModal(
-                "Replenish Account", 
-                "Enter deposit amount:", 
-                async (amount) => {
-                    await createDeposit(amount);
-                }
-            );
-        });
-        // Для вывода
-        document.querySelector('.btn-success').addEventListener('click', async function() {
-            showWithdrawModal();
-        });
-        
-        // Новая функция для вывода
-        function showWithdrawModal() {
-            tg.showPopup({
-                title: 'Withdraw Funds',
-                message: 'Enter withdrawal details:',
-                buttons: [{
-                    id: 'confirm',
-                    type: 'ok',
-                    text: 'Confirm'
-                }],
-                inputs: [
-                    {type: 'text', placeholder: 'USDT Address'},
-                    {type: 'number', placeholder: 'Amount'}
-                ]
-            }, async (btnId, inputs) => {
-                if (btnId === 'confirm' && inputs[0] && inputs[1]) {
-                    await createWithdrawal(parseFloat(inputs[1]), inputs[0]);
-                }
-            });
-        }       
-
-        // Переключение видимости графика
-        function toggleChart() {
-            const chartCard = document.querySelector('.card');
-            chartCard.classList.toggle('chart-hidden');
-            
-            const toggleBtn = document.querySelector('.chart-toggle');
-            if (chartCard.classList.contains('chart-hidden')) {
-                toggleBtn.innerHTML = '<i class="fas fa-eye"></i> Show graph';
-            } else {
-                toggleBtn.innerHTML = '<i class="fas fa-eye-slash"></i> Hide graph';
-            }
-        }
-
-        // Инициализация графика
-        let balanceChart;
-        function initChart() {
-            const ctx = document.getElementById('balanceChart').getContext('2d');
-            balanceChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: state.chartLabels,
-                    datasets: [{
-                        label: 'Balance',
-                        data: state.chartData,
-                        borderColor: '#3498db',
-                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                        fill: true,
-                        tension: 0.4,
-                        pointBackgroundColor: '#3498db',
-                        pointRadius: 4,
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
-                            },
-                            ticks: {
-                                color: '#b0b0b0',
-                                callback: function(value) {
-                                    return '$' + formatNumber(value);
-                                }
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            },
-                            ticks: {
-                                color: '#b0b0b0'
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return 'Balance: $' + formatNumber(context.parsed.y);
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-        
-        // Обновление графика
-        function updateChart() {
-            // Добавляем новую точку
-            state.chartLabels.push(new Date().toLocaleTimeString());
-            state.chartData.push(state.balance);
-            
-            // Обновляем график
-            if (balanceChart) {
-                balanceChart.update();
-            }
-        }
-        
-        // Добавление транзакции
-        function addTransaction(type, amount) {
-            const transaction = {
-                type: type,
-                amount: amount,
-                date: new Date().toLocaleString('ru-RU', {
-                    day: 'numeric',
-                    month: 'short',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                })
-            };
-            
-            state.transactions.push(transaction);
-            updateTransactionsList();
-        }
-        
-        // Обновление списка транзакций
-        function updateTransactionsList() {
-            const container = document.querySelector('#dashboard .card:last-child');
-            container.innerHTML = `
-                <div class="card-title">
-                    <i class="fas fa-history"></i> Recent transactions
-                </div>
-            `;
-            
-            state.transactions.forEach(trans => {
-                const isPositive = trans.amount >= 0;
-                const transactionEl = document.createElement('div');
-                transactionEl.className = 'transaction';
-                transactionEl.innerHTML = `
-                    <div class="transaction-info">
-                        <div class="transaction-title">
-                            <i class="fas ${isPositive ? 'fa-arrow-down positive' : 'fa-shopping-cart negative'}"></i>
-                            ${trans.type}
-                        </div>
-                        <div class="transaction-date">${trans.date}</div>
-                    </div>
-                    <div class="transaction-amount ${isPositive ? 'positive' : 'negative'}">
-                        ${isPositive ? '+' : '-'}$${formatNumber(Math.abs(trans.amount))}
-                    </div>
-                `;
-                container.appendChild(transactionEl);
-            });
-            
-            // Если транзакций нет
-            if (state.transactions.length === 0) {
-                container.innerHTML += `<div class="empty-state">No transactions yet</div>`;
-            }
-        }
-        
-        // Добавление ордера в портфель
-        function addOrderToPortfolio(packId, betSize) {
-            console.log(`Adding order ${packId} with bet size ${betSize}`);
-            
-            // 1. Находим контейнер для ордеров
-            const ordersContainer = document.querySelector('#dashboard .section-title + .pack');
-            if (!ordersContainer) {
-                console.error("Orders container not found!");
-                return;
-            }
-            
-            // 2. Удаляем сообщение "No active orders" если оно есть
-            if (ordersContainer.querySelector('.empty-state')) {
-                ordersContainer.innerHTML = '';
-            }
-            
-            // 3. Находим исходный пакет
-            const originalPack = document.querySelector(`#packs .pack[data-pack-id="${packId}"]`);
-            if (!originalPack) {
-                console.error(`Pack with id ${packId} not found!`);
-                return;
-            }
-            
-            // 4. Клонируем пакет
-            const newOrder = originalPack.cloneNode(true);
-            
-            // 5. Удаляем кнопку Open Order
-            const btn = newOrder.querySelector('.btn-order');
-            if (btn) btn.remove();
-            
-            // 6. Обновляем суммы в активах
-            newOrder.querySelectorAll('.asset').forEach(asset => {
-                const width = parseFloat(asset.style.width);
-                const amount = (width / 100) * betSize;
-                asset.querySelector('.asset-amount').textContent = `$${formatNumber(amount)}`;
-            });
-            
-            // 7. Добавляем в портфель
-            ordersContainer.appendChild(newOrder);
-            console.log("Order added successfully!");
-        }
-        
-        // Обновление состояния кнопки Open Order
-        function updateOpenButtonState(packId) {
-            const btn = document.querySelector(`.btn-order[data-pack-id="${packId}"]`);
-            if (!btn) return;
-            
-            btn.innerHTML = '<i class="fas fa-check-circle"></i> Opened';
-            btn.classList.remove('btn-order');
-            btn.classList.add('btn-disabled');
-            btn.disabled = true;
-        }
-        
-        // Обновление списка открытых ордеров
-        function updateOpenOrdersList() {
-            const container = document.querySelector('#dashboard .section-title + .pack');
-            container.innerHTML = '';
-            
-            // Если ордеров нет - показываем сообщение
-            if (container.children.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-folder-open empty-icon"></i>
-                        <div class="empty-text">No active orders</div>
-                    </div>
-                `;
-            }
-        }
-        
-        // Фильтрация сборок
-        document.querySelector('.apply-btn').addEventListener('click', function() {
-            const betSizeInput = document.querySelectorAll('.filter-input')[2];
-            const betSize = parseFloat(betSizeInput.value);
-            
-            if (!betSize || isNaN(betSize)) {
-                tg.showAlert("Please enter Bet size!");
-                return;
-            }
-            
-            state.betSize = betSize;
-            updatePacksDisplay();
-        });
-        
-        // Обновление отображения пакетов
-        function updatePacksDisplay() {
-            document.querySelectorAll('#packs .pack').forEach(pack => {
-                pack.style.display = 'block';
-                
-                // Обновляем суммы в активах
-                const assets = pack.querySelectorAll('.asset');
-                assets.forEach(asset => {
-                    const width = parseFloat(asset.style.width);
-                    const amount = (width / 100) * state.betSize;
-                    asset.querySelector('.asset-amount').textContent = `$${formatNumber(amount)}`;
-                });
-                
-                // Обновляем кнопку
-                const btn = pack.querySelector('.btn-order');
-                if (btn) {
-                    btn.innerHTML = `<i class="fas fa-play-circle"></i> Open Order ($${formatNumber(state.betSize)})`;
-                    btn.dataset.betSize = state.betSize;
-                }
-            });
-        }
-        
-        // Переключение страниц
-        document.querySelectorAll('.footer-nav-item').forEach(item => {
+        // Навигация
+        document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', function() {
-                document.querySelectorAll('.footer-nav-item').forEach(i => {
-                    i.classList.remove('active');
+                // Удаляем активный класс у всех элементов
+                document.querySelectorAll('.nav-item').forEach(el => {
+                    el.classList.remove('active');
                 });
+                
+                // Добавляем активный класс текущему элементу
                 this.classList.add('active');
                 
-                document.querySelectorAll('.page').forEach(page => {
+                // Скрываем все страницы
+                document.querySelectorAll('.page-content').forEach(page => {
                     page.classList.remove('active');
                 });
                 
+                // Показываем выбранную страницу
                 const pageId = this.getAttribute('data-page');
                 document.getElementById(pageId).classList.add('active');
             });
         });
         
-        // Обработчик для кнопок Open Order
-        document.querySelectorAll('.btn-order').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const packId = this.dataset.packId;
-                const betSize = parseFloat(this.dataset.betSize);
-                
-                // Проверяем баланс
-                if (state.balance < betSize) {
-                    tg.showAlert("Insufficient funds!");
-                    return;
+        // Кнопки инвестирования
+        document.querySelectorAll('.invest-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const buildCard = this.closest('.build-card');
+                const buildName = buildCard.querySelector('.build-name').textContent;
+                document.querySelector('.build-name-modal').textContent = buildName;
+                document.getElementById('invest-modal').classList.add('active');
+            });
+        });
+        
+        // Кнопки закрытия сборки
+        document.querySelectorAll('.close-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const buildCard = this.closest('.build-card');
+                const buildName = buildCard.querySelector('.build-name').textContent;
+                document.querySelector('#close-modal .build-name-modal').textContent = buildName;
+                document.getElementById('close-modal').classList.add('active');
+            });
+        });
+        
+        // Закрытие модальных окон
+        document.querySelectorAll('.modal-close, .btn-outline').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.modal').forEach(modal => {
+                    modal.classList.remove('active');
+                });
+            });
+        });
+        
+        // Закрытие модалки при клике вне контента
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
                 }
-                
-                // Обновляем кнопку
-                this.innerHTML = '<i class="fas fa-check-circle"></i> Opened';
-                this.classList.remove('btn-order');
-                this.classList.add('btn-disabled');
-                this.disabled = true;
-                
-                // Обновляем состояние
-                state.balance -= betSize;
-                updateBalance();
-                updateChart();
-                
-                addTransaction('Order opened', -betSize);
-                
-                // Добавляем в портфель
-                addOrderToPortfolio(packId, betSize);
-                
-                tg.showAlert(`Order opened successfully!`);
             });
         });
-        
-        // Функция для показа модального окна
-        
-        
-        // Обработка кнопок пополнения/вывода
-        document.querySelectorAll('.btn-primary, .btn-success').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const isDeposit = this.classList.contains('btn-primary');
-                const action = isDeposit ? 'Replenish' : 'Withdraw';
-                
-                showAmountModal(
-                    `${action} funds`,
-                    `Enter the amount you want to ${action.toLowerCase()}:`,
-                    (amount) => {
-                        if (isDeposit) {
-                            state.balance += amount;
-                            addTransaction('Replenish', amount);
-                        } else {
-                            if (amount > state.balance) {
-                                tg.showAlert("Insufficient funds!");
-                                return;
-                            }
-                            state.balance -= amount;
-                            addTransaction('Withdraw', -amount);
-                        }
-                        
-                        updateBalance();
-                        updateChart();
-                        tg.showAlert(`${action} successful!`);
-                    }
-                );
-            });
-        });
-        
-        // Инициализация при загрузке
-        document.addEventListener('DOMContentLoaded', async function() {
-            // Очищаем начальные данные
-            document.querySelector('#dashboard .section-title + .pack').innerHTML = '';
-            document.querySelector('#dashboard .card:last-child').innerHTML = `
-                <div class="card-title">
-                    <i class="fas fa-history"></i> Recent transactions
-                </div>
-            `;
-            
-            // Скрываем пакеты изначально
-            document.querySelectorAll('#packs .pack').forEach(pack => {
-                pack.style.display = 'none';
-            });
-            
-            updateBalance();
-            initChart();
-            updateTransactionsList();
-            updateOpenOrdersList();
-            
-            // Эмуляция Telegram WebApp
-            if (!window.Telegram) {
-                window.Telegram = {
-                    WebApp: {
-                        expand: function() { console.log('App expanded') },
-                        enableClosingConfirmation: function() { console.log('Closing confirmation enabled') },
-                        showPopup: function(options, callback) { 
-                            console.log('Popup shown:', options);
-                            const result = confirm(options.message);
-                            callback(result ? 'confirm' : 'cancel');
-                        },
-                        showAlert: function(message) {
-                            alert(message);
-                        },
-                        MainButton: {
-                            showProgress: function() { console.log('Show progress') },
-                            hideProgress: function() { console.log('Hide progress') }
-                        }
-                    }
-                };
-            }
-            await fetchBalance();
-            updateBalance();
-        });
-
-</script>
-
-<!-- Модальное окно для ввода суммы -->
-<div id="amountModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center;">
-    <div style="background-color: #1e1e1e; padding: 25px; border-radius: 12px; width: 80%; max-width: 400px; box-shadow: 0 5px 25px rgba(0,0,0,0.5);">
-        <h3 id="modalTitle" style="margin-top: 0; margin-bottom: 15px; color: white; font-size: 1.3rem;"></h3>
-        <p id="modalMessage" style="margin-bottom: 20px; color: #b0b0b0; font-size: 1rem;"></p>
-        <input type="number" id="amountInput" placeholder="Amount in USD" style="width: 100%; padding: 15px; margin-bottom: 20px; border-radius: 4px; border: 1px solid #444; background-color: #2d2d2d; color: white; font-size: 1rem;">
-        <div style="display: flex; justify-content: flex-end; gap: 15px;">
-            <button id="modalCancel" style="padding: 12px 20px; border: none; border-radius: 4px; background-color: #e74c3c; color: white; cursor: pointer; font-weight: 600;">Cancel</button>
-            <button id="modalConfirm" style="padding: 12px 20px; border: none; border-radius: 4px; background-color: #2ecc71; color: white; cursor: pointer; font-weight: 600;">Confirm</button>
-        </div>
-    </div>
-</div>
+    </script>
 </body>
 </html>
