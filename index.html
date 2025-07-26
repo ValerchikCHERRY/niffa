@@ -5,19 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CryptoBuilds - Investment Platform</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --primary-dark: #0a192f;
-            --primary: #112240;
-            --primary-light: #233554;
-            --accent: #64ffda;
-            --text-primary: #e6f1ff;
-            --text-secondary: #a8b2d1;
-            --text-tertiary: #8892b0;
-            --success: #00c853;
-            --warning: #ffab00;
-            --danger: #ff1744;
-            --border-radius: 12px;
+            --primary-dark: #0a0e17;
+            --primary: #0f172a;
+            --primary-light: #1e293b;
+            --accent: #2563eb;
+            --accent-light: #3b82f6;
+            --positive: #10b981;
+            --negative: #ef4444;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-tertiary: #94a3b8;
+            --border: #334155;
         }
         
         * {
@@ -30,35 +31,53 @@
         body {
             background-color: var(--primary-dark);
             color: var(--text-primary);
-            min-height: 100vh;
-            padding-bottom: 70px;
+            height: 100vh;
+            overflow: hidden;
             position: relative;
         }
         
         .app-container {
             max-width: 480px;
             margin: 0 auto;
-            padding: 20px 15px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--primary);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
         }
         
         /* Header Styles */
         .header {
+            background-color: var(--primary-light);
+            padding: 15px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 15px 0;
-            margin-bottom: 20px;
-            border-bottom: 1px solid var(--primary-light);
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
         
         .logo {
-            font-size: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
             font-weight: 700;
-            color: var(--accent);
+            font-size: 20px;
+            color: var(--accent-light);
         }
         
-        .logo span {
-            color: var(--text-primary);
+        .logo-icon {
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .user-avatar {
@@ -66,434 +85,401 @@
             height: 40px;
             border-radius: 50%;
             background-color: var(--primary-light);
+            border: 2px solid var(--accent);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
             font-size: 18px;
         }
         
-        /* Navigation */
-        .nav-tabs {
+        /* Navigation Styles */
+        .nav {
             display: flex;
-            justify-content: space-around;
-            background-color: var(--primary);
-            position: fixed;
+            background-color: var(--primary-light);
+            border-top: 1px solid var(--border);
+            position: sticky;
             bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 15px 0;
-            border-top: 1px solid var(--primary-light);
             z-index: 100;
         }
         
-        .nav-tab {
+        .nav-item {
+            flex: 1;
+            padding: 15px 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            font-size: 12px;
-            color: var(--text-tertiary);
+            justify-content: center;
             cursor: pointer;
             transition: all 0.3s ease;
+            color: var(--text-tertiary);
+            font-size: 12px;
+            gap: 5px;
         }
         
-        .nav-tab.active {
-            color: var(--accent);
+        .nav-item.active {
+            color: var(--accent-light);
+            background-color: rgba(37, 99, 235, 0.1);
         }
         
-        .nav-tab i {
-            font-size: 20px;
-            margin-bottom: 5px;
+        .nav-item i {
+            font-size: 18px;
         }
         
-        /* Page Container */
+        /* Page Styles */
         .page {
+            flex: 1;
+            overflow-y: auto;
             display: none;
+            padding: 15px;
+            padding-bottom: 70px;
         }
         
         .page.active {
             display: block;
-            animation: fadeIn 0.5s ease;
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* Balance Card */
-        .balance-card {
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            border-radius: var(--border-radius);
+        .section {
+            background-color: var(--primary-light);
+            border-radius: 16px;
             padding: 20px;
-            margin-bottom: 25px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
         }
         
-        .balance-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
             margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
         
-        .balance-title {
-            font-size: 16px;
-            color: var(--text-secondary);
+        .section-title i {
+            color: var(--accent-light);
+            cursor: pointer;
+        }
+        
+        /* Portfolio Page */
+        .balance-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .balance-display {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
         
         .balance-amount {
             font-size: 32px;
             font-weight: 700;
-            margin-bottom: 5px;
         }
         
         .balance-change {
-            font-size: 14px;
-            color: var(--success);
             display: flex;
             align-items: center;
+            gap: 5px;
+            font-weight: 600;
+            font-size: 14px;
         }
         
-        .balance-change.negative {
-            color: var(--danger);
+        .positive {
+            color: var(--positive);
+        }
+        
+        .negative {
+            color: var(--negative);
         }
         
         .balance-actions {
             display: flex;
             gap: 10px;
-            margin-top: 20px;
         }
         
         .btn {
             flex: 1;
-            padding: 12px;
-            border-radius: var(--border-radius);
-            border: none;
+            padding: 12px 15px;
+            border-radius: 12px;
             font-weight: 600;
+            text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            text-align: center;
+            border: none;
+            color: var(--text-primary);
         }
         
         .btn-primary {
-            background-color: var(--accent);
-            color: var(--primary-dark);
+            background: linear-gradient(90deg, var(--accent), var(--accent-light));
         }
         
-        .btn-outline {
-            background-color: transparent;
-            border: 1px solid var(--accent);
-            color: var(--accent);
+        .btn-secondary {
+            background-color: var(--primary);
+            border: 1px solid var(--border);
         }
         
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        .chart-container {
+            height: 200px;
+            margin: 10px 0;
         }
         
-        /* Portfolio Section */
-        .section-title {
-            font-size: 18px;
-            margin: 25px 0 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .builds-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
         }
         
-        .section-link {
-            color: var(--accent);
+        .build-card {
+            background-color: var(--primary);
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .build-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent-light);
+        }
+        
+        .build-title {
             font-size: 14px;
-            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
-        .chart-placeholder {
-            height: 150px;
-            background-color: var(--primary-light);
-            border-radius: var(--border-radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-tertiary);
-            margin-bottom: 25px;
-        }
-        
-        /* Bundles List */
-        .bundles-list {
+        .build-stats {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 8px;
         }
         
-        .bundle-card {
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+        }
+        
+        .stat-label {
+            color: var(--text-tertiary);
+        }
+        
+        .stat-value {
+            font-weight: 600;
+        }
+        
+        .build-assets {
+            display: flex;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .asset {
+            height: 100%;
+        }
+        
+        /* Marketplace Page */
+        .search-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 14px 45px 14px 15px;
+            border-radius: 12px;
             background-color: var(--primary);
-            border-radius: var(--border-radius);
-            padding: 15px;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+        
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-tertiary);
+        }
+        
+        .filter-container {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 5px 0 15px;
+            margin-bottom: 10px;
+        }
+        
+        .filter-container::-webkit-scrollbar {
+            height: 4px;
+        }
+        
+        .filter-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .filter-container::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 2px;
+        }
+        
+        .filter-pill {
+            padding: 8px 15px;
+            border-radius: 20px;
+            background-color: var(--primary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 14px;
+            white-space: nowrap;
             cursor: pointer;
             transition: all 0.3s ease;
         }
         
-        .bundle-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-        
-        .bundle-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-        
-        .bundle-title {
-            font-weight: 600;
-            font-size: 16px;
-        }
-        
-        .bundle-profit {
-            font-weight: 700;
-            color: var(--success);
-        }
-        
-        .bundle-details {
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 15px;
-        }
-        
-        .bundle-structure {
-            display: flex;
-            height: 30px;
-            border-radius: 6px;
-            overflow: hidden;
-            margin-bottom: 15px;
-        }
-        
-        .asset-block {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 600;
+        .filter-pill.active {
+            background-color: var(--accent);
+            border-color: var(--accent-light);
             color: var(--text-primary);
         }
         
-        .bundle-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .risk-tag {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        
-        .risk-low {
-            background-color: rgba(0, 200, 83, 0.2);
-            color: var(--success);
-        }
-        
-        .risk-medium {
-            background-color: rgba(255, 171, 0, 0.2);
-            color: var(--warning);
-        }
-        
-        .risk-high {
-            background-color: rgba(255, 23, 68, 0.2);
-            color: var(--danger);
-        }
-        
-        .bundle-action {
-            padding: 6px 15px;
-            background-color: var(--accent);
-            color: var(--primary-dark);
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 14px;
-        }
-        
-        /* Transactions */
-        .transactions-list {
+        .builds-list {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-        }
-        
-        .transaction-item {
-            background-color: var(--primary);
-            border-radius: var(--border-radius);
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .transaction-info {
-            display: flex;
-            align-items: center;
             gap: 15px;
         }
         
-        .transaction-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: var(--primary-light);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-        }
-        
-        .transaction-details {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .transaction-title {
-            font-weight: 600;
-            margin-bottom: 3px;
-        }
-        
-        .transaction-date {
-            font-size: 12px;
-            color: var(--text-tertiary);
-        }
-        
-        .transaction-amount {
-            font-weight: 700;
-        }
-        
-        .positive {
-            color: var(--success);
-        }
-        
-        .negative {
-            color: var(--danger);
-        }
-        
-        /* Marketplace */
-        .search-bar {
-            display: flex;
-            margin-bottom: 20px;
-            gap: 10px;
-        }
-        
-        .search-input {
-            flex: 1;
-            padding: 15px;
-            border-radius: var(--border-radius);
-            border: none;
+        .build-item {
             background-color: var(--primary);
-            color: var(--text-primary);
-            font-size: 16px;
-        }
-        
-        .search-btn {
-            width: 50px;
-            border-radius: var(--border-radius);
-            background-color: var(--accent);
-            color: var(--primary-dark);
-            border: none;
-            font-size: 18px;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
             cursor: pointer;
         }
         
-        .filters {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-bottom: 25px;
+        .build-item:hover {
+            border-color: var(--accent-light);
+            transform: translateY(-3px);
         }
         
-        .filter-item {
-            background-color: var(--primary);
-            border-radius: var(--border-radius);
-            padding: 12px;
+        .build-header {
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
         }
         
-        .filter-label {
-            font-size: 12px;
-            color: var(--text-tertiary);
-            margin-bottom: 5px;
-        }
-        
-        .filter-value {
+        .build-name {
+            font-size: 16px;
             font-weight: 600;
         }
         
-        /* Settings */
+        .build-profit {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--positive);
+        }
+        
+        .build-details {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .detail-value {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-top: 5px;
+        }
+        
+        /* Settings Page */
+        .profile-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .profile-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            border: 2px solid var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+        
+        .profile-info {
+            flex: 1;
+        }
+        
+        .profile-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .profile-id {
+            color: var(--text-tertiary);
+            font-size: 14px;
+        }
+        
         .settings-list {
             display: flex;
             flex-direction: column;
             gap: 15px;
         }
         
-        .setting-card {
-            background-color: var(--primary);
-            border-radius: var(--border-radius);
-            padding: 20px;
-        }
-        
-        .setting-header {
+        .settings-item {
             display: flex;
             align-items: center;
-            margin-bottom: 15px;
-            gap: 15px;
-        }
-        
-        .setting-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: var(--primary-light);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            color: var(--accent);
-        }
-        
-        .setting-title {
-            font-size: 18px;
-            font-weight: 600;
-        }
-        
-        .setting-content {
-            padding-top: 15px;
-            border-top: 1px solid var(--primary-light);
-        }
-        
-        .setting-item {
-            display: flex;
             justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+        
+        .settings-label {
+            display: flex;
             align-items: center;
-            padding: 12px 0;
+            gap: 12px;
         }
         
-        .setting-item:not(:last-child) {
-            border-bottom: 1px solid var(--primary-light);
+        .settings-label i {
+            width: 24px;
+            color: var(--accent-light);
         }
         
-        .setting-name {
-            font-size: 16px;
-            color: var(--text-secondary);
-        }
-        
-        .switch {
+        .toggle-switch {
             position: relative;
             display: inline-block;
             width: 50px;
             height: 24px;
         }
         
-        .switch input {
+        .toggle-switch input {
             opacity: 0;
             width: 0;
             height: 0;
@@ -506,7 +492,8 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: var(--primary-light);
+            background-color: var(--primary);
+            border: 1px solid var(--border);
             transition: .4s;
             border-radius: 34px;
         }
@@ -514,63 +501,66 @@
         .slider:before {
             position: absolute;
             content: "";
-            height: 16px;
-            width: 16px;
-            left: 4px;
-            bottom: 4px;
-            background-color: var(--text-primary);
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 2px;
+            background-color: var(--text-tertiary);
             transition: .4s;
             border-radius: 50%;
         }
         
         input:checked + .slider {
             background-color: var(--accent);
+            border-color: var(--accent-light);
         }
         
         input:checked + .slider:before {
-            transform: translateX(26px);
+            transform: translateX(24px);
+            background-color: var(--text-primary);
         }
         
-        /* Modal */
-        .modal-overlay {
+        /* Modal Styles */
+        .modal {
             position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
+            width: 100%;
+            height: 100%;
             background-color: rgba(0, 0, 0, 0.7);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 1000;
             opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
+            visibility: hidden;
+            transition: all 0.3s ease;
         }
         
-        .modal-overlay.active {
+        .modal.active {
             opacity: 1;
-            pointer-events: all;
+            visibility: visible;
         }
         
-        .modal {
-            background-color: var(--primary);
-            border-radius: var(--border-radius);
+        .modal-content {
+            background-color: var(--primary-light);
             width: 90%;
             max-width: 400px;
+            border-radius: 20px;
             padding: 25px;
+            position: relative;
             transform: translateY(20px);
-            transition: transform 0.3s ease;
+            transition: all 0.3s ease;
         }
         
-        .modal-overlay.active .modal {
+        .modal.active .modal-content {
             transform: translateY(0);
         }
         
         .modal-header {
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
             margin-bottom: 20px;
         }
         
@@ -579,16 +569,42 @@
             font-weight: 600;
         }
         
-        .modal-close {
+        .close-modal {
             background: none;
             border: none;
-            color: var(--text-secondary);
+            color: var(--text-tertiary);
             font-size: 24px;
             cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .close-modal:hover {
+            color: var(--text-primary);
         }
         
         .modal-body {
             margin-bottom: 25px;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            background-color: var(--primary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 16px;
         }
         
         .modal-actions {
@@ -596,23 +612,94 @@
             gap: 10px;
         }
         
-        /* Responsive adjustments */
+        .btn-cancel {
+            background-color: var(--primary);
+            border: 1px solid var(--border);
+        }
+        
+        /* Transaction History */
+        .transaction-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .transaction-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            background-color: var(--primary);
+            border-radius: 12px;
+            gap: 15px;
+        }
+        
+        .transaction-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        
+        .deposit {
+            background-color: rgba(16, 185, 129, 0.15);
+            color: var(--positive);
+        }
+        
+        .withdrawal {
+            background-color: rgba(239, 68, 68, 0.15);
+            color: var(--negative);
+        }
+        
+        .investment {
+            background-color: rgba(59, 130, 246, 0.15);
+            color: var(--accent-light);
+        }
+        
+        .transaction-info {
+            flex: 1;
+        }
+        
+        .transaction-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        
+        .transaction-date {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+        
+        .transaction-amount {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-in {
+            animation: fadeIn 0.3s ease forwards;
+        }
+        
+        /* Responsive */
         @media (max-width: 480px) {
             .app-container {
-                padding: 15px 10px;
+                max-width: 100%;
+            }
+            
+            .section {
+                padding: 15px;
             }
             
             .balance-amount {
                 font-size: 28px;
-            }
-            
-            .btn {
-                padding: 10px;
-                font-size: 14px;
-            }
-            
-            .filters {
-                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -621,453 +708,518 @@
     <div class="app-container">
         <!-- Header -->
         <div class="header">
-            <div class="logo">Crypto<span>Builds</span></div>
-            <div class="user-avatar">U</div>
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <span>CryptoBuilds</span>
+            </div>
+            <div class="user-avatar">
+                <i class="fas fa-user"></i>
+            </div>
         </div>
         
-        <!-- Pages Container -->
-        <div class="pages-container">
-            <!-- Portfolio Page -->
-            <div id="portfolio-page" class="page active">
-                <div class="balance-card">
-                    <div class="balance-header">
-                        <div class="balance-title">Total Balance</div>
-                        <i class="fas fa-eye"></i>
+        <!-- Pages -->
+        <div class="page active" id="portfolio-page">
+            <div class="section">
+                <div class="balance-container">
+                    <div class="balance-display">
+                        <div>
+                            <div class="balance-title">Your Balance</div>
+                            <div class="balance-amount">$5,248.75</div>
+                        </div>
+                        <div class="balance-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            3.2%
+                        </div>
                     </div>
-                    <div class="balance-amount">$5,842.76</div>
-                    <div class="balance-change">
-                        <i class="fas fa-caret-up"></i> +2.4% ($134.28)
-                    </div>
-                    
                     <div class="balance-actions">
-                        <button class="btn btn-primary">Deposit</button>
-                        <button class="btn btn-outline">Withdraw</button>
+                        <button class="btn btn-primary" id="deposit-btn">
+                            <i class="fas fa-plus"></i> Deposit
+                        </button>
+                        <button class="btn btn-secondary" id="withdraw-btn">
+                            <i class="fas fa-minus"></i> Withdraw
+                        </button>
                     </div>
                 </div>
-                
-                <div class="chart-placeholder">
-                    <i class="fas fa-chart-line"></i> Balance Chart
-                </div>
-                
+            </div>
+            
+            <div class="section">
                 <div class="section-title">
-                    <h2>Active Builds</h2>
-                    <a href="#" class="section-link">View All</a>
+                    Portfolio Value
+                    <i class="fas fa-eye"></i>
                 </div>
-                
-                <div class="bundles-list">
-                    <div class="bundle-card">
-                        <div class="bundle-header">
-                            <div class="bundle-title">Stable Growth</div>
-                            <div class="bundle-profit">+8.2%</div>
+                <div class="chart-container">
+                    <canvas id="portfolio-chart"></canvas>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">
+                    Active Builds
+                    <span>3</span>
+                </div>
+                <div class="builds-grid">
+                    <div class="build-card">
+                        <div class="build-title">Crypto Bull</div>
+                        <div class="build-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Profit:</span>
+                                <span class="stat-value positive">+32.5%</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Time:</span>
+                                <span class="stat-value">4h 12m</span>
+                            </div>
                         </div>
-                        <div class="bundle-details">
-                            <div>Duration: 12h</div>
-                            <div>Min: $50</div>
-                        </div>
-                        <div class="bundle-structure">
-                            <div class="asset-block" style="background-color: #3a86ff; width: 50%;">BTC 50%</div>
-                            <div class="asset-block" style="background-color: #8338ec; width: 30%;">ETH 30%</div>
-                            <div class="asset-block" style="background-color: #ff006e; width: 20%;">SOL 20%</div>
-                        </div>
-                        <div class="bundle-footer">
-                            <div class="risk-tag risk-low">Low Risk</div>
-                            <div class="bundle-action">Close</div>
+                        <div class="build-assets">
+                            <div class="asset" style="width: 45%; background-color: #3b82f6;"></div>
+                            <div class="asset" style="width: 30%; background-color: #8b5cf6;"></div>
+                            <div class="asset" style="width: 25%; background-color: #10b981;"></div>
                         </div>
                     </div>
                     
-                    <div class="bundle-card">
-                        <div class="bundle-header">
-                            <div class="bundle-title">High Yield</div>
-                            <div class="bundle-profit">+15.7%</div>
+                    <div class="build-card">
+                        <div class="build-title">Stable Growth</div>
+                        <div class="build-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Profit:</span>
+                                <span class="stat-value positive">+12.1%</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Time:</span>
+                                <span class="stat-value">1h 45m</span>
+                            </div>
                         </div>
-                        <div class="bundle-details">
-                            <div>Duration: 24h</div>
-                            <div>Min: $100</div>
-                        </div>
-                        <div class="bundle-structure">
-                            <div class="asset-block" style="background-color: #fb5607; width: 40%;">BNB 40%</div>
-                            <div class="asset-block" style="background-color: #ff006e; width: 35%;">SOL 35%</div>
-                            <div class="asset-block" style="background-color: #8338ec; width: 25%;">ETH 25%</div>
-                        </div>
-                        <div class="bundle-footer">
-                            <div class="risk-tag risk-medium">Medium Risk</div>
-                            <div class="bundle-action">Close</div>
+                        <div class="build-assets">
+                            <div class="asset" style="width: 60%; background-color: #8b5cf6;"></div>
+                            <div class="asset" style="width: 25%; background-color: #10b981;"></div>
+                            <div class="asset" style="width: 15%; background-color: #3b82f6;"></div>
                         </div>
                     </div>
                 </div>
-                
+            </div>
+            
+            <div class="section">
                 <div class="section-title">
-                    <h2>Recent Transactions</h2>
-                    <a href="#" class="section-link">View All</a>
+                    Transaction History
                 </div>
-                
-                <div class="transactions-list">
-                    <div class="transaction-item">
+                <div class="transaction-list">
+                    <div class="transaction-item animate-in">
+                        <div class="transaction-icon deposit">
+                            <i class="fas fa-arrow-down"></i>
+                        </div>
                         <div class="transaction-info">
-                            <div class="transaction-icon" style="background-color: rgba(0, 200, 83, 0.1); color: var(--success);">
-                                <i class="fas fa-arrow-down"></i>
-                            </div>
-                            <div class="transaction-details">
-                                <div class="transaction-title">Deposit</div>
-                                <div class="transaction-date">Today, 10:24 AM</div>
-                            </div>
+                            <div class="transaction-title">Deposit</div>
+                            <div class="transaction-date">Today, 10:24 AM</div>
                         </div>
                         <div class="transaction-amount positive">+$1,000.00</div>
                     </div>
                     
-                    <div class="transaction-item">
+                    <div class="transaction-item animate-in">
+                        <div class="transaction-icon investment">
+                            <i class="fas fa-box"></i>
+                        </div>
                         <div class="transaction-info">
-                            <div class="transaction-icon" style="background-color: rgba(255, 171, 0, 0.1); color: var(--warning);">
-                                <i class="fas fa-shopping-cart"></i>
-                            </div>
-                            <div class="transaction-details">
-                                <div class="transaction-title">Build Investment</div>
-                                <div class="transaction-date">Yesterday, 03:45 PM</div>
-                            </div>
+                            <div class="transaction-title">Crypto Bull Build</div>
+                            <div class="transaction-date">Yesterday, 3:45 PM</div>
                         </div>
                         <div class="transaction-amount negative">-$500.00</div>
                     </div>
                     
-                    <div class="transaction-item">
+                    <div class="transaction-item animate-in">
+                        <div class="transaction-icon deposit">
+                            <i class="fas fa-arrow-down"></i>
+                        </div>
                         <div class="transaction-info">
-                            <div class="transaction-icon" style="background-color: rgba(100, 255, 218, 0.1); color: var(--accent);">
-                                <i class="fas fa-chart-line"></i>
-                            </div>
-                            <div class="transaction-details">
-                                <div class="transaction-title">Profit Earned</div>
-                                <div class="transaction-date">Jun 12, 09:15 AM</div>
-                            </div>
+                            <div class="transaction-title">Deposit</div>
+                            <div class="transaction-date">Mar 12, 2:15 PM</div>
                         </div>
-                        <div class="transaction-amount positive">+$134.28</div>
+                        <div class="transaction-amount positive">+$2,500.00</div>
                     </div>
                 </div>
             </div>
-            
-            <!-- Marketplace Page -->
-            <div id="marketplace-page" class="page">
-                <div class="search-bar">
+        </div>
+        
+        <div class="page" id="marketplace-page">
+            <div class="section">
+                <div class="search-container">
                     <input type="text" class="search-input" placeholder="Search builds...">
-                    <button class="search-btn"><i class="fas fa-search"></i></button>
-                </div>
-                
-                <div class="filters">
-                    <div class="filter-item">
-                        <div class="filter-label">Target Profit</div>
-                        <div class="filter-value">+10% - +50%</div>
-                    </div>
-                    <div class="filter-item">
-                        <div class="filter-label">Duration</div>
-                        <div class="filter-value">1h - 24h</div>
-                    </div>
-                    <div class="filter-item">
-                        <div class="filter-label">Risk Level</div>
-                        <div class="filter-value">Medium</div>
-                    </div>
-                    <div class="filter-item">
-                        <div class="filter-label">Min Investment</div>
-                        <div class="filter-value">$50</div>
+                    <div class="search-icon">
+                        <i class="fas fa-search"></i>
                     </div>
                 </div>
                 
-                <div class="section-title">
-                    <h2>Recommended Builds</h2>
+                <div class="filter-container">
+                    <div class="filter-pill active">All Builds</div>
+                    <div class="filter-pill">High Profit</div>
+                    <div class="filter-pill">Short Term</div>
+                    <div class="filter-pill">Low Risk</div>
+                    <div class="filter-pill">Crypto</div>
+                    <div class="filter-pill">Stocks</div>
                 </div>
                 
-                <div class="bundles-list">
-                    <div class="bundle-card">
-                        <div class="bundle-header">
-                            <div class="bundle-title">Balanced Portfolio</div>
-                            <div class="bundle-profit">+12.5%</div>
+                <div class="builds-list">
+                    <div class="build-item">
+                        <div class="build-header">
+                            <div class="build-name">Quantum Leap</div>
+                            <div class="build-profit">+45%</div>
                         </div>
-                        <div class="bundle-details">
-                            <div>Duration: 8h</div>
-                            <div>Min: $50</div>
+                        <div class="build-details">
+                            <div class="detail-item">
+                                <span>Duration</span>
+                                <span class="detail-value">6h</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>Risk</span>
+                                <span class="detail-value">Medium</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>Min. Invest</span>
+                                <span class="detail-value">$100</span>
+                            </div>
                         </div>
-                        <div class="bundle-structure">
-                            <div class="asset-block" style="background-color: #3a86ff; width: 40%;">BTC 40%</div>
-                            <div class="asset-block" style="background-color: #8338ec; width: 40%;">ETH 40%</div>
-                            <div class="asset-block" style="background-color: #ffbe0b; width: 20%;">ADA 20%</div>
-                        </div>
-                        <div class="bundle-footer">
-                            <div class="risk-tag risk-low">Low Risk</div>
-                            <div class="bundle-action">Invest</div>
+                        <div class="build-assets">
+                            <div class="asset" style="width: 50%; background-color: #3b82f6;"></div>
+                            <div class="asset" style="width: 30%; background-color: #8b5cf6;"></div>
+                            <div class="asset" style="width: 20%; background-color: #10b981;"></div>
                         </div>
                     </div>
                     
-                    <div class="bundle-card">
-                        <div class="bundle-header">
-                            <div class="bundle-title">Fast Growth</div>
-                            <div class="bundle-profit">+23.8%</div>
+                    <div class="build-item">
+                        <div class="build-header">
+                            <div class="build-name">Stable Gains</div>
+                            <div class="build-profit">+18%</div>
                         </div>
-                        <div class="bundle-details">
-                            <div>Duration: 6h</div>
-                            <div>Min: $75</div>
-                        </div>
-                        <div class="bundle-structure">
-                            <div class="asset-block" style="background-color: #ff006e; width: 50%;">SOL 50%</div>
-                            <div class="asset-block" style="background-color: #fb5607; width: 30%;">BNB 30%</div>
-                            <div class="asset-block" style="background-color: #ffbe0b; width: 20%;">ADA 20%</div>
-                        </div>
-                        <div class="bundle-footer">
-                            <div class="risk-tag risk-medium">Medium Risk</div>
-                            <div class="bundle-action">Invest</div>
-                        </div>
-                    </div>
-                    
-                    <div class="bundle-card">
-                        <div class="bundle-header">
-                            <div class="bundle-title">Aggressive Strategy</div>
-                            <div class="bundle-profit">+37.2%</div>
-                        </div>
-                        <div class="bundle-details">
-                            <div>Duration: 4h</div>
-                            <div>Min: $100</div>
-                        </div>
-                        <div class="bundle-structure">
-                            <div class="asset-block" style="background-color: #ff006e; width: 60%;">SOL 60%</div>
-                            <div class="asset-block" style="background-color: #3a86ff; width: 25%;">BTC 25%</div>
-                            <div class="asset-block" style="background-color: #06d6a0; width: 15%;">DOT 15%</div>
-                        </div>
-                        <div class="bundle-footer">
-                            <div class="risk-tag risk-high">High Risk</div>
-                            <div class="bundle-action">Invest</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Settings Page -->
-            <div id="settings-page" class="page">
-                <div class="settings-list">
-                    <div class="setting-card">
-                        <div class="setting-header">
-                            <div class="setting-icon">
-                                <i class="fas fa-user"></i>
+                        <div class="build-details">
+                            <div class="detail-item">
+                                <span>Duration</span>
+                                <span class="detail-value">8h</span>
                             </div>
-                            <div class="setting-title">Profile</div>
+                            <div class="detail-item">
+                                <span>Risk</span>
+                                <span class="detail-value">Low</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>Min. Invest</span>
+                                <span class="detail-value">$50</span>
+                            </div>
                         </div>
-                        <div class="setting-content">
-                            <div class="setting-item">
-                                <div class="setting-name">Username</div>
-                                <div>@crypto_investor</div>
-                            </div>
-                            <div class="setting-item">
-                                <div class="setting-name">Email</div>
-                                <div>user@example.com</div>
-                            </div>
+                        <div class="build-assets">
+                            <div class="asset" style="width: 40%; background-color: #10b981;"></div>
+                            <div class="asset" style="width: 35%; background-color: #3b82f6;"></div>
+                            <div class="asset" style="width: 25%; background-color: #8b5cf6;"></div>
                         </div>
                     </div>
                     
-                    <div class="setting-card">
-                        <div class="setting-header">
-                            <div class="setting-icon">
-                                <i class="fas fa-shield-alt"></i>
-                            </div>
-                            <div class="setting-title">Security</div>
+                    <div class="build-item">
+                        <div class="build-header">
+                            <div class="build-name">Crypto Surge</div>
+                            <div class="build-profit">+62%</div>
                         </div>
-                        <div class="setting-content">
-                            <div class="setting-item">
-                                <div class="setting-name">2FA Authentication</div>
-                                <label class="switch">
-                                    <input type="checkbox" checked>
-                                    <span class="slider"></span>
-                                </label>
+                        <div class="build-details">
+                            <div class="detail-item">
+                                <span>Duration</span>
+                                <span class="detail-value">4h</span>
                             </div>
-                            <div class="setting-item">
-                                <div class="setting-name">Hide Balance</div>
-                                <label class="switch">
-                                    <input type="checkbox">
-                                    <span class="slider"></span>
-                                </label>
+                            <div class="detail-item">
+                                <span>Risk</span>
+                                <span class="detail-value">High</span>
                             </div>
-                            <div class="setting-item">
-                                <div class="setting-name">Change Password</div>
-                                <i class="fas fa-chevron-right"></i>
+                            <div class="detail-item">
+                                <span>Min. Invest</span>
+                                <span class="detail-value">$200</span>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="setting-card">
-                        <div class="setting-header">
-                            <div class="setting-icon">
-                                <i class="fas fa-globe"></i>
-                            </div>
-                            <div class="setting-title">Language</div>
-                        </div>
-                        <div class="setting-content">
-                            <div class="setting-item">
-                                <div class="setting-name">App Language</div>
-                                <div>English</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="setting-card">
-                        <div class="setting-header">
-                            <div class="setting-icon">
-                                <i class="fas fa-bell"></i>
-                            </div>
-                            <div class="setting-title">Notifications</div>
-                        </div>
-                        <div class="setting-content">
-                            <div class="setting-item">
-                                <div class="setting-name">Order Updates</div>
-                                <label class="switch">
-                                    <input type="checkbox" checked>
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
-                            <div class="setting-item">
-                                <div class="setting-name">New Builds</div>
-                                <label class="switch">
-                                    <input type="checkbox" checked>
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
-                            <div class="setting-item">
-                                <div class="setting-name">Market Alerts</div>
-                                <label class="switch">
-                                    <input type="checkbox">
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="setting-card">
-                        <div class="setting-header">
-                            <div class="setting-icon">
-                                <i class="fas fa-info-circle"></i>
-                            </div>
-                            <div class="setting-title">Information</div>
-                        </div>
-                        <div class="setting-content">
-                            <div class="setting-item">
-                                <div class="setting-name">FAQ</div>
-                                <i class="fas fa-chevron-right"></i>
-                            </div>
-                            <div class="setting-item">
-                                <div class="setting-name">Terms of Service</div>
-                                <i class="fas fa-chevron-right"></i>
-                            </div>
-                            <div class="setting-item">
-                                <div class="setting-name">Privacy Policy</div>
-                                <i class="fas fa-chevron-right"></i>
-                            </div>
+                        <div class="build-assets">
+                            <div class="asset" style="width: 55%; background-color: #8b5cf6;"></div>
+                            <div class="asset" style="width: 30%; background-color: #3b82f6;"></div>
+                            <div class="asset" style="width: 15%; background-color: #10b981;"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- Navigation Tabs -->
-        <div class="nav-tabs">
-            <div class="nav-tab active" data-page="portfolio-page">
-                <i class="fas fa-chart-pie"></i>
+        <div class="page" id="settings-page">
+            <div class="section">
+                <div class="profile-container">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="profile-info">
+                        <div class="profile-name">Alexander K.</div>
+                        <div class="profile-id">@crypto_investor</div>
+                    </div>
+                </div>
+                
+                <div class="settings-list">
+                    <div class="settings-item">
+                        <div class="settings-label">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Security Settings</span>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                    
+                    <div class="settings-item">
+                        <div class="settings-label">
+                            <i class="fas fa-language"></i>
+                            <span>Language</span>
+                        </div>
+                        <span>English</span>
+                    </div>
+                    
+                    <div class="settings-item">
+                        <div class="settings-label">
+                            <i class="fas fa-mobile-alt"></i>
+                            <span>Active Devices</span>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                    
+                    <div class="settings-item">
+                        <div class="settings-label">
+                            <i class="fas fa-bell"></i>
+                            <span>Notifications</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="settings-item">
+                        <div class="settings-label">
+                            <i class="fas fa-eye-slash"></i>
+                            <span>Hide Balance</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="settings-item">
+                        <div class="settings-label">
+                            <i class="fas fa-info-circle"></i>
+                            <span>About Us</span>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                    
+                    <div class="settings-item">
+                        <div class="settings-label">
+                            <i class="fas fa-question-circle"></i>
+                            <span>FAQ</span>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                    
+                    <div class="settings-item">
+                        <div class="settings-label">
+                            <i class="fas fa-headset"></i>
+                            <span>Support</span>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Navigation -->
+        <div class="nav">
+            <div class="nav-item active" data-page="portfolio-page">
+                <i class="fas fa-chart-line"></i>
                 <span>Portfolio</span>
             </div>
-            <div class="nav-tab" data-page="marketplace-page">
+            <div class="nav-item" data-page="marketplace-page">
                 <i class="fas fa-store"></i>
                 <span>Marketplace</span>
             </div>
-            <div class="nav-tab" data-page="settings-page">
+            <div class="nav-item" data-page="settings-page">
                 <i class="fas fa-cog"></i>
                 <span>Settings</span>
             </div>
         </div>
-        
-        <!-- Deposit Modal -->
-        <div class="modal-overlay" id="deposit-modal">
-            <div class="modal">
-                <div class="modal-header">
-                    <div class="modal-title">Deposit Funds</div>
-                    <button class="modal-close">&times;</button>
+    </div>
+    
+    <!-- Deposit Modal -->
+    <div class="modal" id="deposit-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Deposit Funds</div>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label class="input-label">Amount (USDT)</label>
+                    <input type="number" class="input-field" placeholder="Enter amount">
                 </div>
-                <div class="modal-body">
-                    <p>Select deposit method and enter amount to fund your account.</p>
-                    <!-- Deposit form would go here -->
+                <div class="input-group">
+                    <label class="input-label">Payment Method</label>
+                    <select class="input-field">
+                        <option>Credit Card</option>
+                        <option>Bank Transfer</option>
+                        <option>Crypto Wallet</option>
+                    </select>
                 </div>
-                <div class="modal-actions">
-                    <button class="btn btn-outline" style="flex: 1;">Cancel</button>
-                    <button class="btn btn-primary" style="flex: 1;">Continue</button>
-                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel close-modal">Cancel</button>
+                <button class="btn btn-primary">Deposit</button>
             </div>
         </div>
     </div>
-
+    
+    <!-- Withdraw Modal -->
+    <div class="modal" id="withdraw-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Withdraw Funds</div>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label class="input-label">Amount (USDT)</label>
+                    <input type="number" class="input-field" placeholder="Enter amount">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Wallet Address</label>
+                    <input type="text" class="input-field" placeholder="Enter your wallet address">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel close-modal">Cancel</button>
+                <button class="btn btn-primary">Withdraw</button>
+            </div>
+        </div>
+    </div>
+    
     <script>
-        // Navigation functionality
-        document.querySelectorAll('.nav-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                // Remove active class from all tabs and pages
-                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        // Navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // Update active nav item
+                document.querySelectorAll('.nav-item').forEach(nav => {
+                    nav.classList.remove('active');
+                });
+                this.classList.add('active');
                 
-                // Add active class to clicked tab
-                tab.classList.add('active');
-                
-                // Show corresponding page
-                const pageId = tab.getAttribute('data-page');
+                // Show active page
+                const pageId = this.getAttribute('data-page');
+                document.querySelectorAll('.page').forEach(page => {
+                    page.classList.remove('active');
+                });
                 document.getElementById(pageId).classList.add('active');
             });
         });
         
-        // Balance visibility toggle
-        const balanceEye = document.querySelector('.balance-header .fa-eye');
-        const balanceAmount = document.querySelector('.balance-amount');
-        const balanceChange = document.querySelector('.balance-change');
-        
-        let balanceVisible = true;
-        
-        balanceEye.addEventListener('click', () => {
-            balanceVisible = !balanceVisible;
-            balanceEye.classList = balanceVisible ? 'fas fa-eye' : 'fas fa-eye-slash';
-            balanceAmount.textContent = balanceVisible ? '$5,842.76' : '••••••';
-            balanceChange.textContent = balanceVisible ? '+2.4% ($134.28)' : '••••••';
-        });
-        
         // Modal functionality
+        const depositBtn = document.getElementById('deposit-btn');
+        const withdrawBtn = document.getElementById('withdraw-btn');
         const depositModal = document.getElementById('deposit-modal');
-        const depositBtn = document.querySelector('.btn-primary');
-        const closeModalBtns = document.querySelectorAll('.modal-close, .btn-outline');
+        const withdrawModal = document.getElementById('withdraw-modal');
+        const closeButtons = document.querySelectorAll('.close-modal');
         
         depositBtn.addEventListener('click', () => {
             depositModal.classList.add('active');
         });
         
-        closeModalBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
+        withdrawBtn.addEventListener('click', () => {
+            withdrawModal.classList.add('active');
+        });
+        
+        closeButtons.forEach(button => {
+            button.addEventListener('click', () => {
                 depositModal.classList.remove('active');
+                withdrawModal.classList.remove('active');
             });
         });
         
         // Close modal when clicking outside
-        depositModal.addEventListener('click', (e) => {
+        window.addEventListener('click', (e) => {
             if (e.target === depositModal) {
                 depositModal.classList.remove('active');
             }
+            if (e.target === withdrawModal) {
+                withdrawModal.classList.remove('active');
+            }
         });
         
-        // Bundle actions (invest/close)
-        document.querySelectorAll('.bundle-action').forEach(action => {
-            action.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const actionType = action.textContent;
-                const bundleName = action.closest('.bundle-card').querySelector('.bundle-title').textContent;
-                
-                if (actionType === 'Invest') {
-                    alert(`You are about to invest in "${bundleName}"`);
-                } else {
-                    alert(`You are closing your position in "${bundleName}"`);
+        // Portfolio Chart
+        const ctx = document.getElementById('portfolio-chart').getContext('2d');
+        const portfolioChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Portfolio Value',
+                    data: [3200, 3800, 4100, 3700, 4200, 5248],
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 3,
+                    pointRadius: 0,
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#94a3b8'
+                        }
+                    },
+                    y: {
+                        grid: {
+                            color: 'rgba(148, 163, 184, 0.1)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#94a3b8',
+                            callback: function(value) {
+                                return '$' + value;
+                            }
+                        }
+                    }
                 }
+            }
+        });
+        
+        // Filter pills
+        document.querySelectorAll('.filter-pill').forEach(pill => {
+            pill.addEventListener('click', function() {
+                this.classList.toggle('active');
             });
         });
         
-        // Transaction details
-        document.querySelectorAll('.transaction-item').forEach(item => {
-            item.addEventListener('click', () => {
-                const title = item.querySelector('.transaction-title').textContent;
-                alert(`Showing details for transaction: ${title}`);
+        // Build card click
+        document.querySelectorAll('.build-card, .build-item').forEach(card => {
+            card.addEventListener('click', function() {
+                // In a real app, this would open a build details modal
+                alert('Build details would be shown here');
+            });
+        });
+        
+        // Settings toggle
+        document.querySelectorAll('.settings-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // In a real app, this would navigate to the settings section
+                if(!this.querySelector('input')) {
+                    alert('Setting details would be shown here');
+                }
             });
         });
     </script>
