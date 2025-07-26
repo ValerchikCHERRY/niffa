@@ -3,697 +3,429 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuantumBuilds - Crypto Investment Platform</title>
+    <title>Bets - Crypto Investments</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --deep-space: #0a0f1d;
-            --cosmic-blue: #121a2d;
-            --nebula-purple: #1a2342;
-            --stellar-accent: #3a5bc7;
-            --quantum-teal: #00e6cc;
-            --galaxy-gold: #ffd166;
-            --star-light: #ffffff;
-            --moon-dust: #a0aec0;
-            --dark-matter: #070b15;
-            --event-horizon: #0f1425;
-            --success: #00e6a0;
-            --warning: #ffcc00;
-            --danger: #ff4d6d;
-            --border-radius: 16px;
-            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
+        :root {
+            --bg-primary: #121212;
+            --bg-secondary: #1e1e1e;
+            --bg-tertiary: #2a2a2a;
+            --accent: #6a41ed;
+            --accent-hover: #7d55ff;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --positive: #4caf50;
+            --negative: #f44336;
+            --warning: #ff9800;
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
         body {
-            background: linear-gradient(135deg, var(--deep-space), var(--dark-matter));
-            color: var(--star-light);
-            min-height: 100vh;
-            padding-bottom: 80px;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 16px;
+            max-width: 500px;
+            margin: 0 auto;
             position: relative;
             overflow-x: hidden;
+            min-height: 100vh;
         }
-        
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 10% 20%, rgba(58, 91, 199, 0.1) 0%, transparent 30%),
-                        radial-gradient(circle at 90% 80%, rgba(0, 230, 204, 0.1) 0%, transparent 30%);
-            z-index: -1;
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
-        
-        .app-container {
-            max-width: 480px;
-            margin: 0 auto;
-            padding: 20px 15px;
-        }
-        
+
         /* Header Styles */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 0;
-            margin-bottom: 20px;
-            position: relative;
+            padding: 10px 0;
         }
-        
+
         .logo {
-            font-size: 28px;
-            font-weight: 800;
-            background: linear-gradient(to right, var(--stellar-accent), var(--quantum-teal));
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -0.5px;
-        }
-        
-        .header-actions {
-            display: flex;
-            gap: 15px;
-        }
-        
-        .header-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--nebula-purple);
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: var(--star-light);
-            font-size: 16px;
-            cursor: pointer;
-            transition: var(--transition);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            gap: 10px;
         }
-        
-        .header-btn:hover {
-            background: var(--stellar-accent);
-            transform: translateY(-2px);
+
+        .logo i {
+            font-size: 24px;
+            color: var(--accent);
         }
-        
-        /* Navigation */
-        .nav-tabs {
-            display: flex;
-            justify-content: space-around;
-            background: var(--event-horizon);
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 15px 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            z-index: 100;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
-        
-        .nav-tab {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 12px;
-            color: var(--moon-dust);
-            cursor: pointer;
-            transition: var(--transition);
-            position: relative;
-            padding: 8px 15px;
-            border-radius: 30px;
-        }
-        
-        .nav-tab.active {
-            color: var(--star-light);
-            background: rgba(58, 91, 199, 0.2);
-        }
-        
-        .nav-tab.active::before {
-            content: '';
-            position: absolute;
-            top: -5px;
-            width: 30px;
-            height: 3px;
-            background: var(--quantum-teal);
-            border-radius: 10px;
-        }
-        
-        .nav-tab i {
-            font-size: 20px;
-            margin-bottom: 5px;
-        }
-        
-        .nav-tab.active i {
-            color: var(--quantum-teal);
-        }
-        
-        /* Page Container */
-        .page {
-            display: none;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: opacity 0.4s ease, transform 0.4s ease;
-        }
-        
-        .page.active {
-            display: block;
-            opacity: 1;
-            transform: translateY(0);
-        }
-        
-        /* Balance Card */
-        .balance-card {
-            background: linear-gradient(135deg, var(--cosmic-blue), var(--nebula-purple));
+
+        .balance-container {
+            background-color: var(--bg-secondary);
             border-radius: var(--border-radius);
-            padding: 25px;
-            margin-bottom: 25px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            position: relative;
-            overflow: hidden;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
-        
-        .balance-card::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 120px;
-            height: 120px;
-            background: radial-gradient(circle, rgba(58, 91, 199, 0.3) 0%, transparent 70%);
-            border-radius: 50%;
-            transform: translate(30%, -30%);
-        }
-        
+
         .balance-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
-        
+
         .balance-title {
             font-size: 16px;
-            color: var(--moon-dust);
-            font-weight: 500;
+            color: var(--text-secondary);
         }
-        
-        .balance-toggle {
+
+        .toggle-balance {
             background: none;
             border: none;
-            color: var(--moon-dust);
-            font-size: 18px;
+            color: var(--text-secondary);
+            font-size: 16px;
             cursor: pointer;
             transition: var(--transition);
         }
-        
-        .balance-toggle:hover {
-            color: var(--star-light);
+
+        .toggle-balance:hover {
+            color: var(--text-primary);
         }
-        
+
         .balance-amount {
-            font-size: 38px;
+            font-size: 32px;
             font-weight: 700;
             margin-bottom: 5px;
-            letter-spacing: -1px;
-            font-family: 'SF Pro Display', -apple-system, sans-serif;
+            letter-spacing: 0.5px;
         }
-        
+
         .balance-change {
-            font-size: 16px;
+            font-size: 14px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 5px;
         }
-        
-        .balance-change.positive {
-            color: var(--success);
+
+        .positive {
+            color: var(--positive);
         }
-        
-        .balance-change.negative {
-            color: var(--danger);
-        }
-        
+
         .balance-actions {
             display: flex;
-            gap: 15px;
-            margin-top: 25px;
+            gap: 10px;
+            margin-top: 15px;
         }
-        
+
         .btn {
             flex: 1;
-            padding: 16px;
-            border-radius: 12px;
+            padding: 12px;
+            border-radius: var(--border-radius);
             border: none;
             font-weight: 600;
+            font-size: 16px;
             cursor: pointer;
             transition: var(--transition);
             text-align: center;
-            font-size: 16px;
-            position: relative;
-            overflow: hidden;
-            z-index: 1;
+            color: var(--text-primary);
+            background-color: var(--bg-tertiary);
         }
-        
-        .btn::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.1);
-            opacity: 0;
-            transition: var(--transition);
-            z-index: -1;
-        }
-        
-        .btn:hover::after {
-            opacity: 1;
-        }
-        
+
         .btn-primary {
-            background: linear-gradient(90deg, var(--stellar-accent), var(--quantum-teal));
-            color: var(--star-light);
-            box-shadow: 0 5px 15px rgba(58, 91, 199, 0.3);
+            background-color: var(--accent);
         }
-        
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--stellar-accent);
-            color: var(--stellar-accent);
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
         }
-        
-        /* Portfolio Section */
-        .section-title {
+
+        /* Navigation */
+        .navigation {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 30px 0 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            justify-content: space-around;
+            background-color: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            padding: 8px;
+            margin-bottom: 10px;
         }
-        
-        .section-title h2 {
-            font-size: 20px;
-            font-weight: 700;
-            background: linear-gradient(to right, var(--stellar-accent), var(--quantum-teal));
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .section-link {
-            color: var(--moon-dust);
-            font-size: 14px;
-            text-decoration: none;
+
+        .nav-btn {
+            padding: 12px 20px;
+            border-radius: 8px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
             transition: var(--transition);
+            flex: 1;
+            text-align: center;
         }
-        
-        .section-link:hover {
-            color: var(--quantum-teal);
+
+        .nav-btn.active {
+            background-color: var(--accent);
+            color: var(--text-primary);
         }
-        
-        /* Bundles List */
-        .bundles-list {
-            display: flex;
+
+        /* Page Content */
+        .page {
+            display: none;
             flex-direction: column;
             gap: 20px;
         }
-        
-        .bundle-card {
-            background: var(--cosmic-blue);
+
+        .page.active {
+            display: flex;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        /* Portfolio Styles */
+        .chart-placeholder {
+            height: 150px;
+            background-color: var(--bg-secondary);
             border-radius: var(--border-radius);
-            padding: 20px;
-            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .open-bundles {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .bundle {
+            background-color: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            padding: 16px;
             transition: var(--transition);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            position: relative;
-            overflow: hidden;
+            cursor: pointer;
         }
-        
-        .bundle-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 5px;
-            height: 100%;
-            background: linear-gradient(to bottom, var(--stellar-accent), var(--quantum-teal));
+
+        .bundle:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
         }
-        
-        .bundle-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-            border-color: rgba(58, 91, 199, 0.3);
-        }
-        
+
         .bundle-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 15px;
+            align-items: center;
+            margin-bottom: 12px;
         }
-        
+
         .bundle-title {
             font-weight: 700;
             font-size: 18px;
-            color: var(--star-light);
         }
-        
+
         .bundle-profit {
             font-weight: 700;
-            font-size: 18px;
-            color: var(--success);
-            font-family: 'SF Pro Display', -apple-system, sans-serif;
+            font-size: 16px;
+            color: var(--positive);
         }
-        
+
         .bundle-details {
             display: flex;
             justify-content: space-between;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
             font-size: 14px;
-            color: var(--moon-dust);
-            margin-bottom: 20px;
         }
-        
+
         .bundle-structure {
             display: flex;
-            height: 8px;
-            border-radius: 10px;
+            height: 30px;
+            border-radius: 8px;
             overflow: hidden;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            margin-bottom: 15px;
         }
-        
-        .asset-block {
-            position: relative;
-        }
-        
-        .asset-label {
-            position: absolute;
-            top: -25px;
+
+        .asset {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
             font-size: 12px;
             font-weight: 600;
-            color: var(--star-light);
-            background: rgba(0, 0, 0, 0.5);
-            padding: 3px 8px;
-            border-radius: 4px;
-            opacity: 0;
-            transition: var(--transition);
-            white-space: nowrap;
+            text-align: center;
         }
-        
-        .asset-block:hover .asset-label {
-            opacity: 1;
-            top: -30px;
-        }
-        
+
         .bundle-footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        
-        .risk-tag {
-            padding: 6px 15px;
+
+        .bundle-status {
+            padding: 6px 12px;
             border-radius: 20px;
             font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .risk-low {
-            background: rgba(0, 230, 160, 0.15);
-            color: var(--success);
-        }
-        
-        .risk-medium {
-            background: rgba(255, 204, 0, 0.15);
-            color: var(--warning);
-        }
-        
-        .risk-high {
-            background: rgba(255, 77, 109, 0.15);
-            color: var(--danger);
-        }
-        
-        .bundle-action {
-            padding: 8px 20px;
-            background: linear-gradient(90deg, var(--stellar-accent), rgba(58, 91, 199, 0.5));
-            color: var(--star-light);
-            border-radius: 20px;
             font-weight: 600;
-            font-size: 14px;
-            transition: var(--transition);
+            background-color: var(--warning);
+        }
+
+        .close-btn {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
             border: none;
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            font-weight: 600;
             cursor: pointer;
-        }
-        
-        .bundle-action:hover {
-            transform: translateX(5px);
-            box-shadow: 0 5px 15px rgba(58, 91, 199, 0.3);
-        }
-        
-        /* Transactions */
-        .transactions-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        
-        .transaction-item {
-            background: var(--cosmic-blue);
-            border-radius: var(--border-radius);
-            padding: 18px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: var(--transition);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        
-        .transaction-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            border-color: rgba(58, 91, 199, 0.2);
-        }
-        
-        .transaction-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .transaction-icon {
-            width: 45px;
-            height: 45px;
-            border-radius: 12px;
-            background: var(--nebula-purple);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            color: var(--quantum-teal);
-        }
-        
-        .transaction-details {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .transaction-title {
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: var(--star-light);
-        }
-        
-        .transaction-date {
-            font-size: 13px;
-            color: var(--moon-dust);
-        }
-        
-        .transaction-amount {
-            font-weight: 700;
-            font-size: 16px;
-            font-family: 'SF Pro Display', -apple-system, sans-serif;
-        }
-        
-        .positive {
-            color: var(--success);
-        }
-        
-        .negative {
-            color: var(--danger);
-        }
-        
-        /* Marketplace */
-        .search-container {
-            position: relative;
-            margin-bottom: 25px;
-        }
-        
-        .search-input {
-            width: 100%;
-            padding: 16px 20px 16px 50px;
-            border-radius: var(--border-radius);
-            border: none;
-            background: var(--cosmic-blue);
-            color: var(--star-light);
-            font-size: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
             transition: var(--transition);
         }
-        
-        .search-input:focus {
-            outline: none;
-            border-color: var(--stellar-accent);
-            box-shadow: 0 0 0 3px rgba(58, 91, 199, 0.2);
+
+        .close-btn:hover {
+            background-color: var(--negative);
         }
-        
-        .search-icon {
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--moon-dust);
-        }
-        
+
+        /* Marketplace Styles */
         .filters {
             display: flex;
-            gap: 12px;
-            overflow-x: auto;
-            padding: 5px 0 15px;
+            flex-wrap: wrap;
+            gap: 10px;
             margin-bottom: 20px;
-            scrollbar-width: none;
         }
-        
-        .filters::-webkit-scrollbar {
-            display: none;
-        }
-        
-        .filter-tag {
-            padding: 10px 18px;
-            background: var(--nebula-purple);
-            border-radius: 30px;
+
+        .filter-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: none;
             font-size: 14px;
-            white-space: nowrap;
             cursor: pointer;
             transition: var(--transition);
-            border: 1px solid rgba(255, 255, 255, 0.05);
         }
-        
-        .filter-tag.active {
-            background: linear-gradient(90deg, var(--stellar-accent), var(--quantum-teal));
-            color: var(--star-light);
-            border-color: transparent;
+
+        .filter-btn.active {
+            background-color: var(--accent);
         }
-        
-        /* Settings */
-        .settings-list {
-            display: flex;
-            flex-direction: column;
+
+        .recommended-bundles {
+            display: grid;
+            grid-template-columns: 1fr;
             gap: 15px;
         }
-        
-        .setting-card {
-            background: var(--cosmic-blue);
+
+        .bundle-invest {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: none;
+            padding: 8px 16px;
             border-radius: var(--border-radius);
-            padding: 0;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        
-        .setting-header {
-            display: flex;
-            align-items: center;
-            padding: 20px;
+            font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
         }
-        
-        .setting-header:hover {
-            background: rgba(255, 255, 255, 0.03);
+
+        .bundle-invest:hover {
+            background-color: var(--accent);
         }
-        
-        .setting-icon {
-            width: 45px;
-            height: 45px;
-            border-radius: 12px;
-            background: var(--nebula-purple);
+
+        /* Settings Styles */
+        .settings-section {
+            background-color: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .settings-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .profile-pic {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--accent);
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 24px;
+        }
+
+        .profile-info h2 {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .profile-info p {
+            color: var(--text-secondary);
+        }
+
+        .settings-group {
+            margin-bottom: 25px;
+        }
+
+        .settings-title {
             font-size: 18px;
-            color: var(--quantum-teal);
-            margin-right: 15px;
-        }
-        
-        .setting-title {
-            font-size: 17px;
             font-weight: 600;
-            flex: 1;
+            margin-bottom: 15px;
+            color: var(--text-primary);
         }
-        
-        .setting-arrow {
-            color: var(--moon-dust);
-            transition: var(--transition);
-        }
-        
-        .setting-header.active .setting-arrow {
-            transform: rotate(180deg);
-            color: var(--quantum-teal);
-        }
-        
-        .setting-content {
-            padding: 0 20px;
-            max-height: 0;
-            overflow: hidden;
-            transition: var(--transition);
-        }
-        
-        .setting-header.active + .setting-content {
-            padding: 0 20px 20px;
-            max-height: 500px;
-        }
-        
-        .setting-item {
+
+        .settings-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 15px 0;
+            border-bottom: 1px solid var(--bg-tertiary);
         }
-        
-        .setting-item:not(:last-child) {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+
+        .settings-item:last-child {
+            border-bottom: none;
         }
-        
-        .setting-name {
-            font-size: 15px;
-            color: var(--moon-dust);
+
+        .settings-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        
+
+        .settings-label i {
+            font-size: 18px;
+            width: 24px;
+            color: var(--accent);
+        }
+
         .switch {
             position: relative;
             display: inline-block;
             width: 50px;
-            height: 26px;
+            height: 24px;
         }
-        
+
         .switch input {
             opacity: 0;
             width: 0;
             height: 0;
         }
-        
+
         .slider {
             position: absolute;
             cursor: pointer;
@@ -701,676 +433,644 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: var(--nebula-purple);
-            transition: var(--transition);
+            background-color: var(--bg-tertiary);
+            transition: .4s;
             border-radius: 34px;
         }
-        
+
         .slider:before {
             position: absolute;
             content: "";
-            height: 20px;
-            width: 20px;
-            left: 3px;
-            bottom: 3px;
-            background: var(--star-light);
-            transition: var(--transition);
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
             border-radius: 50%;
         }
-        
+
         input:checked + .slider {
-            background: linear-gradient(90deg, var(--stellar-accent), var(--quantum-teal));
+            background-color: var(--accent);
         }
-        
+
         input:checked + .slider:before {
-            transform: translateX(24px);
+            transform: translateX(26px);
         }
-        
-        /* Modal */
-        .modal-overlay {
+
+        /* Modal Styles */
+        .modal {
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(7, 11, 21, 0.9);
-            display: flex;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
         }
-        
-        .modal-overlay.active {
-            opacity: 1;
-            pointer-events: all;
+
+        .modal.active {
+            display: flex;
         }
-        
-        .modal {
-            background: linear-gradient(135deg, var(--cosmic-blue), var(--nebula-purple));
+
+        .modal-content {
+            background-color: var(--bg-secondary);
             border-radius: var(--border-radius);
             width: 90%;
             max-width: 400px;
-            padding: 30px;
-            transform: translateY(20px);
-            transition: transform 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+            padding: 25px;
+            position: relative;
+            animation: modalAppear 0.3s ease;
         }
-        
-        .modal-overlay.active .modal {
-            transform: translateY(0);
+
+        @keyframes modalAppear {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        
+
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
-        
+
         .modal-title {
             font-size: 22px;
             font-weight: 700;
-            background: linear-gradient(to right, var(--stellar-accent), var(--quantum-teal));
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
         }
-        
-        .modal-close {
+
+        .close-modal {
             background: none;
             border: none;
-            color: var(--moon-dust);
+            color: var(--text-secondary);
             font-size: 24px;
             cursor: pointer;
             transition: var(--transition);
         }
-        
-        .modal-close:hover {
-            color: var(--star-light);
-            transform: rotate(90deg);
+
+        .close-modal:hover {
+            color: var(--text-primary);
         }
-        
+
         .modal-body {
-            margin-bottom: 30px;
-            color: var(--moon-dust);
-            line-height: 1.6;
+            margin-bottom: 25px;
         }
-        
-        .modal-actions {
+
+        .modal-footer {
             display: flex;
-            gap: 15px;
+            gap: 10px;
         }
-        
-        /* Animations */
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
+
+        .btn-cancel {
+            background-color: var(--bg-tertiary);
         }
-        
-        .floating {
-            animation: float 4s ease-in-out infinite;
+
+        .btn-confirm {
+            background-color: var(--accent);
         }
-        
-        /* Responsive adjustments */
-        @media (max-width: 480px) {
-            .app-container {
-                padding: 15px;
-            }
-            
-            .balance-amount {
-                font-size: 32px;
-            }
-            
-            .btn {
-                padding: 14px;
-                font-size: 14px;
+
+        .btn-cancel:hover, .btn-confirm:hover {
+            opacity: 0.9;
+        }
+
+        /* History Styles */
+        .history-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .history-item {
+            background-color: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .history-type {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .history-date {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .history-amount {
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .positive-amount {
+            color: var(--positive);
+        }
+
+        .negative-amount {
+            color: var(--negative);
+        }
+
+        /* Responsive */
+        @media (min-width: 768px) {
+            .recommended-bundles {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
+    <div class="container">
         <!-- Header -->
         <div class="header">
-            <div class="logo">QuantumBuilds</div>
-            <div class="header-actions">
-                <div class="header-btn">
-                    <i class="fas fa-bell"></i>
+            <div class="logo">
+                <i class="fas fa-bat"></i>
+                <h1>Bets</h1>
+            </div>
+        </div>
+
+        <!-- Balance Card -->
+        <div class="balance-container">
+            <div class="balance-header">
+                <div class="balance-title">Total Balance</div>
+                <button class="toggle-balance" id="toggleBalance">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+            <div class="balance-amount" id="balanceAmount">$1,245.80</div>
+            <div class="balance-change">
+                <i class="fas fa-caret-up positive"></i>
+                <span class="positive">+2.5%</span> last 24h
+            </div>
+            <div class="balance-actions">
+                <button class="btn btn-primary" id="depositBtn">Deposit</button>
+                <button class="btn" id="withdrawBtn">Withdraw</button>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="navigation">
+            <button class="nav-btn active" data-page="portfolio">Portfolio</button>
+            <button class="nav-btn" data-page="marketplace">Marketplace</button>
+            <button class="nav-btn" data-page="settings">Settings</button>
+        </div>
+
+        <!-- Portfolio Page -->
+        <div class="page active" id="portfolioPage">
+            <div class="chart-placeholder">
+                <i class="fas fa-chart-line"></i>
+                <span>Balance Chart</span>
+            </div>
+
+            <h2 class="section-title">Open Bundles</h2>
+            <div class="open-bundles">
+                <!-- Bundle 1 -->
+                <div class="bundle">
+                    <div class="bundle-header">
+                        <div class="bundle-title">Low Risk BTC/ETH</div>
+                        <div class="bundle-profit">+8.2%</div>
+                    </div>
+                    <div class="bundle-details">
+                        <div>Duration: 6h</div>
+                        <div>Risk: Low</div>
+                    </div>
+                    <div class="bundle-structure">
+                        <div class="asset" style="background-color: #f7931a; width: 60%;">BTC 60%</div>
+                        <div class="asset" style="background-color: #627eea; width: 30%;">ETH 30%</div>
+                        <div class="asset" style="background-color: #26a17b; width: 10%;">USDT 10%</div>
+                    </div>
+                    <div class="bundle-footer">
+                        <div class="bundle-status">Active</div>
+                        <button class="close-btn">Close</button>
+                    </div>
                 </div>
-                <div class="header-btn">
-                    <i class="fas fa-user"></i>
+
+                <!-- Bundle 2 -->
+                <div class="bundle">
+                    <div class="bundle-header">
+                        <div class="bundle-title">High Growth Altcoins</div>
+                        <div class="bundle-profit">+15.7%</div>
+                    </div>
+                    <div class="bundle-details">
+                        <div>Duration: 12h</div>
+                        <div>Risk: Medium</div>
+                    </div>
+                    <div class="bundle-structure">
+                        <div class="asset" style="background-color: #00d395; width: 40%;">SOL 40%</div>
+                        <div class="asset" style="background-color: #5d78ff; width: 35%;">DOT 35%</div>
+                        <div class="asset" style="background-color: #f3ba2f; width: 25%;">BNB 25%</div>
+                    </div>
+                    <div class="bundle-footer">
+                        <div class="bundle-status">Active</div>
+                        <button class="close-btn">Close</button>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="section-title">Transaction History</h2>
+            <div class="history-container">
+                <div class="history-item">
+                    <div class="history-info">
+                        <div class="history-type">Deposit</div>
+                        <div class="history-date">Today, 10:30 AM</div>
+                    </div>
+                    <div class="history-amount positive-amount">+$500.00</div>
+                </div>
+                <div class="history-item">
+                    <div class="history-info">
+                        <div class="history-type">Bundle Closed</div>
+                        <div class="history-date">Yesterday, 5:45 PM</div>
+                    </div>
+                    <div class="history-amount positive-amount">+$82.50</div>
+                </div>
+                <div class="history-item">
+                    <div class="history-info">
+                        <div class="history-type">Withdrawal</div>
+                        <div class="history-date">Mar 12, 2:15 PM</div>
+                    </div>
+                    <div class="history-amount negative-amount">-$200.00</div>
                 </div>
             </div>
         </div>
-        
-        <!-- Pages Container -->
-        <div class="pages-container">
-            <!-- Portfolio Page -->
-            <div id="portfolio-page" class="page active">
-                <div class="balance-card floating">
-                    <div class="balance-header">
-                        <div class="balance-title">TOTAL BALANCE</div>
-                        <button class="balance-toggle">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                    <div class="balance-amount">$18,426.90</div>
-                    <div class="balance-change positive">
-                        <i class="fas fa-arrow-trend-up"></i> +3.7% ($654.82)
-                    </div>
-                    
-                    <div class="balance-actions">
-                        <button class="btn btn-primary">Deposit</button>
-                        <button class="btn btn-outline">Withdraw</button>
-                    </div>
-                </div>
-                
-                <div class="section-title">
-                    <h2>Active Builds</h2>
-                    <a href="#" class="section-link">View All</a>
-                </div>
-                
-                <div class="bundles-list">
-                    <div class="bundle-card">
-                        <div class="bundle-header">
-                            <div class="bundle-title">Quantum Growth</div>
-                            <div class="bundle-profit">+12.8%</div>
-                        </div>
-                        <div class="bundle-details">
-                            <div>Duration: 8h 42m</div>
-                            <div>Invested: $2,500</div>
-                        </div>
-                        <div class="bundle-structure">
-                            <div class="asset-block" style="width: 45%;">
-                                <div class="asset-label">BTC 45%</div>
-                                <div style="background: linear-gradient(90deg, #3a86ff, #4361ee); height: 100%;"></div>
-                            </div>
-                            <div class="asset-block" style="width: 35%;">
-                                <div class="asset-label">ETH 35%</div>
-                                <div style="background: linear-gradient(90deg, #8338ec, #5a189a); height: 100%;"></div>
-                            </div>
-                            <div class="asset-block" style="width: 20%;">
-                                <div class="asset-label">SOL 20%</div>
-                                <div style="background: linear-gradient(90deg, #ff006e, #ff7096); height: 100%;"></div>
-                            </div>
-                        </div>
-                        <div class="bundle-footer">
-                            <div class="risk-tag risk-medium">Medium Risk</div>
-                            <div class="bundle-action">Close</div>
-                        </div>
-                    </div>
-                    
-                    <div class="bundle-card">
-                        <div class="bundle-header">
-                            <div class="bundle-title">Stellar Yield</div>
-                            <div class="bundle-profit">+7.3%</div>
-                        </div>
-                        <div class="bundle-details">
-                            <div>Duration: 16h 15m</div>
-                            <div>Invested: $1,200</div>
-                        </div>
-                        <div class="bundle-structure">
-                            <div class="asset-block" style="width: 50%;">
-                                <div class="asset-label">BTC 50%</div>
-                                <div style="background: linear-gradient(90deg, #3a86ff, #4361ee); height: 100%;"></div>
-                            </div>
-                            <div class="asset-block" style="width: 30%;">
-                                <div class="asset-label">ADA 30%</div>
-                                <div style="background: linear-gradient(90deg, #06d6a0, #048a81); height: 100%;"></div>
-                            </div>
-                            <div class="asset-block" style="width: 20%;">
-                                <div class="asset-label">DOT 20%</div>
-                                <div style="background: linear-gradient(90deg, #118ab2, #073b4c); height: 100%;"></div>
-                            </div>
-                        </div>
-                        <div class="bundle-footer">
-                            <div class="risk-tag risk-low">Low Risk</div>
-                            <div class="bundle-action">Close</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="section-title">
-                    <h2>Recent Transactions</h2>
-                    <a href="#" class="section-link">View All</a>
-                </div>
-                
-                <div class="transactions-list">
-                    <div class="transaction-item">
-                        <div class="transaction-info">
-                            <div class="transaction-icon">
-                                <i class="fas fa-arrow-down"></i>
-                            </div>
-                            <div class="transaction-details">
-                                <div class="transaction-title">Deposit Received</div>
-                                <div class="transaction-date">Today, 11:24 AM</div>
-                            </div>
-                        </div>
-                        <div class="transaction-amount positive">+$5,000.00</div>
-                    </div>
-                    
-                    <div class="transaction-item">
-                        <div class="transaction-info">
-                            <div class="transaction-icon">
-                                <i class="fas fa-cube"></i>
-                            </div>
-                            <div class="transaction-details">
-                                <div class="transaction-title">Build Investment</div>
-                                <div class="transaction-date">Yesterday, 02:15 PM</div>
-                            </div>
-                        </div>
-                        <div class="transaction-amount negative">-$2,500.00</div>
-                    </div>
-                    
-                    <div class="transaction-item">
-                        <div class="transaction-info">
-                            <div class="transaction-icon">
-                                <i class="fas fa-coins"></i>
-                            </div>
-                            <div class="transaction-details">
-                                <div class="transaction-title">Profit Distribution</div>
-                                <div class="transaction-date">Jun 15, 08:42 AM</div>
-                            </div>
-                        </div>
-                        <div class="transaction-amount positive">+$654.82</div>
-                    </div>
-                </div>
+
+        <!-- Marketplace Page -->
+        <div class="page" id="marketplacePage">
+            <h2 class="section-title">Available Bundles</h2>
+            
+            <div class="filters">
+                <button class="filter-btn active">All</button>
+                <button class="filter-btn">Low Risk</button>
+                <button class="filter-btn">High Profit</button>
+                <button class="filter-btn">Short Term</button>
+                <button class="filter-btn">Crypto</button>
             </div>
             
-            <!-- Marketplace Page -->
-            <div id="marketplace-page" class="page">
-                <div class="search-container">
-                    <div class="search-icon">
-                        <i class="fas fa-search"></i>
+            <div class="recommended-bundles">
+                <!-- Bundle 1 -->
+                <div class="bundle">
+                    <div class="bundle-header">
+                        <div class="bundle-title">Stable Growth</div>
+                        <div class="bundle-profit">+7.5%</div>
                     </div>
-                    <input type="text" class="search-input" placeholder="Search builds...">
-                </div>
-                
-                <div class="filters">
-                    <div class="filter-tag active">All Builds</div>
-                    <div class="filter-tag">Low Risk</div>
-                    <div class="filter-tag">High Yield</div>
-                    <div class="filter-tag">Short Term</div>
-                    <div class="filter-tag">BTC Focused</div>
-                    <div class="filter-tag">ETH Focused</div>
-                </div>
-                
-                <div class="section-title">
-                    <h2>Featured Builds</h2>
-                    <a href="#" class="section-link">Filters</a>
-                </div>
-                
-                <div class="bundles-list">
-                    <div class="bundle-card">
-                        <div class="bundle-header">
-                            <div class="bundle-title">Nebula Portfolio</div>
-                            <div class="bundle-profit">+18.5%</div>
-                        </div>
-                        <div class="bundle-details">
-                            <div>Duration: 6h 30m</div>
-                            <div>Min: $100</div>
-                        </div>
-                        <div class="bundle-structure">
-                            <div class="asset-block" style="width: 40%;">
-                                <div class="asset-label">ETH 40%</div>
-                                <div style="background: linear-gradient(90deg, #8338ec, #5a189a); height: 100%;"></div>
-                            </div>
-                            <div class="asset-block" style="width: 35%;">
-                                <div class="asset-label">SOL 35%</div>
-                                <div style="background: linear-gradient(90deg, #ff006e, #ff7096); height: 100%;"></div>
-                            </div>
-                            <div class="asset-block" style="width: 25%;">
-                                <div class="asset-label">BNB 25%</div>
-                                <div style="background: linear-gradient(90deg, #ff9e00, #ff5400); height: 100%;"></div>
-                            </div>
-                        </div>
-                        <div class="bundle-footer">
-                            <div class="risk-tag risk-high">High Risk</div>
-                            <div class="bundle-action">Invest</div>
-                        </div>
+                    <div class="bundle-details">
+                        <div>Duration: 4h</div>
+                        <div>Risk: Low</div>
                     </div>
-                    
-                    <div class="bundle-card">
-                        <div class="bundle-header">
-                            <div class="bundle-title">Galaxy Balanced</div>
-                            <div class="bundle-profit">+9.2%</div>
-                        </div>
-                        <div class="bundle-details">
-                            <div>Duration: 12h</div>
-                            <div>Min: $50</div>
-                        </div>
-                        <div class="bundle-structure">
-                            <div class="asset-block" style="width: 50%;">
-                                <div class="asset-label">BTC 50%</div>
-                                <div style="background: linear-gradient(90deg, #3a86ff, #4361ee); height: 100%;"></div>
-                            </div>
-                            <div class="asset-block" style="width: 30%;">
-                                <div class="asset-label">ETH 30%</div>
-                                <div style="background: linear-gradient(90deg, #8338ec, #5a189a); height: 100%;"></div>
-                            </div>
-                            <div class="asset-block" style="width: 20%;">
-                                <div class="asset-label">USDT 20%</div>
-                                <div style="background: linear-gradient(90deg, #00b4d8, #0077b6); height: 100%;"></div>
-                            </div>
-                        </div>
-                        <div class="bundle-footer">
-                            <div class="risk-tag risk-low">Low Risk</div>
-                            <div class="bundle-action">Invest</div>
-                        </div>
+                    <div class="bundle-structure">
+                        <div class="asset" style="background-color: #f7931a; width: 50%;">BTC 50%</div>
+                        <div class="asset" style="background-color: #627eea; width: 30%;">ETH 30%</div>
+                        <div class="asset" style="background-color: #26a17b; width: 20%;">USDT 20%</div>
                     </div>
-                    
-                    <div class="bundle-card">
-                        <div class="bundle-header">
-                            <div class="bundle-title">Cosmos Aggressive</div>
-                            <div class="bundle-profit">+26.7%</div>
-                        </div>
-                        <div class="bundle-details">
-                            <div>Duration: 4h 15m</div>
-                            <div>Min: $200</div>
-                        </div>
-                        <div class="bundle-structure">
-                            <div class="asset-block" style="width: 55%;">
-                                <div class="asset-label">SOL 55%</div>
-                                <div style="background: linear-gradient(90deg, #ff006e, #ff7096); height: 100%;"></div>
-                            </div>
-                            <div class="asset-block" style="width: 30%;">
-                                <div class="asset-label">ADA 30%</div>
-                                <div style="background: linear-gradient(90deg, #06d6a0, #048a81); height: 100%;"></div>
-                            </div>
-                            <div class="asset-block" style="width: 15%;">
-                                <div class="asset-label">DOT 15%</div>
-                                <div style="background: linear-gradient(90deg, #118ab2, #073b4c); height: 100%;"></div>
-                            </div>
-                        </div>
-                        <div class="bundle-footer">
-                            <div class="risk-tag risk-high">High Risk</div>
-                            <div class="bundle-action">Invest</div>
-                        </div>
+                    <div class="bundle-footer">
+                        <div>Min: $50</div>
+                        <button class="bundle-invest">Invest</button>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Settings Page -->
-            <div id="settings-page" class="page">
-                <div class="settings-list">
-                    <div class="setting-card">
-                        <div class="setting-header">
-                            <div class="setting-icon">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <div class="setting-title">Account Settings</div>
-                            <div class="setting-arrow">
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                        </div>
-                        <div class="setting-content">
-                            <div class="setting-item">
-                                <div class="setting-name">Username</div>
-                                <div>@crypto_trader</div>
-                            </div>
-                            <div class="setting-item">
-                                <div class="setting-name">Email</div>
-                                <div>user@quantumbuilds.com</div>
-                            </div>
-                            <div class="setting-item">
-                                <div class="setting-name">Telegram Account</div>
-                                <div>Connected</div>
-                            </div>
-                        </div>
+
+                <!-- Bundle 2 -->
+                <div class="bundle">
+                    <div class="bundle-header">
+                        <div class="bundle-title">Tech Leaders</div>
+                        <div class="bundle-profit">+12.3%</div>
                     </div>
-                    
-                    <div class="setting-card">
-                        <div class="setting-header">
-                            <div class="setting-icon">
-                                <i class="fas fa-shield-alt"></i>
-                            </div>
-                            <div class="setting-title">Security</div>
-                            <div class="setting-arrow">
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                        </div>
-                        <div class="setting-content">
-                            <div class="setting-item">
-                                <div class="setting-name">Two-Factor Authentication</div>
-                                <label class="switch">
-                                    <input type="checkbox" checked>
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
-                            <div class="setting-item">
-                                <div class="setting-name">Hide Balance</div>
-                                <label class="switch">
-                                    <input type="checkbox">
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
-                            <div class="setting-item">
-                                <div class="setting-name">Login Password</div>
-                                <div>••••••••</div>
-                            </div>
-                        </div>
+                    <div class="bundle-details">
+                        <div>Duration: 8h</div>
+                        <div>Risk: Medium</div>
                     </div>
-                    
-                    <div class="setting-card">
-                        <div class="setting-header">
-                            <div class="setting-icon">
-                                <i class="fas fa-globe"></i>
-                            </div>
-                            <div class="setting-title">Preferences</div>
-                            <div class="setting-arrow">
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                        </div>
-                        <div class="setting-content">
-                            <div class="setting-item">
-                                <div class="setting-name">Language</div>
-                                <div>English</div>
-                            </div>
-                            <div class="setting-item">
-                                <div class="setting-name">Currency</div>
-                                <div>USDT</div>
-                            </div>
-                            <div class="setting-item">
-                                <div class="setting-name">Theme</div>
-                                <div>Dark</div>
-                            </div>
-                        </div>
+                    <div class="bundle-structure">
+                        <div class="asset" style="background-color: #00d395; width: 45%;">SOL 45%</div>
+                        <div class="asset" style="background-color: #5d78ff; width: 30%;">DOT 30%</div>
+                        <div class="asset" style="background-color: #f3ba2f; width: 25%;">BNB 25%</div>
                     </div>
-                    
-                    <div class="setting-card">
-                        <div class="setting-header">
-                            <div class="setting-icon">
-                                <i class="fas fa-bell"></i>
-                            </div>
-                            <div class="setting-title">Notifications</div>
-                            <div class="setting-arrow">
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                        </div>
-                        <div class="setting-content">
-                            <div class="setting-item">
-                                <div class="setting-name">Build Updates</div>
-                                <label class="switch">
-                                    <input type="checkbox" checked>
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
-                            <div class="setting-item">
-                                <div class="setting-name">New Build Alerts</div>
-                                <label class="switch">
-                                    <input type="checkbox" checked>
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
-                            <div class="setting-item">
-                                <div class="setting-name">Market Movements</div>
-                                <label class="switch">
-                                    <input type="checkbox">
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
-                        </div>
+                    <div class="bundle-footer">
+                        <div>Min: $30</div>
+                        <button class="bundle-invest">Invest</button>
                     </div>
-                    
-                    <div class="setting-card">
-                        <div class="setting-header">
-                            <div class="setting-icon">
-                                <i class="fas fa-info-circle"></i>
-                            </div>
-                            <div class="setting-title">Information</div>
-                            <div class="setting-arrow">
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                        </div>
-                        <div class="setting-content">
-                            <div class="setting-item">
-                                <div class="setting-name">FAQ & Help Center</div>
-                                <div><i class="fas fa-arrow-right"></i></div>
-                            </div>
-                            <div class="setting-item">
-                                <div class="setting-name">Terms of Service</div>
-                                <div><i class="fas fa-arrow-right"></i></div>
-                            </div>
-                            <div class="setting-item">
-                                <div class="setting-name">Privacy Policy</div>
-                                <div><i class="fas fa-arrow-right"></i></div>
-                            </div>
-                        </div>
+                </div>
+
+                <!-- Bundle 3 -->
+                <div class="bundle">
+                    <div class="bundle-header">
+                        <div class="bundle-title">Meme Power</div>
+                        <div class="bundle-profit">+24.8%</div>
+                    </div>
+                    <div class="bundle-details">
+                        <div>Duration: 6h</div>
+                        <div>Risk: High</div>
+                    </div>
+                    <div class="bundle-structure">
+                        <div class="asset" style="background-color: #d07c16; width: 50%;">DOGE 50%</div>
+                        <div class="asset" style="background-color: #a57eff; width: 30%;">SHIB 30%</div>
+                        <div class="asset" style="background-color: #00a3ff; width: 20%;">PEPE 20%</div>
+                    </div>
+                    <div class="bundle-footer">
+                        <div>Min: $20</div>
+                        <button class="bundle-invest">Invest</button>
+                    </div>
+                </div>
+
+                <!-- Bundle 4 -->
+                <div class="bundle">
+                    <div class="bundle-header">
+                        <div class="bundle-title">DeFi Stars</div>
+                        <div class="bundle-profit">+9.7%</div>
+                    </div>
+                    <div class="bundle-details">
+                        <div>Duration: 10h</div>
+                        <div>Risk: Medium</div>
+                    </div>
+                    <div class="bundle-structure">
+                        <div class="asset" style="background-color: #ff007a; width: 40%;">UNI 40%</div>
+                        <div class="asset" style="background-color: #00d2ff; width: 35%;">AAVE 35%</div>
+                        <div class="asset" style="background-color: #6747ed; width: 25%;">MKR 25%</div>
+                    </div>
+                    <div class="bundle-footer">
+                        <div>Min: $40</div>
+                        <button class="bundle-invest">Invest</button>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <!-- Navigation Tabs -->
-        <div class="nav-tabs">
-            <div class="nav-tab active" data-page="portfolio-page">
-                <i class="fas fa-chart-pie"></i>
-                <span>Portfolio</span>
-            </div>
-            <div class="nav-tab" data-page="marketplace-page">
-                <i class="fas fa-cubes"></i>
-                <span>Builds</span>
-            </div>
-            <div class="nav-tab" data-page="settings-page">
-                <i class="fas fa-sliders-h"></i>
-                <span>Settings</span>
-            </div>
-        </div>
-        
-        <!-- Deposit Modal -->
-        <div class="modal-overlay" id="deposit-modal">
-            <div class="modal">
-                <div class="modal-header">
-                    <div class="modal-title">Deposit Funds</div>
-                    <button class="modal-close">&times;</button>
+
+        <!-- Settings Page -->
+        <div class="page" id="settingsPage">
+            <div class="settings-section">
+                <div class="settings-header">
+                    <div class="profile-pic">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="profile-info">
+                        <h2>John Crypto</h2>
+                        <p>@john_crypto</p>
+                    </div>
                 </div>
-                <div class="modal-body">
-                    <p>Fund your account to start investing in crypto builds. Select your preferred deposit method and enter the amount.</p>
-                    <p style="margin-top: 15px;">Minimum deposit: $50.00</p>
+
+                <div class="settings-group">
+                    <h3 class="settings-title">Security</h3>
+                    <div class="settings-item">
+                        <div class="settings-label">
+                            <i class="fas fa-envelope"></i>
+                            <span>Email Verification</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-label">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>2FA Authentication</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-label">
+                            <i class="fas fa-eye-slash"></i>
+                            <span>Hide Balance</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
                 </div>
-                <div class="modal-actions">
-                    <button class="btn btn-outline" style="flex: 1;">Cancel</button>
-                    <button class="btn btn-primary" style="flex: 1;">Continue</button>
+
+                <div class="settings-group">
+                    <h3 class="settings-title">Preferences</h3>
+                    <div class="settings-item">
+                        <div class="settings-label">
+                            <i class="fas fa-globe"></i>
+                            <span>Language</span>
+                        </div>
+                        <div>English</div>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-label">
+                            <i class="fas fa-bell"></i>
+                            <span>Notifications</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <h3 class="settings-title">Information</h3>
+                    <div class="settings-item">
+                        <div class="settings-label">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Terms of Service</span>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-label">
+                            <i class="fas fa-lock"></i>
+                            <span>Privacy Policy</span>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-label">
+                            <i class="fas fa-question-circle"></i>
+                            <span>FAQ & Support</span>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Deposit Modal -->
+    <div class="modal" id="depositModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Deposit Funds</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Deposit USDT to your account to start investing.</p>
+                <div style="margin: 20px 0; text-align: center;">
+                    <div style="background-color: #1e1e1e; padding: 20px; border-radius: 12px; font-family: monospace; word-break: break-all;">
+                        0x742d35Cc6634C0532925a3b844Bc454e4438f44e
+                    </div>
+                    <p style="margin-top: 10px; color: #b0b0b0; font-size: 14px;">Send only USDT to this address</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel close-modal">Cancel</button>
+                <button class="btn btn-confirm" id="copyAddress">Copy Address</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invest Modal -->
+    <div class="modal" id="investModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Confirm Investment</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>You're about to invest in:</p>
+                <h4 style="margin: 15px 0; text-align: center;">Low Risk BTC/ETH</h4>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                    <div>Target Profit:</div>
+                    <div style="font-weight: 700; color: #4caf50;">+8.2%</div>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                    <div>Duration:</div>
+                    <div>6 hours</div>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                    <div>Risk Level:</div>
+                    <div>Low</div>
+                </div>
+                <div style="margin-top: 20px;">
+                    <label for="investAmount">Investment Amount (USDT)</label>
+                    <input type="number" id="investAmount" placeholder="Enter amount" style="width: 100%; padding: 12px; margin-top: 8px; border-radius: 8px; background-color: #2a2a2a; border: 1px solid #333; color: white; font-size: 16px;">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel close-modal">Cancel</button>
+                <button class="btn btn-confirm" id="confirmInvest">Confirm</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Navigation functionality
-        document.querySelectorAll('.nav-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                // Remove active class from all tabs and pages
-                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        // Page Navigation
+        document.querySelectorAll('.nav-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons and pages
+                document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
                 
-                // Add active class to clicked tab
-                tab.classList.add('active');
+                // Add active class to clicked button
+                button.classList.add('active');
                 
                 // Show corresponding page
-                const pageId = tab.getAttribute('data-page');
+                const pageId = button.getAttribute('data-page') + 'Page';
                 document.getElementById(pageId).classList.add('active');
             });
         });
+
+        // Toggle Balance Visibility
+        const toggleBalance = document.getElementById('toggleBalance');
+        const balanceAmount = document.getElementById('balanceAmount');
         
-        // Balance visibility toggle
-        const balanceToggle = document.querySelector('.balance-toggle');
-        const balanceAmount = document.querySelector('.balance-amount');
-        const balanceChange = document.querySelector('.balance-change');
-        
-        let balanceVisible = true;
-        
-        balanceToggle.addEventListener('click', () => {
-            balanceVisible = !balanceVisible;
-            balanceToggle.innerHTML = balanceVisible ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
-            balanceAmount.textContent = balanceVisible ? '$18,426.90' : '•••••••';
-            balanceChange.textContent = balanceVisible ? '<i class="fas fa-arrow-trend-up"></i> +3.7% ($654.82)' : '•••••••';
+        toggleBalance.addEventListener('click', () => {
+            if (balanceAmount.textContent === '$1,245.80') {
+                balanceAmount.textContent = '******';
+                toggleBalance.innerHTML = '<i class="fas fa-eye-slash"></i>';
+            } else {
+                balanceAmount.textContent = '$1,245.80';
+                toggleBalance.innerHTML = '<i class="fas fa-eye"></i>';
+            }
         });
+
+        // Modal Handling
+        const depositModal = document.getElementById('depositModal');
+        const investModal = document.getElementById('investModal');
         
-        // Modal functionality
-        const depositModal = document.getElementById('deposit-modal');
-        const depositBtn = document.querySelector('.btn-primary');
-        const closeModalBtns = document.querySelectorAll('.modal-close, .btn-outline');
-        
-        depositBtn.addEventListener('click', () => {
+        // Show deposit modal
+        document.getElementById('depositBtn').addEventListener('click', () => {
             depositModal.classList.add('active');
         });
         
-        closeModalBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                depositModal.classList.remove('active');
+        // Show invest modal when any "Invest" button is clicked
+        document.querySelectorAll('.bundle-invest').forEach(button => {
+            button.addEventListener('click', () => {
+                investModal.classList.add('active');
             });
         });
         
-        // Close modal when clicking outside
-        depositModal.addEventListener('click', (e) => {
-            if (e.target === depositModal) {
+        // Close modals
+        document.querySelectorAll('.close-modal').forEach(button => {
+            button.addEventListener('click', () => {
                 depositModal.classList.remove('active');
+                investModal.classList.remove('active');
+            });
+        });
+        
+        // Copy address to clipboard
+        document.getElementById('copyAddress').addEventListener('click', () => {
+            navigator.clipboard.writeText('0x742d35Cc6634C0532925a3b844Bc454e4438f44e');
+            alert('Address copied to clipboard!');
+        });
+        
+        // Confirm investment
+        document.getElementById('confirmInvest').addEventListener('click', () => {
+            const amount = document.getElementById('investAmount').value;
+            if (amount && parseFloat(amount) > 0) {
+                alert(`Successfully invested ${amount} USDT!`);
+                investModal.classList.remove('active');
+            } else {
+                alert('Please enter a valid amount');
             }
         });
         
-        // Bundle actions (invest/close)
-        document.querySelectorAll('.bundle-action').forEach(action => {
-            action.addEventListener('click', (e) => {
+        // Close bundle buttons
+        document.querySelectorAll('.close-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const actionType = action.textContent;
-                const bundleName = action.closest('.bundle-card').querySelector('.bundle-title').textContent;
-                
-                if (actionType === 'Invest') {
-                    alert(`You are about to invest in the "${bundleName}" build`);
-                } else {
-                    alert(`Closing your position in the "${bundleName}" build`);
+                const bundle = button.closest('.bundle');
+                const bundleName = bundle.querySelector('.bundle-title').textContent;
+                if (confirm(`Are you sure you want to close your position in "${bundleName}"?`)) {
+                    alert(`Position in "${bundleName}" closed successfully!`);
+                    bundle.remove();
                 }
             });
         });
         
-        // Transaction details
-        document.querySelectorAll('.transaction-item').forEach(item => {
+        // Filter buttons in marketplace
+        document.querySelectorAll('.filter-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+            });
+        });
+        
+        // Bundle click to show details (for portfolio bundles)
+        document.querySelectorAll('.open-bundles .bundle').forEach(bundle => {
+            bundle.addEventListener('click', (e) => {
+                // Only open details if not clicking on close button
+                if (!e.target.closest('.close-btn')) {
+                    const bundleName = bundle.querySelector('.bundle-title').textContent;
+                    alert(`Details for "${bundleName}" would be shown here`);
+                }
+            });
+        });
+        
+        // History item click
+        document.querySelectorAll('.history-item').forEach(item => {
             item.addEventListener('click', () => {
-                const title = item.querySelector('.transaction-title').textContent;
-                alert(`Showing details for transaction: ${title}`);
-            });
-        });
-        
-        // Settings accordion
-        document.querySelectorAll('.setting-header').forEach(header => {
-            header.addEventListener('click', () => {
-                header.classList.toggle('active');
-            });
-        });
-        
-        // Filter tags
-        document.querySelectorAll('.filter-tag').forEach(tag => {
-            tag.addEventListener('click', () => {
-                document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
-                tag.classList.add('active');
+                const type = item.querySelector('.history-type').textContent;
+                alert(`Details for ${type} transaction would be shown here`);
             });
         });
     </script>
