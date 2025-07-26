@@ -502,6 +502,27 @@
             color: var(--text-tertiary);
         }
         
+        .language-selector {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .lang-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            background-color: rgba(59, 130, 246, 0.1);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .lang-btn.active {
+            background-color: var(--accent);
+            color: white;
+        }
+        
         /* Modal */
         .modal {
             position: fixed;
@@ -559,6 +580,90 @@
             cursor: pointer;
         }
         
+        .modal-body {
+            margin: 20px 0;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .amount-input {
+            width: 100%;
+            background-color: var(--secondary);
+            border: none;
+            border-radius: 12px;
+            padding: 14px 16px;
+            color: var(--text-primary);
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .amount-input::placeholder {
+            color: var(--text-tertiary);
+        }
+        
+        .currency-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background-color: var(--secondary);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        
+        .currency-option.active {
+            border: 1px solid var(--accent);
+        }
+        
+        .currency-icon {
+            width: 30px;
+            height: 30px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .currency-info {
+            flex: 1;
+        }
+        
+        .currency-name {
+            font-weight: 500;
+        }
+        
+        .currency-fee {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+        
+        .info-text {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-top: 8px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .action-buttons .btn {
+            flex: 1;
+        }
+        
         /* Responsive */
         @media (max-width: 480px) {
             .app-container {
@@ -585,45 +690,45 @@
         
         <!-- Page Content -->
         <div id="portfolio-page" class="page-content active">
-            <h2 class="section-title"><i class="fas fa-chart-line"></i> Портфель</h2>
+            <h2 class="section-title"><i class="fas fa-chart-line"></i> <span class="lang-portfolio">Портфель</span></h2>
             
             <div class="balance-card">
                 <div class="balance-header">
-                    <div class="balance-title">Общий баланс</div>
+                    <div class="balance-title lang-total-balance">Общий баланс</div>
                     <div class="actions">
-                        <button class="btn btn-primary"><i class="fas fa-plus"></i> Пополнить</button>
-                        <button class="btn btn-outline"><i class="fas fa-arrow-right"></i> Вывести</button>
+                        <button class="btn btn-primary" id="deposit-btn"><i class="fas fa-plus"></i> <span class="lang-deposit">Пополнить</span></button>
+                        <button class="btn btn-outline" id="withdraw-btn"><i class="fas fa-arrow-right"></i> <span class="lang-withdraw">Вывести</span></button>
                     </div>
                 </div>
                 
                 <div class="chart-placeholder">
-                    <i class="fas fa-chart-line"></i> График баланса
+                    <i class="fas fa-chart-line"></i> <span class="lang-balance-chart">График баланса</span>
                 </div>
             </div>
             
-            <h3 class="open-builds-title"><i class="fas fa-folder-open"></i> Открытые сборки</h3>
+            <h3 class="open-builds-title"><i class="fas fa-folder-open"></i> <span class="lang-open-builds">Открытые сборки</span></h3>
             
             <div class="builds-list">
                 <div class="build-card">
                     <div class="build-header">
                         <div class="build-name">Крипто-индекс</div>
-                        <div class="build-status status-active">Активна</div>
+                        <div class="build-status status-active lang-active">Активна</div>
                     </div>
                     <div class="build-details">
                         <div class="detail-item">
-                            <div class="detail-label">Срок</div>
+                            <div class="detail-label lang-period">Срок</div>
                             <div class="detail-value">4 часа</div>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">Цель</div>
+                            <div class="detail-label lang-target">Цель</div>
                             <div class="detail-value positive-value">+2.8%</div>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">Риск</div>
+                            <div class="detail-label lang-risk">Риск</div>
                             <div class="detail-value">Средний</div>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">Инвестиция</div>
+                            <div class="detail-label lang-invested">Инвестиция</div>
                             <div class="detail-value">$350.00</div>
                         </div>
                     </div>
@@ -633,30 +738,30 @@
                         <div class="asset asset-3" style="width: 20%">SOL 20%</div>
                     </div>
                     <div class="build-actions">
-                        <button class="btn btn-outline close-btn">Закрыть</button>
+                        <button class="btn btn-outline close-btn lang-close">Закрыть</button>
                     </div>
                 </div>
                 
                 <div class="build-card">
                     <div class="build-header">
                         <div class="build-name">Дефи-комбо</div>
-                        <div class="build-status status-active">Активна</div>
+                        <div class="build-status status-active lang-active">Активна</div>
                     </div>
                     <div class="build-details">
                         <div class="detail-item">
-                            <div class="detail-label">Срок</div>
+                            <div class="detail-label lang-period">Срок</div>
                             <div class="detail-value">8 часов</div>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">Цель</div>
+                            <div class="detail-label lang-target">Цель</div>
                             <div class="detail-value positive-value">+4.2%</div>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">Риск</div>
+                            <div class="detail-label lang-risk">Риск</div>
                             <div class="detail-value">Высокий</div>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">Инвестиция</div>
+                            <div class="detail-label lang-invested">Инвестиция</div>
                             <div class="detail-value">$210.00</div>
                         </div>
                     </div>
@@ -666,17 +771,17 @@
                         <div class="asset asset-3" style="width: 25%">MKR 25%</div>
                     </div>
                     <div class="build-actions">
-                        <button class="btn btn-outline close-btn">Закрыть</button>
+                        <button class="btn btn-outline close-btn lang-close">Закрыть</button>
                     </div>
                 </div>
             </div>
             
-            <h3 class="history-title"><i class="fas fa-history"></i> История операций</h3>
+            <h3 class="history-title"><i class="fas fa-history"></i> <span class="lang-history">История операций</span></h3>
             
             <div class="history-list">
                 <div class="history-item">
                     <div class="history-info">
-                        <div class="history-type">Пополнение</div>
+                        <div class="history-type lang-deposit">Пополнение</div>
                         <div class="history-date">Сегодня, 14:30</div>
                     </div>
                     <div class="history-amount positive-value">+$500.00</div>
@@ -684,7 +789,7 @@
                 
                 <div class="history-item">
                     <div class="history-info">
-                        <div class="history-type">Инвестиция</div>
+                        <div class="history-type lang-investment">Инвестиция</div>
                         <div class="history-date">Сегодня, 14:45</div>
                     </div>
                     <div class="history-amount negative-value">-$350.00</div>
@@ -692,7 +797,7 @@
                 
                 <div class="history-item">
                     <div class="history-info">
-                        <div class="history-type">Инвестиция</div>
+                        <div class="history-type lang-investment">Инвестиция</div>
                         <div class="history-date">Сегодня, 15:20</div>
                     </div>
                     <div class="history-amount negative-value">-$210.00</div>
@@ -700,7 +805,7 @@
                 
                 <div class="history-item">
                     <div class="history-info">
-                        <div class="history-type">Доход</div>
+                        <div class="history-type lang-income">Доход</div>
                         <div class="history-date">Вчера, 18:40</div>
                     </div>
                     <div class="history-amount positive-value">+$86.50</div>
@@ -709,7 +814,7 @@
         </div>
         
         <div id="marketplace-page" class="page-content">
-            <h2 class="section-title"><i class="fas fa-store"></i> Маркетплейс</h2>
+            <h2 class="section-title"><i class="fas fa-store"></i> <span class="lang-marketplace">Маркетплейс</span></h2>
             
             <div class="search-container">
                 <input type="text" class="search-input" placeholder="Поиск сборок...">
@@ -719,18 +824,18 @@
             <div class="filter-container">
                 <div class="filter-row">
                     <div class="filter-item">
-                        <div class="filter-label">Ожидаемая прибыль</div>
+                        <div class="filter-label lang-expected-profit">Ожидаемая прибыль</div>
                         <select class="filter-select">
-                            <option>Любая</option>
+                            <option class="lang-any">Любая</option>
                             <option>+10% и выше</option>
                             <option>+20% и выше</option>
                             <option>+30% и выше</option>
                         </select>
                     </div>
                     <div class="filter-item">
-                        <div class="filter-label">Срок закрытия</div>
+                        <div class="filter-label lang-closing-time">Срок закрытия</div>
                         <select class="filter-select">
-                            <option>Любой</option>
+                            <option class="lang-any">Любой</option>
                             <option>До 1 часа</option>
                             <option>До 4 часов</option>
                             <option>До 12 часов</option>
@@ -740,18 +845,18 @@
                 
                 <div class="filter-row">
                     <div class="filter-item">
-                        <div class="filter-label">Уровень риска</div>
+                        <div class="filter-label lang-risk-level">Уровень риска</div>
                         <select class="filter-select">
-                            <option>Любой</option>
-                            <option>Низкий</option>
-                            <option>Средний</option>
-                            <option>Высокий</option>
+                            <option class="lang-any">Любой</option>
+                            <option class="lang-low">Низкий</option>
+                            <option class="lang-medium">Средний</option>
+                            <option class="lang-high">Высокий</option>
                         </select>
                     </div>
                     <div class="filter-item">
-                        <div class="filter-label">Размер вложений</div>
+                        <div class="filter-label lang-investment-size">Размер вложений</div>
                         <select class="filter-select">
-                            <option>Любой</option>
+                            <option class="lang-any">Любой</option>
                             <option>До $100</option>
                             <option>$100 - $500</option>
                             <option>$500+</option>
@@ -760,30 +865,26 @@
                 </div>
             </div>
             
-            <h3 class="recommended-title">Рекомендованные сборки</h3>
+            <h3 class="recommended-title lang-recommended">Рекомендованные сборки</h3>
             
             <div class="builds-list">
                 <div class="build-card">
                     <div class="build-header">
                         <div class="build-name">Биткоин-профит</div>
-                        <div class="build-status status-active">Доступна</div>
+                        <div class="build-status status-active lang-available">Доступна</div>
                     </div>
                     <div class="build-details">
                         <div class="detail-item">
-                            <div class="detail-label">Срок</div>
+                            <div class="detail-label lang-period">Срок</div>
                             <div class="detail-value">3 часа</div>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">Цель</div>
+                            <div class="detail-label lang-target">Цель</div>
                             <div class="detail-value positive-value">+3.5%</div>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">Риск</div>
-                            <div class="detail-value">Низкий</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Инвестиция</div>
-                            <div class="detail-value">от $100</div>
+                            <div class="detail-label lang-risk">Риск</div>
+                            <div class="detail-value lang-low">Низкий</div>
                         </div>
                     </div>
                     <div class="build-assets">
@@ -792,31 +893,27 @@
                         <div class="asset asset-3" style="width: 10%">BNB 10%</div>
                     </div>
                     <div class="build-actions">
-                        <button class="btn btn-primary invest-btn">Инвестировать</button>
+                        <button class="btn btn-primary invest-btn lang-invest">Инвестировать</button>
                     </div>
                 </div>
                 
                 <div class="build-card">
                     <div class="build-header">
                         <div class="build-name">Эфириум-буст</div>
-                        <div class="build-status status-active">Доступна</div>
+                        <div class="build-status status-active lang-available">Доступна</div>
                     </div>
                     <div class="build-details">
                         <div class="detail-item">
-                            <div class="detail-label">Срок</div>
+                            <div class="detail-label lang-period">Срок</div>
                             <div class="detail-value">6 часов</div>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">Цель</div>
+                            <div class="detail-label lang-target">Цель</div>
                             <div class="detail-value positive-value">+4.8%</div>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">Риск</div>
-                            <div class="detail-value">Средний</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Инвестиция</div>
-                            <div class="detail-value">от $50</div>
+                            <div class="detail-label lang-risk">Риск</div>
+                            <div class="detail-value lang-medium">Средний</div>
                         </div>
                     </div>
                     <div class="build-assets">
@@ -825,31 +922,27 @@
                         <div class="asset asset-3" style="width: 15%">LDO 15%</div>
                     </div>
                     <div class="build-actions">
-                        <button class="btn btn-primary invest-btn">Инвестировать</button>
+                        <button class="btn btn-primary invest-btn lang-invest">Инвестировать</button>
                     </div>
                 </div>
                 
                 <div class="build-card">
                     <div class="build-header">
                         <div class="build-name">Альткоин-раннеры</div>
-                        <div class="build-status status-active">Доступна</div>
+                        <div class="build-status status-active lang-available">Доступна</div>
                     </div>
                     <div class="build-details">
                         <div class="detail-item">
-                            <div class="detail-label">Срок</div>
+                            <div class="detail-label lang-period">Срок</div>
                             <div class="detail-value">2 часа</div>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">Цель</div>
+                            <div class="detail-label lang-target">Цель</div>
                             <div class="detail-value positive-value">+5.2%</div>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">Риск</div>
-                            <div class="detail-value">Высокий</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Инвестиция</div>
-                            <div class="detail-value">от $150</div>
+                            <div class="detail-label lang-risk">Риск</div>
+                            <div class="detail-value lang-high">Высокий</div>
                         </div>
                     </div>
                     <div class="build-assets">
@@ -858,20 +951,20 @@
                         <div class="asset asset-3" style="width: 25%">DOT 25%</div>
                     </div>
                     <div class="build-actions">
-                        <button class="btn btn-primary invest-btn">Инвестировать</button>
+                        <button class="btn btn-primary invest-btn lang-invest">Инвестировать</button>
                     </div>
                 </div>
             </div>
         </div>
         
         <div id="settings-page" class="page-content">
-            <h2 class="section-title"><i class="fas fa-cog"></i> Настройки</h2>
+            <h2 class="section-title"><i class="fas fa-cog"></i> <span class="lang-settings">Настройки</span></h2>
             
             <div class="settings-list">
                 <div class="settings-item">
                     <div class="settings-info">
                         <div class="settings-icon"><i class="fas fa-user"></i></div>
-                        <div class="settings-title">Профиль</div>
+                        <div class="settings-title lang-profile">Профиль</div>
                     </div>
                     <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
                 </div>
@@ -879,7 +972,7 @@
                 <div class="settings-item">
                     <div class="settings-info">
                         <div class="settings-icon"><i class="fas fa-shield-alt"></i></div>
-                        <div class="settings-title">Безопасность</div>
+                        <div class="settings-title lang-security">Безопасность</div>
                     </div>
                     <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
                 </div>
@@ -887,7 +980,7 @@
                 <div class="settings-item">
                     <div class="settings-info">
                         <div class="settings-icon"><i class="fas fa-globe"></i></div>
-                        <div class="settings-title">Язык</div>
+                        <div class="settings-title lang-language">Язык</div>
                     </div>
                     <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
                 </div>
@@ -895,7 +988,7 @@
                 <div class="settings-item">
                     <div class="settings-info">
                         <div class="settings-icon"><i class="fas fa-mobile-alt"></i></div>
-                        <div class="settings-title">Устройства</div>
+                        <div class="settings-title lang-devices">Устройства</div>
                     </div>
                     <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
                 </div>
@@ -903,7 +996,7 @@
                 <div class="settings-item">
                     <div class="settings-info">
                         <div class="settings-icon"><i class="fas fa-bell"></i></div>
-                        <div class="settings-title">Уведомления</div>
+                        <div class="settings-title lang-notifications">Уведомления</div>
                     </div>
                     <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
                 </div>
@@ -911,7 +1004,7 @@
                 <div class="settings-item">
                     <div class="settings-info">
                         <div class="settings-icon"><i class="fas fa-info-circle"></i></div>
-                        <div class="settings-title">О нас</div>
+                        <div class="settings-title lang-about">О нас</div>
                     </div>
                     <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
                 </div>
@@ -919,7 +1012,7 @@
                 <div class="settings-item">
                     <div class="settings-info">
                         <div class="settings-icon"><i class="fas fa-question-circle"></i></div>
-                        <div class="settings-title">FAQ</div>
+                        <div class="settings-title lang-faq">FAQ</div>
                     </div>
                     <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
                 </div>
@@ -927,7 +1020,7 @@
                 <div class="settings-item">
                     <div class="settings-info">
                         <div class="settings-icon"><i class="fas fa-file-alt"></i></div>
-                        <div class="settings-title">Условия использования</div>
+                        <div class="settings-title lang-terms">Условия использования</div>
                     </div>
                     <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
                 </div>
@@ -935,7 +1028,7 @@
                 <div class="settings-item">
                     <div class="settings-info">
                         <div class="settings-icon"><i class="fas fa-headset"></i></div>
-                        <div class="settings-title">Обратная связь</div>
+                        <div class="settings-title lang-support">Обратная связь</div>
                     </div>
                     <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
                 </div>
@@ -946,15 +1039,15 @@
         <div class="nav-container">
             <div class="nav-item active" data-page="portfolio-page">
                 <i class="fas fa-chart-line"></i>
-                <span>Портфель</span>
+                <span class="lang-portfolio">Портфель</span>
             </div>
             <div class="nav-item" data-page="marketplace-page">
                 <i class="fas fa-store"></i>
-                <span>Маркетплейс</span>
+                <span class="lang-marketplace">Маркетплейс</span>
             </div>
             <div class="nav-item" data-page="settings-page">
                 <i class="fas fa-cog"></i>
-                <span>Настройки</span>
+                <span class="lang-settings">Настройки</span>
             </div>
         </div>
         
@@ -962,17 +1055,20 @@
         <div class="modal" id="invest-modal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <div class="modal-title">Инвестировать в сборку</div>
+                    <div class="modal-title lang-invest-title">Инвестировать в сборку</div>
                     <button class="modal-close">&times;</button>
                 </div>
                 <div class="modal-body">
-                    <p>Вы собираетесь инвестировать в сборку:</p>
+                    <p class="lang-invest-text">Вы собираетесь инвестировать в сборку:</p>
                     <p class="build-name-modal" style="font-weight: 600; margin: 10px 0;">Биткоин-профит</p>
-                    <div style="margin: 20px 0;">
-                        <label style="display: block; margin-bottom: 8px;">Сумма инвестиции (USDT):</label>
-                        <input type="number" class="search-input" value="100" style="width: 100%;">
+                    
+                    <div class="input-group">
+                        <label class="input-label lang-invest-amount">Сумма инвестиции (USDT)</label>
+                        <input type="number" class="amount-input" value="100" min="10" max="10000">
+                        <div class="info-text lang-available-balance">Доступно: $1,245.80</div>
                     </div>
-                    <button class="btn btn-primary" style="width: 100%;">Подтвердить инвестицию</button>
+                    
+                    <button class="btn btn-primary lang-confirm-invest" style="width: 100%;">Подтвердить инвестицию</button>
                 </div>
             </div>
         </div>
@@ -980,25 +1076,129 @@
         <div class="modal" id="close-modal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <div class="modal-title">Закрыть сборку</div>
+                    <div class="modal-title lang-close-title">Закрыть сборку</div>
                     <button class="modal-close">&times;</button>
                 </div>
                 <div class="modal-body">
-                    <p>Вы уверены, что хотите закрыть сборку?</p>
+                    <p class="lang-close-confirm">Вы уверены, что хотите закрыть сборку?</p>
                     <p class="build-name-modal" style="font-weight: 600; margin: 10px 0;">Крипто-индекс</p>
                     <div style="margin: 20px 0; padding: 15px; background-color: var(--secondary); border-radius: 12px;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                            <span>Текущая прибыль:</span>
+                            <span class="lang-current-profit">Текущая прибыль:</span>
                             <span class="positive-value">+$12.50</span>
                         </div>
                         <div style="display: flex; justify-content: space-between;">
-                            <span>Сумма к возврату:</span>
+                            <span class="lang-return-amount">Сумма к возврату:</span>
                             <span>$362.50</span>
                         </div>
                     </div>
-                    <div style="display: flex; gap: 10px;">
-                        <button class="btn btn-outline" style="flex: 1;">Отмена</button>
-                        <button class="btn btn-primary" style="flex: 1;">Закрыть</button>
+                    <div class="action-buttons">
+                        <button class="btn btn-outline lang-cancel">Отмена</button>
+                        <button class="btn btn-primary lang-close-action">Закрыть</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal" id="deposit-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title lang-deposit-title">Пополнение баланса</div>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group">
+                        <label class="input-label lang-deposit-amount">Сумма пополнения</label>
+                        <input type="number" class="amount-input" placeholder="100" min="10" max="10000">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="input-label lang-choose-currency">Выберите валюту</label>
+                        
+                        <div class="currency-option active">
+                            <div class="currency-icon">
+                                <i class="fab fa-bitcoin"></i>
+                            </div>
+                            <div class="currency-info">
+                                <div class="currency-name">Bitcoin (BTC)</div>
+                                <div class="currency-fee lang-fee">Комиссия: 0.5%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="currency-option">
+                            <div class="currency-icon">
+                                <i class="fab fa-ethereum"></i>
+                            </div>
+                            <div class="currency-info">
+                                <div class="currency-name">Ethereum (ETH)</div>
+                                <div class="currency-fee lang-fee">Комиссия: 0.3%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="currency-option">
+                            <div class="currency-icon">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <div class="currency-info">
+                                <div class="currency-name">Tether (USDT)</div>
+                                <div class="currency-fee lang-fee">Комиссия: 0.1%</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-outline lang-cancel">Отмена</button>
+                        <button class="btn btn-primary lang-proceed">Продолжить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal" id="withdraw-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title lang-withdraw-title">Вывод средств</div>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group">
+                        <label class="input-label lang-withdraw-amount">Сумма вывода</label>
+                        <input type="number" class="amount-input" placeholder="100" min="10" max="10000">
+                        <div class="info-text lang-available-balance">Доступно: $1,245.80</div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="input-label lang-wallet-address">Адрес кошелька</label>
+                        <input type="text" class="amount-input" placeholder="Введите адрес кошелька">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="input-label lang-choose-network">Выберите сеть</label>
+                        <select class="filter-select">
+                            <option>ERC-20 (Ethereum)</option>
+                            <option>BEP-20 (Binance Smart Chain)</option>
+                            <option>TRC-20 (Tron)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-outline lang-cancel">Отмена</button>
+                        <button class="btn btn-primary lang-confirm-withdraw">Подтвердить вывод</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal" id="language-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title lang-language-title">Выбор языка</div>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="language-selector">
+                        <button class="lang-btn active" data-lang="ru">Русский</button>
+                        <button class="lang-btn" data-lang="en">English</button>
                     </div>
                 </div>
             </div>
@@ -1006,23 +1206,170 @@
     </div>
     
     <script>
+        // Тексты для перевода
+        const translations = {
+            ru: {
+                portfolio: "Портфель",
+                totalBalance: "Общий баланс",
+                deposit: "Пополнить",
+                withdraw: "Вывести",
+                balanceChart: "График баланса",
+                openBuilds: "Открытые сборки",
+                period: "Срок",
+                target: "Цель",
+                risk: "Риск",
+                invested: "Инвестиция",
+                close: "Закрыть",
+                history: "История операций",
+                investment: "Инвестиция",
+                income: "Доход",
+                marketplace: "Маркетплейс",
+                expectedProfit: "Ожидаемая прибыль",
+                closingTime: "Срок закрытия",
+                any: "Любой",
+                riskLevel: "Уровень риска",
+                investmentSize: "Размер вложений",
+                low: "Низкий",
+                medium: "Средний",
+                high: "Высокий",
+                recommended: "Рекомендованные сборки",
+                available: "Доступна",
+                active: "Активна",
+                settings: "Настройки",
+                profile: "Профиль",
+                security: "Безопасность",
+                language: "Язык",
+                devices: "Устройства",
+                notifications: "Уведомления",
+                about: "О нас",
+                faq: "FAQ",
+                terms: "Условия использования",
+                support: "Обратная связь",
+                investTitle: "Инвестировать в сборку",
+                investText: "Вы собираетесь инвестировать в сборку:",
+                investAmount: "Сумма инвестиции (USDT)",
+                availableBalance: "Доступно: $1,245.80",
+                confirmInvest: "Подтвердить инвестицию",
+                closeTitle: "Закрыть сборку",
+                closeConfirm: "Вы уверены, что хотите закрыть сборку?",
+                currentProfit: "Текущая прибыль:",
+                returnAmount: "Сумма к возврату:",
+                cancel: "Отмена",
+                closeAction: "Закрыть",
+                depositTitle: "Пополнение баланса",
+                depositAmount: "Сумма пополнения",
+                chooseCurrency: "Выберите валюту",
+                fee: "Комиссия:",
+                proceed: "Продолжить",
+                withdrawTitle: "Вывод средств",
+                withdrawAmount: "Сумма вывода",
+                walletAddress: "Адрес кошелька",
+                chooseNetwork: "Выберите сеть",
+                confirmWithdraw: "Подтвердить вывод",
+                languageTitle: "Выбор языка"
+            },
+            en: {
+                portfolio: "Portfolio",
+                totalBalance: "Total Balance",
+                deposit: "Deposit",
+                withdraw: "Withdraw",
+                balanceChart: "Balance Chart",
+                openBuilds: "Open Builds",
+                period: "Period",
+                target: "Target",
+                risk: "Risk",
+                invested: "Invested",
+                close: "Close",
+                history: "History",
+                investment: "Investment",
+                income: "Income",
+                marketplace: "Marketplace",
+                expectedProfit: "Expected Profit",
+                closingTime: "Closing Time",
+                any: "Any",
+                riskLevel: "Risk Level",
+                investmentSize: "Investment Size",
+                low: "Low",
+                medium: "Medium",
+                high: "High",
+                recommended: "Recommended Builds",
+                available: "Available",
+                active: "Active",
+                settings: "Settings",
+                profile: "Profile",
+                security: "Security",
+                language: "Language",
+                devices: "Devices",
+                notifications: "Notifications",
+                about: "About Us",
+                faq: "FAQ",
+                terms: "Terms of Use",
+                support: "Support",
+                investTitle: "Invest in Build",
+                investText: "You are going to invest in build:",
+                investAmount: "Investment Amount (USDT)",
+                availableBalance: "Available: $1,245.80",
+                confirmInvest: "Confirm Investment",
+                closeTitle: "Close Build",
+                closeConfirm: "Are you sure you want to close this build?",
+                currentProfit: "Current Profit:",
+                returnAmount: "Amount to Return:",
+                cancel: "Cancel",
+                closeAction: "Close",
+                depositTitle: "Deposit Funds",
+                depositAmount: "Deposit Amount",
+                chooseCurrency: "Choose Currency",
+                fee: "Fee:",
+                proceed: "Proceed",
+                withdrawTitle: "Withdraw Funds",
+                withdrawAmount: "Withdrawal Amount",
+                walletAddress: "Wallet Address",
+                chooseNetwork: "Choose Network",
+                confirmWithdraw: "Confirm Withdrawal",
+                languageTitle: "Language Selection"
+            }
+        };
+
+        // Текущий язык
+        let currentLang = 'ru';
+        
+        // Функция смены языка
+        function changeLanguage(lang) {
+            currentLang = lang;
+            document.querySelectorAll('[class^="lang-"]').forEach(element => {
+                const className = Array.from(element.classList).find(cls => cls.startsWith('lang-'));
+                if (className) {
+                    const key = className.replace('lang-', '');
+                    if (translations[lang][key]) {
+                        element.textContent = translations[lang][key];
+                    }
+                }
+            });
+            
+            // Обновляем текст в выпадающих списках
+            document.querySelectorAll('.filter-select option').forEach(option => {
+                const key = option.textContent;
+                if (translations[lang][key]) {
+                    option.textContent = translations[lang][key];
+                }
+            });
+            
+            // Сохраняем выбор языка
+            localStorage.setItem('language', lang);
+        }
+        
         // Навигация
         document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', function() {
-                // Удаляем активный класс у всех элементов
                 document.querySelectorAll('.nav-item').forEach(el => {
                     el.classList.remove('active');
                 });
-                
-                // Добавляем активный класс текущему элементу
                 this.classList.add('active');
                 
-                // Скрываем все страницы
                 document.querySelectorAll('.page-content').forEach(page => {
                     page.classList.remove('active');
                 });
                 
-                // Показываем выбранную страницу
                 const pageId = this.getAttribute('data-page');
                 document.getElementById(pageId).classList.add('active');
             });
@@ -1048,8 +1395,35 @@
             });
         });
         
+        // Кнопки ввода/вывода средств
+        document.getElementById('deposit-btn').addEventListener('click', function() {
+            document.getElementById('deposit-modal').classList.add('active');
+        });
+        
+        document.getElementById('withdraw-btn').addEventListener('click', function() {
+            document.getElementById('withdraw-modal').classList.add('active');
+        });
+        
+        // Кнопки смены языка
+        document.querySelectorAll('.lang-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const lang = this.getAttribute('data-lang');
+                document.querySelectorAll('.lang-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                this.classList.add('active');
+                changeLanguage(lang);
+                document.getElementById('language-modal').classList.remove('active');
+            });
+        });
+        
+        // Открытие модального окна выбора языка
+        document.querySelector('.settings-item:nth-child(3)').addEventListener('click', function() {
+            document.getElementById('language-modal').classList.add('active');
+        });
+        
         // Закрытие модальных окон
-        document.querySelectorAll('.modal-close, .btn-outline').forEach(button => {
+        document.querySelectorAll('.modal-close, .lang-cancel').forEach(button => {
             button.addEventListener('click', function() {
                 document.querySelectorAll('.modal').forEach(modal => {
                     modal.classList.remove('active');
@@ -1064,6 +1438,29 @@
                     this.classList.remove('active');
                 }
             });
+        });
+        
+        // Выбор валюты для пополнения
+        document.querySelectorAll('.currency-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.currency-option').forEach(opt => {
+                    opt.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+        
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            // Проверяем сохраненный язык
+            const savedLang = localStorage.getItem('language');
+            if (savedLang) {
+                changeLanguage(savedLang);
+                document.querySelector(`.lang-btn[data-lang="${savedLang}"]`).classList.add('active');
+            }
+            
+            // Инициализация всех элементов с классом lang-*
+            changeLanguage(currentLang);
         });
     </script>
 </body>
