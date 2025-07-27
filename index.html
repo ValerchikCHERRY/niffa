@@ -938,94 +938,7 @@
     </div>
 
     <script>
-        // Bundle data with dynamic min investment calculation
-        const bundles = [
-            {
-                id: 1,
-                name: "Stable Growth",
-                profit: "+7.5%",
-                duration: "4h",
-                risk: "Low",
-                assets: [
-                    { name: "BTC", percentage: 50, color: "#f7931a" },
-                    { name: "ETH", percentage: 30, color: "#627eea" },
-                    { name: "USDT", percentage: 20, color: "#26a17b" }
-                ],
-                currentInvested: 3.50, // Example current invested amount
-                timeRemaining: Math.floor(Math.random() * 1800) + 60 // 1-30 minutes in seconds
-            },
-            {
-                id: 2,
-                name: "Tech Leaders",
-                profit: "+12.3%",
-                duration: "8h",
-                risk: "Medium",
-                assets: [
-                    { name: "SOL", percentage: 45, color: "#00d395" },
-                    { name: "DOT", percentage: 30, color: "#5d78ff" },
-                    { name: "BNB", percentage: 25, color: "#f3ba2f" }
-                ],
-                currentInvested: 8.75,
-                timeRemaining: Math.floor(Math.random() * 1800) + 60
-            },
-            {
-                id: 3,
-                name: "Meme Power",
-                profit: "+24.8%",
-                duration: "6h",
-                risk: "High",
-                assets: [
-                    { name: "DOGE", percentage: 50, color: "#d07c16" },
-                    { name: "SHIB", percentage: 30, color: "#a57eff" },
-                    { name: "PEPE", percentage: 20, color: "#00a3ff" }
-                ],
-                currentInvested: 12.20,
-                timeRemaining: Math.floor(Math.random() * 1800) + 60
-            },
-            {
-                id: 4,
-                name: "DeFi Stars",
-                profit: "+9.7%",
-                duration: "10h",
-                risk: "Medium",
-                assets: [
-                    { name: "UNI", percentage: 40, color: "#ff007a" },
-                    { name: "AAVE", percentage: 35, color: "#00d2ff" },
-                    { name: "MKR", percentage: 25, color: "#6747ed" }
-                ],
-                currentInvested: 9.30,
-                timeRemaining: Math.floor(Math.random() * 1800) + 60
-            },
-            {
-                id: 5,
-                name: "Blue Chip Mix",
-                profit: "+6.2%",
-                duration: "5h",
-                risk: "Low",
-                assets: [
-                    { name: "BTC", percentage: 40, color: "#f7931a" },
-                    { name: "ETH", percentage: 40, color: "#627eea" },
-                    { name: "USDC", percentage: 20, color: "#2775ca" }
-                ],
-                currentInvested: 15.80,
-                timeRemaining: Math.floor(Math.random() * 1800) + 60
-            },
-            {
-                id: 6,
-                name: "AI Revolution",
-                profit: "+18.5%",
-                duration: "9h",
-                risk: "High",
-                assets: [
-                    { name: "AGIX", percentage: 40, color: "#ff6e6e" },
-                    { name: "FET", percentage: 35, color: "#1e75bb" },
-                    { name: "OCEAN", percentage: 25, color: "#00a0d0" }
-                ],
-                currentInvested: 6.25,
-                timeRemaining: Math.floor(Math.random() * 1800) + 60
-            }
-        ];
-
+            
         // Calculate min investment based on current invested amount
         function calculateMinInvestment(currentInvested) {
             if (currentInvested >= 10) {
@@ -1044,119 +957,167 @@
         }
 
         // Render bundles in marketplace
-        function renderBundles() {
-            const container = document.getElementById('bundlesContainer');
-            container.innerHTML = '';
-            
-            // Get sort option
-            const sortOption = document.getElementById('sortSelect').value;
-            
-            // Sort bundles
-            const sortedBundles = [...bundles];
-            
-            switch(sortOption) {
-                case 'profit':
-                    sortedBundles.sort((a, b) => 
-                        parseFloat(b.profit) - parseFloat(a.profit));
-                    break;
-                case 'risk':
-                    const riskOrder = { "Low": 1, "Medium": 2, "High": 3 };
-                    sortedBundles.sort((a, b) => 
-                        riskOrder[a.risk] - riskOrder[b.risk]);
-                    break;
-                case 'start':
-                    sortedBundles.sort((a, b) => 
-                        a.timeRemaining - b.timeRemaining);
-                    break;
-                case 'duration':
-                    sortedBundles.sort((a, b) => 
-                        parseInt(a.duration) - parseInt(b.duration));
-                    break;
-            }
-            
-            // Render each bundle
-            sortedBundles.forEach(bundle => {
-                const minInvestment = calculateMinInvestment(bundle.currentInvested);
-                
-                const bundleEl = document.createElement('div');
-                bundleEl.className = 'bundle';
-                bundleEl.innerHTML = `
-                    <div class="bundle-header">
-                        <div class="bundle-title">${bundle.name}</div>
-                        <div class="bundle-profit">${bundle.profit}</div>
-                    </div>
-                    <div class="bundle-details">
-                        <div>Duration: ${bundle.duration}</div>
-                        <div>Risk: ${bundle.risk}</div>
-                    </div>
-                    <div class="bundle-structure">
-                        ${bundle.assets.map(asset => 
-                            `<div class="asset" style="background-color: ${asset.color}; width: ${asset.percentage}%;">
-                                ${asset.name} ${asset.percentage}%
-                            </div>`
-                        ).join('')}
-                    </div>
-                    <div class="bundle-footer">
-                        <div class="min-invest">Min: $${minInvestment.toFixed(2)}</div>
-                        <button class="bundle-invest" data-id="${bundle.id}">Invest</button>
-                    </div>
-                    <div class="time-remaining">
-                        <i class="fas fa-clock"></i>
-                        <span class="timer-${bundle.id}">Closing in: ${formatTime(bundle.timeRemaining)}</span>
-                    </div>
-                `;
-                container.appendChild(bundleEl);
-            });
-            
-            // Add event listeners to new invest buttons
-            document.querySelectorAll('.bundle-invest').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const bundleId = e.target.getAttribute('data-id');
-                    const bundle = bundles.find(b => b.id == bundleId);
-                    
-                    if (bundle) {
-                        // Update modal with bundle details
-                        document.getElementById('modalBundleName').textContent = bundle.name;
-                        document.getElementById('modalBundleProfit').textContent = bundle.profit;
-                        document.getElementById('modalBundleDuration').textContent = bundle.duration;
-                        document.getElementById('modalBundleRisk').textContent = bundle.risk;
-                        document.getElementById('modalBundleTime').textContent = formatTime(bundle.timeRemaining);
-                        
-                        // Calculate and show min investment
-                        const minInvestment = calculateMinInvestment(bundle.currentInvested);
-                        document.getElementById('minInvestInfo').textContent = `Min: $${minInvestment.toFixed(2)}`;
-                        
-                        // Show modal
-                        document.getElementById('investModal').classList.add('active');
-                    }
-                });
-            });
+        // Функция загрузки данных из JSON-файла
+async function loadBundlesData() {
+    try {
+        const response = await fetch('bundles.json');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
+        const data = await response.json();
+        return data.bundles;
+    } catch (error) {
+        console.error('Error loading bundles:', error);
+        return [];
+    }
+}
 
-        // Initialize countdown timers
-        function initTimers() {
-            bundles.forEach(bundle => {
-                const timerElement = document.querySelector(`.timer-${bundle.id}`);
-                if (timerElement) {
-                    let seconds = bundle.timeRemaining;
+// Функция рендеринга сборок с загрузкой данных
+async function renderBundles() {
+    const container = document.getElementById('bundlesContainer');
+    
+    // Показываем индикатор загрузки
+    container.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--text-secondary);">Loading bundles...</div>';
+    
+    try {
+        // Загружаем данные из bundles.json
+        const bundles = await loadBundlesData();
+        
+        if (bundles.length === 0) {
+            container.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--text-secondary);">No bundles available. Try again later.</div>';
+            return;
+        }
+        
+        // Очищаем контейнер
+        container.innerHTML = '';
+        
+        // Получаем выбранную сортировку
+        const sortOption = document.getElementById('sortSelect').value;
+        
+        // Создаем копию массива для сортировки
+        const sortedBundles = [...bundles];
+        
+        // Применяем сортировку
+        switch(sortOption) {
+            case 'profit':
+                sortedBundles.sort((a, b) => 
+                    parseFloat(b.profit.replace('+', '')) - parseFloat(a.profit.replace('+', '')));
+                break;
+            case 'risk':
+                const riskOrder = { "Low": 1, "Medium": 2, "High": 3 };
+                sortedBundles.sort((a, b) => 
+                    riskOrder[a.risk] - riskOrder[b.risk]);
+                break;
+            case 'start':
+                sortedBundles.sort((a, b) => 
+                    a.timeRemaining - b.timeRemaining);
+                break;
+            case 'duration':
+                sortedBundles.sort((a, b) => 
+                    parseInt(a.duration) - parseInt(b.duration));
+                break;
+        }
+        
+        // Рендерим каждую сборку
+        sortedBundles.forEach(bundle => {
+            const minInvestment = calculateMinInvestment(bundle.currentInvested);
+            
+            const bundleEl = document.createElement('div');
+            bundleEl.className = 'bundle';
+            bundleEl.innerHTML = `
+                <div class="bundle-header">
+                    <div class="bundle-title">${bundle.name}</div>
+                    <div class="bundle-profit">${bundle.profit}</div>
+                </div>
+                <div class="bundle-details">
+                    <div>Duration: ${bundle.duration}</div>
+                    <div>Risk: ${bundle.risk}</div>
+                </div>
+                <div class="bundle-structure">
+                    ${bundle.assets.map(asset => 
+                        `<div class="asset" style="background-color: ${asset.color}; width: ${asset.percentage}%;">
+                            ${asset.name} ${asset.percentage}%
+                        </div>`
+                    ).join('')}
+                </div>
+                <div class="bundle-footer">
+                    <div class="min-invest">Min: $${minInvestment.toFixed(2)}</div>
+                    <button class="bundle-invest" data-id="${bundle.id}">Invest</button>
+                </div>
+                <div class="time-remaining">
+                    <i class="fas fa-clock"></i>
+                    <span class="timer-${bundle.id}">Closing in: ${formatTime(bundle.timeRemaining)}</span>
+                </div>
+            `;
+            container.appendChild(bundleEl);
+        });
+        
+        // Добавляем обработчики событий для кнопок "Invest"
+        document.querySelectorAll('.bundle-invest').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const bundleId = e.target.getAttribute('data-id');
+                const bundle = bundles.find(b => b.id == bundleId);
+                
+                if (bundle) {
+                    // Обновляем модальное окно с деталями сборки
+                    document.getElementById('modalBundleName').textContent = bundle.name;
+                    document.getElementById('modalBundleProfit').textContent = bundle.profit;
+                    document.getElementById('modalBundleDuration').textContent = bundle.duration;
+                    document.getElementById('modalBundleRisk').textContent = bundle.risk;
+                    document.getElementById('modalBundleTime').textContent = formatTime(bundle.timeRemaining);
                     
-                    const timer = setInterval(() => {
-                        seconds--;
-                        if (seconds <= 0) {
-                            clearInterval(timer);
-                            timerElement.textContent = "Closed for investment";
-                            timerElement.style.color = "#f44336";
-                        } else {
-                            timerElement.textContent = `Closing in: ${formatTime(seconds)}`;
-                        }
-                    }, 1000);
+                    // Рассчитываем и показываем минимальную инвестицию
+                    const minInvestment = calculateMinInvestment(bundle.currentInvested);
+                    document.getElementById('minInvestInfo').textContent = `Min: $${minInvestment.toFixed(2)}`;
+                    
+                    // Показываем модальное окно
+                    document.getElementById('investModal').classList.add('active');
                 }
             });
+        });
+        
+        // Инициализируем таймеры
+        initTimers(bundles);
+        
+    } catch (error) {
+        console.error('Error rendering bundles:', error);
+        container.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--negative);">Failed to load bundles. Please try again later.</div>';
+    }
+}
+            
+        // Initialize countdown timers
+        // Функция инициализации таймеров (теперь принимает bundles как аргумент)
+function initTimers(bundles) {
+    bundles.forEach(bundle => {
+        const timerElement = document.querySelector(`.timer-${bundle.id}`);
+        if (timerElement) {
+            let seconds = bundle.timeRemaining;
+            
+            const timer = setInterval(() => {
+                seconds--;
+                if (seconds <= 0) {
+                    clearInterval(timer);
+                    timerElement.textContent = "Closed for investment";
+                    timerElement.style.color = "#f44336";
+                    
+                    // Отключаем кнопку Invest
+                    const investBtn = document.querySelector(`.bundle-invest[data-id="${bundle.id}"]`);
+                    if (investBtn) {
+                        investBtn.disabled = true;
+                        investBtn.textContent = "Closed";
+                        investBtn.style.opacity = "0.6";
+                    }
+                } else {
+                    timerElement.textContent = `Closing in: ${formatTime(seconds)}`;
+                }
+            }, 1000);
         }
+    });
+}
 
         // Page Navigation
         document.querySelectorAll('.nav-btn').forEach(button => {
-            button.addEventListener('click', () => {
+            button.addEventListener('click', async () => { // Добавлено async
                 // Remove active class from all buttons and pages
                 document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
                 document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
@@ -1170,8 +1131,7 @@
                 
                 // Initialize marketplace if needed
                 if (pageId === 'marketplacePage') {
-                    renderBundles();
-                    initTimers();
+                    await renderBundles(); // Добавлено await
                 }
             });
         });
@@ -1239,18 +1199,16 @@
         
         // Filter buttons in marketplace
         document.querySelectorAll('.filter-btn').forEach(button => {
-            button.addEventListener('click', () => {
+            button.addEventListener('click', async () => { // Добавлено async
                 document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
                 button.classList.add('active');
-                renderBundles();
-                initTimers();
+                await renderBundles(); // Добавлено await
             });
         });
         
         // Sort select change
-        document.getElementById('sortSelect').addEventListener('change', () => {
-            renderBundles();
-            initTimers();
+        document.getElementById('sortSelect').addEventListener('change', async () => { // Добавлено async
+            await renderBundles(); // Добавлено await
         });
         
         // Bundle click to show details (for portfolio bundles)
@@ -1275,6 +1233,101 @@
         // Initialize marketplace bundles
         renderBundles();
         initTimers();
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set up initial page
+            renderPortfolio();
+            
+            // Set up event listeners
+            setupEventListeners();
+        });
+        
+        function renderPortfolio() {
+            // Your existing portfolio rendering code
+            // (no changes needed here)
+        }
+        
+        async function setupEventListeners() {
+            // Toggle Balance Visibility
+            const toggleBalance = document.getElementById('toggleBalance');
+            const balanceAmount = document.getElementById('balanceAmount');
+            
+            toggleBalance.addEventListener('click', () => {
+                if (balanceAmount.textContent === '$1,245.80') {
+                    balanceAmount.textContent = '******';
+                    toggleBalance.innerHTML = '<i class="fas fa-eye-slash"></i>';
+                } else {
+                    balanceAmount.textContent = '$1,245.80';
+                    toggleBalance.innerHTML = '<i class="fas fa-eye"></i>';
+                }
+            });
+        
+            // Modal Handling
+            const depositModal = document.getElementById('depositModal');
+            const investModal = document.getElementById('investModal');
+            
+            // Show deposit modal
+            document.getElementById('depositBtn').addEventListener('click', () => {
+                depositModal.classList.add('active');
+            });
+            
+            // Close modals
+            document.querySelectorAll('.close-modal').forEach(button => {
+                button.addEventListener('click', () => {
+                    depositModal.classList.remove('active');
+                    investModal.classList.remove('active');
+                });
+            });
+            
+            // Copy address to clipboard
+            document.getElementById('copyAddress').addEventListener('click', () => {
+                navigator.clipboard.writeText('0x742d35Cc6634C0532925a3b844Bc454e4438f44e');
+                alert('Address copied to clipboard!');
+            });
+            
+            // Confirm investment
+            document.getElementById('confirmInvest').addEventListener('click', () => {
+                const amount = parseFloat(document.getElementById('investAmount').value);
+                if (amount && amount > 0) {
+                    alert(`Successfully invested ${amount} USDT!`);
+                    investModal.classList.remove('active');
+                } else {
+                    alert('Please enter a valid amount');
+                }
+            });
+            
+            // Close bundle buttons
+            document.querySelectorAll('.close-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const bundle = button.closest('.bundle');
+                    const bundleName = bundle.querySelector('.bundle-title').textContent;
+                    if (confirm(`Are you sure you want to close your position in "${bundleName}"?`)) {
+                        alert(`Position in "${bundleName}" closed successfully!`);
+                        bundle.remove();
+                    }
+                });
+            });
+            
+            // Bundle click to show details (for portfolio bundles)
+            document.querySelectorAll('.open-bundles .bundle').forEach(bundle => {
+                bundle.addEventListener('click', (e) => {
+                    // Only open details if not clicking on close button
+                    if (!e.target.closest('.close-btn')) {
+                        const bundleName = bundle.querySelector('.bundle-title').textContent;
+                        alert(`Details for "${bundleName}" would be shown here`);
+                    }
+                });
+            });
+            
+            // History item click
+            document.querySelectorAll('.history-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const type = item.querySelector('.history-type').textContent;
+                    alert(`Details for ${type} transaction would be shown here`);
+                });
+            });
+        }
     </script>
 </body>
 </html>
