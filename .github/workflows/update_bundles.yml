@@ -1,0 +1,39 @@
+name: Update Crypto Bundles
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'  # Запускать каждые 5 минут
+  workflow_dispatch:        # Разрешить ручной запуск
+  push:
+    branches:
+      - main                # Запускать при пуше в main (опционально)
+
+jobs:
+  generate-bundles:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write       # Разрешить запись в репозиторий
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0      # Полная история коммитов
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Generate bundles
+      run: |
+        python bundle_generator.py
+        cat bundles.json    # Для отладки (выводит содержимое файла)
+
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "actions@github.com"
+        git config --local user.name "GitHub Actions"
+        git add bundles.json
+        git diff --quiet && git diff --staged --quiet || git commit -m "Auto-update bundles [skip ci]"
+        git push
