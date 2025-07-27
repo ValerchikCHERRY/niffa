@@ -73,7 +73,7 @@
         .balance-container {
             background-color: var(--bg-secondary);
             border-radius: var(--border-radius);
-            padding: 20px;
+            padding: 16px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
@@ -81,7 +81,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
 
         .balance-title {
@@ -103,9 +103,9 @@
         }
 
         .balance-amount {
-            font-size: 32px;
+            font-size: 26px;
             font-weight: 700;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             letter-spacing: 0.5px;
         }
 
@@ -300,11 +300,38 @@
         }
 
         /* Marketplace Styles */
+        .filters-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .sorting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sort-label {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+
+        .sort-select {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: none;
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            cursor: pointer;
+        }
+
         .filters {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
-            margin-bottom: 20px;
         }
 
         .filter-btn {
@@ -341,6 +368,20 @@
 
         .bundle-invest:hover {
             background-color: var(--accent);
+        }
+
+        .min-invest {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .time-remaining {
+            font-size: 14px;
+            color: var(--warning);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 8px;
         }
 
         /* Settings Styles */
@@ -606,7 +647,7 @@
             </div>
         </div>
 
-        <!-- Balance Card -->
+        <!-- Balance Card (Smaller version) -->
         <div class="balance-container">
             <div class="balance-header">
                 <div class="balance-title">Total Balance</div>
@@ -714,98 +755,28 @@
         <div class="page" id="marketplacePage">
             <h2 class="section-title">Available Bundles</h2>
             
-            <div class="filters">
-                <button class="filter-btn active">All</button>
-                <button class="filter-btn">Low Risk</button>
-                <button class="filter-btn">High Profit</button>
-                <button class="filter-btn">Short Term</button>
-                <button class="filter-btn">Crypto</button>
+            <div class="filters-container">
+                <div class="sorting-row">
+                    <div class="sort-label">Sort by:</div>
+                    <select class="sort-select" id="sortSelect">
+                        <option value="profit">Highest Profit</option>
+                        <option value="risk">Lowest Risk</option>
+                        <option value="start">Starting Soon</option>
+                        <option value="duration">Shortest Duration</option>
+                    </select>
+                </div>
+                
+                <div class="filters">
+                    <button class="filter-btn active">All</button>
+                    <button class="filter-btn">Low Risk</button>
+                    <button class="filter-btn">High Profit</button>
+                    <button class="filter-btn">Short Term</button>
+                    <button class="filter-btn">Crypto</button>
+                </div>
             </div>
             
-            <div class="recommended-bundles">
-                <!-- Bundle 1 -->
-                <div class="bundle">
-                    <div class="bundle-header">
-                        <div class="bundle-title">Stable Growth</div>
-                        <div class="bundle-profit">+7.5%</div>
-                    </div>
-                    <div class="bundle-details">
-                        <div>Duration: 4h</div>
-                        <div>Risk: Low</div>
-                    </div>
-                    <div class="bundle-structure">
-                        <div class="asset" style="background-color: #f7931a; width: 50%;">BTC 50%</div>
-                        <div class="asset" style="background-color: #627eea; width: 30%;">ETH 30%</div>
-                        <div class="asset" style="background-color: #26a17b; width: 20%;">USDT 20%</div>
-                    </div>
-                    <div class="bundle-footer">
-                        <div>Min: $50</div>
-                        <button class="bundle-invest">Invest</button>
-                    </div>
-                </div>
-
-                <!-- Bundle 2 -->
-                <div class="bundle">
-                    <div class="bundle-header">
-                        <div class="bundle-title">Tech Leaders</div>
-                        <div class="bundle-profit">+12.3%</div>
-                    </div>
-                    <div class="bundle-details">
-                        <div>Duration: 8h</div>
-                        <div>Risk: Medium</div>
-                    </div>
-                    <div class="bundle-structure">
-                        <div class="asset" style="background-color: #00d395; width: 45%;">SOL 45%</div>
-                        <div class="asset" style="background-color: #5d78ff; width: 30%;">DOT 30%</div>
-                        <div class="asset" style="background-color: #f3ba2f; width: 25%;">BNB 25%</div>
-                    </div>
-                    <div class="bundle-footer">
-                        <div>Min: $30</div>
-                        <button class="bundle-invest">Invest</button>
-                    </div>
-                </div>
-
-                <!-- Bundle 3 -->
-                <div class="bundle">
-                    <div class="bundle-header">
-                        <div class="bundle-title">Meme Power</div>
-                        <div class="bundle-profit">+24.8%</div>
-                    </div>
-                    <div class="bundle-details">
-                        <div>Duration: 6h</div>
-                        <div>Risk: High</div>
-                    </div>
-                    <div class="bundle-structure">
-                        <div class="asset" style="background-color: #d07c16; width: 50%;">DOGE 50%</div>
-                        <div class="asset" style="background-color: #a57eff; width: 30%;">SHIB 30%</div>
-                        <div class="asset" style="background-color: #00a3ff; width: 20%;">PEPE 20%</div>
-                    </div>
-                    <div class="bundle-footer">
-                        <div>Min: $20</div>
-                        <button class="bundle-invest">Invest</button>
-                    </div>
-                </div>
-
-                <!-- Bundle 4 -->
-                <div class="bundle">
-                    <div class="bundle-header">
-                        <div class="bundle-title">DeFi Stars</div>
-                        <div class="bundle-profit">+9.7%</div>
-                    </div>
-                    <div class="bundle-details">
-                        <div>Duration: 10h</div>
-                        <div>Risk: Medium</div>
-                    </div>
-                    <div class="bundle-structure">
-                        <div class="asset" style="background-color: #ff007a; width: 40%;">UNI 40%</div>
-                        <div class="asset" style="background-color: #00d2ff; width: 35%;">AAVE 35%</div>
-                        <div class="asset" style="background-color: #6747ed; width: 25%;">MKR 25%</div>
-                    </div>
-                    <div class="bundle-footer">
-                        <div>Min: $40</div>
-                        <button class="bundle-invest">Invest</button>
-                    </div>
-                </div>
+            <div class="recommended-bundles" id="bundlesContainer">
+                <!-- Bundles will be generated dynamically -->
             </div>
         </div>
 
@@ -937,22 +908,26 @@
             </div>
             <div class="modal-body">
                 <p>You're about to invest in:</p>
-                <h4 style="margin: 15px 0; text-align: center;">Low Risk BTC/ETH</h4>
+                <h4 style="margin: 15px 0; text-align: center;" id="modalBundleName">Low Risk BTC/ETH</h4>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
                     <div>Target Profit:</div>
-                    <div style="font-weight: 700; color: #4caf50;">+8.2%</div>
+                    <div style="font-weight: 700; color: #4caf50;" id="modalBundleProfit">+8.2%</div>
                 </div>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
                     <div>Duration:</div>
-                    <div>6 hours</div>
+                    <div id="modalBundleDuration">6 hours</div>
                 </div>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
                     <div>Risk Level:</div>
-                    <div>Low</div>
+                    <div id="modalBundleRisk">Low</div>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <div>Closing in: <span id="modalBundleTime" style="color: #ff9800; font-weight: 600;">12:34</span></div>
                 </div>
                 <div style="margin-top: 20px;">
                     <label for="investAmount">Investment Amount (USDT)</label>
                     <input type="number" id="investAmount" placeholder="Enter amount" style="width: 100%; padding: 12px; margin-top: 8px; border-radius: 8px; background-color: #2a2a2a; border: 1px solid #333; color: white; font-size: 16px;">
+                    <div style="margin-top: 5px; font-size: 14px; color: #b0b0b0;" id="minInvestInfo">Min: $5.00</div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -963,6 +938,222 @@
     </div>
 
     <script>
+        // Bundle data with dynamic min investment calculation
+        const bundles = [
+            {
+                id: 1,
+                name: "Stable Growth",
+                profit: "+7.5%",
+                duration: "4h",
+                risk: "Low",
+                assets: [
+                    { name: "BTC", percentage: 50, color: "#f7931a" },
+                    { name: "ETH", percentage: 30, color: "#627eea" },
+                    { name: "USDT", percentage: 20, color: "#26a17b" }
+                ],
+                currentInvested: 3.50, // Example current invested amount
+                timeRemaining: Math.floor(Math.random() * 1800) + 60 // 1-30 minutes in seconds
+            },
+            {
+                id: 2,
+                name: "Tech Leaders",
+                profit: "+12.3%",
+                duration: "8h",
+                risk: "Medium",
+                assets: [
+                    { name: "SOL", percentage: 45, color: "#00d395" },
+                    { name: "DOT", percentage: 30, color: "#5d78ff" },
+                    { name: "BNB", percentage: 25, color: "#f3ba2f" }
+                ],
+                currentInvested: 8.75,
+                timeRemaining: Math.floor(Math.random() * 1800) + 60
+            },
+            {
+                id: 3,
+                name: "Meme Power",
+                profit: "+24.8%",
+                duration: "6h",
+                risk: "High",
+                assets: [
+                    { name: "DOGE", percentage: 50, color: "#d07c16" },
+                    { name: "SHIB", percentage: 30, color: "#a57eff" },
+                    { name: "PEPE", percentage: 20, color: "#00a3ff" }
+                ],
+                currentInvested: 12.20,
+                timeRemaining: Math.floor(Math.random() * 1800) + 60
+            },
+            {
+                id: 4,
+                name: "DeFi Stars",
+                profit: "+9.7%",
+                duration: "10h",
+                risk: "Medium",
+                assets: [
+                    { name: "UNI", percentage: 40, color: "#ff007a" },
+                    { name: "AAVE", percentage: 35, color: "#00d2ff" },
+                    { name: "MKR", percentage: 25, color: "#6747ed" }
+                ],
+                currentInvested: 9.30,
+                timeRemaining: Math.floor(Math.random() * 1800) + 60
+            },
+            {
+                id: 5,
+                name: "Blue Chip Mix",
+                profit: "+6.2%",
+                duration: "5h",
+                risk: "Low",
+                assets: [
+                    { name: "BTC", percentage: 40, color: "#f7931a" },
+                    { name: "ETH", percentage: 40, color: "#627eea" },
+                    { name: "USDC", percentage: 20, color: "#2775ca" }
+                ],
+                currentInvested: 15.80,
+                timeRemaining: Math.floor(Math.random() * 1800) + 60
+            },
+            {
+                id: 6,
+                name: "AI Revolution",
+                profit: "+18.5%",
+                duration: "9h",
+                risk: "High",
+                assets: [
+                    { name: "AGIX", percentage: 40, color: "#ff6e6e" },
+                    { name: "FET", percentage: 35, color: "#1e75bb" },
+                    { name: "OCEAN", percentage: 25, color: "#00a0d0" }
+                ],
+                currentInvested: 6.25,
+                timeRemaining: Math.floor(Math.random() * 1800) + 60
+            }
+        ];
+
+        // Calculate min investment based on current invested amount
+        function calculateMinInvestment(currentInvested) {
+            if (currentInvested >= 10) {
+                return 0.1;
+            } else {
+                const min = 10 - currentInvested;
+                return min > 0.1 ? min : 0.1;
+            }
+        }
+
+        // Format time remaining
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Render bundles in marketplace
+        function renderBundles() {
+            const container = document.getElementById('bundlesContainer');
+            container.innerHTML = '';
+            
+            // Get sort option
+            const sortOption = document.getElementById('sortSelect').value;
+            
+            // Sort bundles
+            const sortedBundles = [...bundles];
+            
+            switch(sortOption) {
+                case 'profit':
+                    sortedBundles.sort((a, b) => 
+                        parseFloat(b.profit) - parseFloat(a.profit));
+                    break;
+                case 'risk':
+                    const riskOrder = { "Low": 1, "Medium": 2, "High": 3 };
+                    sortedBundles.sort((a, b) => 
+                        riskOrder[a.risk] - riskOrder[b.risk]);
+                    break;
+                case 'start':
+                    sortedBundles.sort((a, b) => 
+                        a.timeRemaining - b.timeRemaining);
+                    break;
+                case 'duration':
+                    sortedBundles.sort((a, b) => 
+                        parseInt(a.duration) - parseInt(b.duration));
+                    break;
+            }
+            
+            // Render each bundle
+            sortedBundles.forEach(bundle => {
+                const minInvestment = calculateMinInvestment(bundle.currentInvested);
+                
+                const bundleEl = document.createElement('div');
+                bundleEl.className = 'bundle';
+                bundleEl.innerHTML = `
+                    <div class="bundle-header">
+                        <div class="bundle-title">${bundle.name}</div>
+                        <div class="bundle-profit">${bundle.profit}</div>
+                    </div>
+                    <div class="bundle-details">
+                        <div>Duration: ${bundle.duration}</div>
+                        <div>Risk: ${bundle.risk}</div>
+                    </div>
+                    <div class="bundle-structure">
+                        ${bundle.assets.map(asset => 
+                            `<div class="asset" style="background-color: ${asset.color}; width: ${asset.percentage}%;">
+                                ${asset.name} ${asset.percentage}%
+                            </div>`
+                        ).join('')}
+                    </div>
+                    <div class="bundle-footer">
+                        <div class="min-invest">Min: $${minInvestment.toFixed(2)}</div>
+                        <button class="bundle-invest" data-id="${bundle.id}">Invest</button>
+                    </div>
+                    <div class="time-remaining">
+                        <i class="fas fa-clock"></i>
+                        <span class="timer-${bundle.id}">Closing in: ${formatTime(bundle.timeRemaining)}</span>
+                    </div>
+                `;
+                container.appendChild(bundleEl);
+            });
+            
+            // Add event listeners to new invest buttons
+            document.querySelectorAll('.bundle-invest').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const bundleId = e.target.getAttribute('data-id');
+                    const bundle = bundles.find(b => b.id == bundleId);
+                    
+                    if (bundle) {
+                        // Update modal with bundle details
+                        document.getElementById('modalBundleName').textContent = bundle.name;
+                        document.getElementById('modalBundleProfit').textContent = bundle.profit;
+                        document.getElementById('modalBundleDuration').textContent = bundle.duration;
+                        document.getElementById('modalBundleRisk').textContent = bundle.risk;
+                        document.getElementById('modalBundleTime').textContent = formatTime(bundle.timeRemaining);
+                        
+                        // Calculate and show min investment
+                        const minInvestment = calculateMinInvestment(bundle.currentInvested);
+                        document.getElementById('minInvestInfo').textContent = `Min: $${minInvestment.toFixed(2)}`;
+                        
+                        // Show modal
+                        document.getElementById('investModal').classList.add('active');
+                    }
+                });
+            });
+        }
+
+        // Initialize countdown timers
+        function initTimers() {
+            bundles.forEach(bundle => {
+                const timerElement = document.querySelector(`.timer-${bundle.id}`);
+                if (timerElement) {
+                    let seconds = bundle.timeRemaining;
+                    
+                    const timer = setInterval(() => {
+                        seconds--;
+                        if (seconds <= 0) {
+                            clearInterval(timer);
+                            timerElement.textContent = "Closed for investment";
+                            timerElement.style.color = "#f44336";
+                        } else {
+                            timerElement.textContent = `Closing in: ${formatTime(seconds)}`;
+                        }
+                    }, 1000);
+                }
+            });
+        }
+
         // Page Navigation
         document.querySelectorAll('.nav-btn').forEach(button => {
             button.addEventListener('click', () => {
@@ -976,6 +1167,12 @@
                 // Show corresponding page
                 const pageId = button.getAttribute('data-page') + 'Page';
                 document.getElementById(pageId).classList.add('active');
+                
+                // Initialize marketplace if needed
+                if (pageId === 'marketplacePage') {
+                    renderBundles();
+                    initTimers();
+                }
             });
         });
 
@@ -1002,13 +1199,6 @@
             depositModal.classList.add('active');
         });
         
-        // Show invest modal when any "Invest" button is clicked
-        document.querySelectorAll('.bundle-invest').forEach(button => {
-            button.addEventListener('click', () => {
-                investModal.classList.add('active');
-            });
-        });
-        
         // Close modals
         document.querySelectorAll('.close-modal').forEach(button => {
             button.addEventListener('click', () => {
@@ -1025,8 +1215,8 @@
         
         // Confirm investment
         document.getElementById('confirmInvest').addEventListener('click', () => {
-            const amount = document.getElementById('investAmount').value;
-            if (amount && parseFloat(amount) > 0) {
+            const amount = parseFloat(document.getElementById('investAmount').value);
+            if (amount && amount > 0) {
                 alert(`Successfully invested ${amount} USDT!`);
                 investModal.classList.remove('active');
             } else {
@@ -1052,7 +1242,15 @@
             button.addEventListener('click', () => {
                 document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
                 button.classList.add('active');
+                renderBundles();
+                initTimers();
             });
+        });
+        
+        // Sort select change
+        document.getElementById('sortSelect').addEventListener('change', () => {
+            renderBundles();
+            initTimers();
         });
         
         // Bundle click to show details (for portfolio bundles)
@@ -1073,6 +1271,10 @@
                 alert(`Details for ${type} transaction would be shown here`);
             });
         });
+        
+        // Initialize marketplace bundles
+        renderBundles();
+        initTimers();
     </script>
 </body>
 </html>
