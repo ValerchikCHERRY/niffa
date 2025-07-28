@@ -1,0 +1,94 @@
+name: Database Backup and Sync
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # Каждые 6 часов (UTC)
+  workflow_dispatch:        # Разрешить ручной запуск
+  push:
+    branches:
+      - main                # Запускать при изменениях в main
+
+jobs:
+  backup-database:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0      # Полная история коммитов
+        
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install gspread oauth2client pyyaml google-api-python-client
+        
+    - name: Run backup script
+      env:
+        GOOGLE_SHEETS_KEY: ${{ secrets.GOOGLE_SHEETS_KEY }}
+      run: |
+        cat << 'EOF' > backup_script.py
+        import gspread
+        import json
+        import yaml
+        from oauth2client.service_account import ServiceAccountCredentials
+        from datetime import datetime
+        
+        # Настройки
+        SCOPE = ['https://spreadsheets.google.com/feeds',
+                 'https://www.googleapis.com/auth/drive']
+        
+        CREDS = ServiceAccountCredentials.from_json_keyfile_dict(
+            json.loads('${{ secrets.GOOGLE_SHEETS_KEY }}'), SCOPE)
+        
+        def backup_sheet(sheet, sheet_name):
+            """Создает резервную копию листа"""
+            print(f"Backing up {sheet_name}...")
+            data = sheet.get_all_records()
+            timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+            filename = f"backups/{sheet_name}_{timestamp}.json"
+            
+            with open(filename, 'w') as f:
+                json.dump(data, f, indent=2)
+            
+            return filename
+        
+        def main():
+            print("Starting database backup...")
+            
+            # Подключение к Google Sheets
+            client = gspread.authorize(CREDS)
+            spreadsheet = client.open("Bets_Database")
+            
+            # Листы для резервного копирования
+            sheets = {
+                "Users": spreadsheet.worksheet("Users"),
+                "Bundles": spreadsheet.worksheet("Bundles"),
+                "Investments": spreadsheet.worksheet("Investments"),
+                "Transactions": spreadsheet.worksheet("Transactions")
+            }
+            
+            # Создание резервных копий
+            backups = []
+            for name, sheet in sheets.items():
+                backups.append(backup_sheet(sheet, name))
+            
+            print("Backup completed successfully!")
+            return backups
+        
+        if __name__ == "__main__":
+            main()
+        EOF
+        
+        python backup_script.py
+        
+    - name: Commit and push backups
+      run: |
+        git config --local user.email "actions@github.com"
+        git config --local user.name "GitHub Actions"
+        git add backups/
+        git commit -m "Auto database backup [skip ci]" || echo "No changes to commit"
+        git push
