@@ -938,7 +938,54 @@
     </div>
 
     <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbyg9ImJ8Z3p6CZafwyS-lXGLnmfmRrenB5DoDMN5UoOvnw9oyR7XBbqq3-unUnmkfQo/exec";
+
+                  // Основная функция для работы с базой данных
+          async function dbRequest(action, table, data = {}) {
+            try {
+              const response = await fetch(API_URL, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                  action: action,
+                  table: table,
+                  record: data
+                })
+              });
+              
+              if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+              }
+              
+              return await response.json();
+            } catch (error) {
+              console.error("Database request failed:", error);
+              showNotification("Database error. Please try again later.");
+              return null;
+            }
+          }
+          
+          // Вспомогательная функция для показа уведомлений
+          function showNotification(message, isError = true) {
+            const notification = document.createElement("div");
+            notification.textContent = message;
+            notification.style.position = "fixed";
+            notification.style.bottom = "20px";
+            notification.style.right = "20px";
+            notification.style.padding = "15px";
+            notification.style.background = isError ? "#f44336" : "#4CAF50";
+            notification.style.color = "white";
+            notification.style.borderRadius = "8px";
+            notification.style.zIndex = "1000";
+            document.body.appendChild(notification);
             
+            setTimeout(() => {
+              notification.remove();
+            }, 5000);
+          }
+        
         // Calculate min investment based on current invested amount
         function calculateMinInvestment(currentInvested) {
             if (currentInvested >= 10) {
@@ -1319,10 +1366,81 @@ function initTimers(bundles) {
                     }
                 });
             });
+
+              // Регистрация пользователя через Telegram
+              async function registerUser(telegramData) {
+                const user = {
+                  UserID: `tg${telegramData.id}`,
+                  TelegramData: JSON.stringify(telegramData),
+                  Email: "",
+                  PasswordHash: "",
+                  Balance: 0,
+                  Settings: JSON.stringify({ theme: "dark", language: "en" })
+                };
+                
+                return await dbRequest("create", "Users", user);
+              }
+            
+              // Создание инвестиции
+              async function createInvestment(userId, bundleId, amount) {
+                // Рассчитываем долю в пуле (упрощенно)
+                const bundleResponse = await dbRequest("read", "Bundles", { BundleID: bundleId });
+                const bundle = bundleResponse[0];
+                const totalInvested = bundle.TotalInvested || 0;
+                const newTotal = totalInvested + amount;
+                const share = (amount / newTotal) * 100;
+                
+                // Обновляем общую сумму инвестиций в сборке
+                await dbRequest("update", "Bundles", {
+                  ...bundle,
+                  TotalInvested: newTotal
+                });
+                
+                // Создаем запись об инвестиции
+                const investment = {
+                  InvestmentID: `inv${Date.now()}`,
+                  UserID: userId,
+                  BundleID: bundleId,
+                  Amount: amount,
+                  PoolShare: share,
+                  Status: "active",
+                  PnL: 0
+                };
+                
+                return await dbRequest("create", "Investments", investment);
+              }
+            
+              // Обновление статуса сборки
+              async function updateBundleStatus(bundleId, status) {
+                const bundles = await dbRequest("read", "Bundles", { BundleID: bundleId });
+                if (bundles.length > 0) {
+                  const bundle = bundles[0];
+                  return await dbRequest("update", "Bundles", {
+                    ...bundle,
+                    Status: status
+                  });
+                }
+                return null;
+              }
+            
+              // Создание транзакции
+              async function createTransaction(userId, type, amount, details = {}) {
+                const transaction = {
+                  TransactionID: `tx${Date.now()}`,
+                  UserID: userId,
+                  Type: type,
+                  Amount: amount,
+                  Currency: "USDT",
+                  DateTime: new Date().toISOString(),
+                  ...details
+                };
+                
+                return await dbRequest("create", "Transactions", transaction);
+              }
             
             // History item click
             document.querySelectorAll('.history-item').forEach(item => {
-                item.addEventListener('click', () => {
+                document.addEventListener('DOMContentLoaded', () => {
                     const type = item.querySelector('.history-type').textContent;
                     alert(`Details for ${type} transaction would be shown here`);
                 });
