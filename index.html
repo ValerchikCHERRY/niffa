@@ -1446,6 +1446,493 @@ function initTimers(bundles) {
                 });
             });
         }
+       
+          /**************************************************
+           * БАЗОВЫЕ ФУНКЦИИ ДЛЯ РАБОТЫ С БАЗОЙ ДАННЫХ
+           **************************************************/
+          
+          // ЗАМЕНИТЕ ЭТОТ URL НА ВАШ REAL GOOGLE APPS SCRIPT URL
+          const API_URL = "https://script.google.com/macros/s/AKfycbyg9ImJ8Z3p6CZafwyS-lXGLnmfmRrenB5DoDMN5UoOvnw9oyR7XBbqq3-unUnmkfQo/exec";
+          
+          /**
+           * Основная функция для работы с базой данных
+           * @param {string} action - Действие: 'create', 'read', 'update', 'delete'
+           * @param {string} table - Название таблицы: 'Users', 'Bundles', 'Investments', 'Transactions'
+           * @param {Object} data - Данные для отправки
+           * @returns {Promise<Object>} - Результат запроса
+           */
+          async function dbRequest(action, table, data = {}) {
+            try {
+              // Добавляем токен безопасности (если используется)
+              const payload = {
+                action,
+                table,
+                record: data,
+                token: "SECURE_TOKEN_123" // Замените на ваш реальный токен
+              };
+              
+              const response = await fetch(API_URL, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+              });
+              
+              if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+              }
+              
+              return await response.json();
+            } catch (error) {
+              console.error("Database request failed:", error);
+              showNotification("Database error. Please try again later.", true);
+              return null;
+            }
+          }
+          
+          /**
+           * Показать уведомление пользователю
+           * @param {string} message - Текст сообщения
+           * @param {boolean} isError - Является ли сообщение об ошибке
+           */
+          function showNotification(message, isError = false) {
+            // Удаляем предыдущие уведомления
+            const oldNotification = document.getElementById("db-notification");
+            if (oldNotification) oldNotification.remove();
+            
+            // Создаем элемент уведомления
+            const notification = document.createElement("div");
+            notification.id = "db-notification";
+            notification.textContent = message;
+            notification.style.position = "fixed";
+            notification.style.bottom = "20px";
+            notification.style.right = "20px";
+            notification.style.padding = "15px 20px";
+            notification.style.background = isError ? "#f44336" : "#4CAF50";
+            notification.style.color = "white";
+            notification.style.borderRadius = "8px";
+            notification.style.zIndex = "10000";
+            notification.style.fontWeight = "500";
+            notification.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)";
+            notification.style.animation = "fadeIn 0.3s ease";
+            
+            // Добавляем в DOM
+            document.body.appendChild(notification);
+            
+            // Автоматическое скрытие через 5 секунд
+            setTimeout(() => {
+              notification.style.animation = "fadeOut 0.3s ease";
+              setTimeout(() => notification.remove(), 300);
+            }, 5000);
+          }
+        
+          /**************************************************
+           * ФУНКЦИИ ДЛЯ РАБОТЫ С ПОЛЬЗОВАТЕЛЯМИ
+           **************************************************/
+          
+          /**
+           * Регистрация нового пользователя
+           * @param {Object} telegramData - Данные из Telegram WebApp
+           * @returns {Promise<Object>} - Результат регистрации
+           */
+          async function registerUser(telegramData) {
+            const user = {
+              UserID: `tg${telegramData.id}`,
+              TelegramData: JSON.stringify(telegramData),
+              Username: telegramData.username || "",
+              FirstName: telegramData.first_name || "",
+              LastName: telegramData.last_name || "",
+              Email: "",
+              PasswordHash: "",
+              Balance: 0,
+              Settings: JSON.stringify({ 
+                theme: "dark", 
+                language: "en",
+                hideBalance: false
+              })
+            };
+            
+            const result = await dbRequest("create", "Users", user);
+            
+            if (result && result.id) {
+              showNotification("Account created successfully!", false);
+              return result;
+            }
+            
+            return null;
+          }
+          
+          /**
+           * Получить данные пользователя
+           * @param {string} userId - ID пользователя
+           * @returns {Promise<Object>} - Данные пользователя
+           */
+          async function getUser(userId) {
+            const response = await dbRequest("read", "Users", { UserID: userId });
+            return response && response.length > 0 ? response[0] : null;
+          }
+          
+          /**
+           * Обновить баланс пользователя
+           * @param {string} userId - ID пользователя
+           * @param {number} newBalance - Новый баланс
+           * @returns {Promise<Object>} - Результат обновления
+           */
+          async function updateUserBalance(userId, newBalance) {
+            const user = await getUser(userId);
+            if (!user) return null;
+            
+            return await dbRequest("update", "Users", {
+              ...user,
+              Balance: newBalance
+            });
+          }
+        
+          /**************************************************
+           * ФУНКЦИИ ДЛЯ РАБОТЫ СО СБОРКАМИ
+           **************************************************/
+          
+          /**
+           * Получить активные сборки
+           * @returns {Promise<Array>} - Список активных сборок
+           */
+          async function getActiveBundles() {
+            const response = await dbRequest("read", "Bundles", { Status: "active" });
+            return response || [];
+          }
+          
+          /**
+           * Получить сборку по ID
+           * @param {string} bundleId - ID сборки
+           * @returns {Promise<Object>} - Данные сборки
+           */
+          async function getBundle(bundleId) {
+            const response = await dbRequest("read", "Bundles", { BundleID: bundleId });
+            return response && response.length > 0 ? response[0] : null;
+          }
+          
+          /**
+           * Обновить статус сборки
+           * @param {string} bundleId - ID сборки
+           * @param {string} status - Новый статус
+           * @returns {Promise<Object>} - Результат обновления
+           */
+          async function updateBundleStatus(bundleId, status) {
+            const bundle = await getBundle(bundleId);
+            if (!bundle) return null;
+            
+            return await dbRequest("update", "Bundles", {
+              ...bundle,
+              Status: status
+            });
+          }
+        
+          /**************************************************
+           * ФУНКЦИИ ДЛЯ РАБОТЫ С ИНВЕСТИЦИЯМИ
+           **************************************************/
+          
+          /**
+           * Создать новую инвестицию
+           * @param {string} userId - ID пользователя
+           * @param {string} bundleId - ID сборки
+           * @param {number} amount - Сумма инвестиции
+           * @returns {Promise<Object>} - Созданная инвестиция
+           */
+          async function createInvestment(userId, bundleId, amount) {
+            const bundle = await getBundle(bundleId);
+            if (!bundle) {
+              showNotification("Bundle not found", true);
+              return null;
+            }
+            
+            // Расчет доли в пуле
+            const totalInvested = bundle.TotalInvested || 0;
+            const newTotal = totalInvested + amount;
+            const share = (amount / newTotal) * 100;
+            
+            // Обновление общей суммы в сборке
+            await dbRequest("update", "Bundles", {
+              ...bundle,
+              TotalInvested: newTotal
+            });
+            
+            // Создание записи об инвестиции
+            const investment = {
+              InvestmentID: `inv${Date.now()}`,
+              UserID: userId,
+              BundleID: bundleId,
+              Amount: amount,
+              PoolShare: share,
+              Status: "active",
+              PnL: 0,
+              CreatedAt: new Date().toISOString()
+            };
+            
+            const result = await dbRequest("create", "Investments", investment);
+            
+            if (result && result.id) {
+              showNotification(`Invested $${amount} successfully!`, false);
+              return investment;
+            }
+            
+            return null;
+          }
+          
+          /**
+           * Получить инвестиции пользователя
+           * @param {string} userId - ID пользователя
+           * @returns {Promise<Array>} - Список инвестиций
+           */
+          async function getUserInvestments(userId) {
+            return await dbRequest("read", "Investments", { UserID: userId });
+          }
+        
+          /**************************************************
+           * ФУНКЦИИ ДЛЯ РАБОТЫ С ТРАНЗАКЦИЯМИ
+           **************************************************/
+          
+          /**
+           * Создать новую транзакцию
+           * @param {string} userId - ID пользователя
+           * @param {string} type - Тип транзакции
+           * @param {number} amount - Сумма
+           * @param {Object} details - Дополнительные детали
+           * @returns {Promise<Object>} - Созданная транзакция
+           */
+          async function createTransaction(userId, type, amount, details = {}) {
+            const transaction = {
+              TransactionID: `tx${Date.now()}`,
+              UserID: userId,
+              Type: type,
+              Amount: amount,
+              Currency: "USDT",
+              DateTime: new Date().toISOString(),
+              ...details
+            };
+            
+            const result = await dbRequest("create", "Transactions", transaction);
+            
+            if (result && result.id) {
+              // Обновляем баланс пользователя
+              const user = await getUser(userId);
+              if (user) {
+                const newBalance = parseFloat(user.Balance) + amount;
+                await updateUserBalance(userId, newBalance);
+              }
+              
+              return transaction;
+            }
+            
+            return null;
+          }
+          
+          /**
+           * Получить историю транзакций пользователя
+           * @param {string} userId - ID пользователя
+           * @returns {Promise<Array>} - Список транзакций
+           */
+          async function getUserTransactions(userId) {
+            return await dbRequest("read", "Transactions", { UserID: userId });
+          }
+        
+          /**************************************************
+           * ИНТЕГРАЦИЯ С ТЕЛЕГРАМ
+           **************************************************/
+          
+          // Инициализация Telegram Web App
+          function initTelegram() {
+            const tg = window.Telegram?.WebApp;
+            if (!tg) {
+              console.warn("Telegram WebApp not available");
+              return;
+            }
+            
+            tg.ready();
+            tg.expand();
+            
+            // Обработка данных пользователя
+            const userData = tg.initDataUnsafe?.user;
+            if (userData) {
+              handleTelegramUser(userData);
+            }
+          }
+          
+          // Обработка данных пользователя из Telegram
+          async function handleTelegramUser(userData) {
+            // Проверяем, есть ли пользователь в базе
+            const userId = `tg${userData.id}`;
+            const user = await getUser(userId);
+            
+            if (!user) {
+              // Регистрируем нового пользователя
+              await registerUser(userData);
+            } else {
+              // Обновляем данные, если нужно
+              await dbRequest("update", "Users", {
+                ...user,
+                TelegramData: JSON.stringify(userData)
+              });
+            }
+            
+            // Сохраняем ID пользователя для дальнейшего использования
+            window.currentUserId = userId;
+            
+            // Загружаем данные пользователя
+            loadUserData(userId);
+          }
+          
+          // Загрузка данных пользователя
+          async function loadUserData(userId) {
+            const user = await getUser(userId);
+            if (user) {
+              // Обновляем баланс в интерфейсе
+              const balanceElement = document.getElementById("balanceAmount");
+              if (balanceElement) {
+                balanceElement.textContent = `$${parseFloat(user.Balance).toFixed(2)}`;
+              }
+              
+              // Применяем настройки
+              applyUserSettings(user.Settings ? JSON.parse(user.Settings) : {});
+            }
+          }
+          
+          // Применение настроек пользователя
+          function applyUserSettings(settings) {
+            // Пример: скрытие баланса
+            if (settings.hideBalance) {
+              const balanceAmount = document.getElementById("balanceAmount");
+              if (balanceAmount) {
+                balanceAmount.textContent = "******";
+              }
+            }
+            
+            // Здесь можно добавить другие настройки
+          }
+        
+          /**************************************************
+           * ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ
+           **************************************************/
+          
+          // Основная функция инициализации
+          async function initApp() {
+            // Инициализируем Telegram
+            initTelegram();
+            
+            // Инициализируем обработчики событий
+            initEventHandlers();
+            
+            // Загрузка данных для активной страницы
+            loadPageData();
+          }
+          
+          // Инициализация обработчиков событий
+          function initEventHandlers() {
+            // Обработчик кнопки инвестирования
+            document.getElementById("confirmInvest")?.addEventListener("click", async () => {
+              const amountInput = document.getElementById("investAmount");
+              const amount = parseFloat(amountInput.value);
+              
+              if (!amount || amount <= 0) {
+                showNotification("Please enter a valid amount", true);
+                return;
+              }
+              
+              const userId = window.currentUserId;
+              if (!userId) {
+                showNotification("User not identified", true);
+                return;
+              }
+              
+              // Здесь должен быть ID текущей выбранной сборки
+              const bundleId = window.currentBundleId;
+              
+              if (!bundleId) {
+                showNotification("No bundle selected", true);
+                return;
+              }
+              
+              // Создаем инвестицию
+              const investment = await createInvestment(userId, bundleId, amount);
+              
+              if (investment) {
+                // Создаем транзакцию
+                await createTransaction(userId, "investment_out", -amount, {
+                  BundleID: bundleId,
+                  InvestmentID: investment.InvestmentID
+                });
+                
+                // Закрываем модальное окно
+                document.getElementById("investModal").classList.remove("active");
+                amountInput.value = "";
+                
+                // Обновляем UI
+                updatePortfolio();
+              }
+            });
+            
+            // Добавьте здесь другие обработчики по аналогии
+          }
+          
+          // Загрузка данных для активной страницы
+          function loadPageData() {
+            const activePage = document.querySelector(".page.active");
+            if (!activePage) return;
+            
+            if (activePage.id === "portfolioPage") {
+              updatePortfolio();
+            } else if (activePage.id === "marketplacePage") {
+              updateMarketplace();
+            }
+          }
+          
+          // Обновление портфолио
+          async function updatePortfolio() {
+            const userId = window.currentUserId;
+            if (!userId) return;
+            
+            // Получаем инвестиции пользователя
+            const investments = await getUserInvestments(userId);
+            
+            // Получаем транзакции
+            const transactions = await getUserTransactions(userId);
+            
+            // Здесь будет код обновления интерфейса
+            console.log("Updating portfolio with:", { investments, transactions });
+          }
+          
+          // Обновление маркетплейса
+          async function updateMarketplace() {
+            const bundles = await getActiveBundles();
+            
+            // Здесь будет код отображения сборок
+            console.log("Updating marketplace with bundles:", bundles);
+          }
+        
+          /**************************************************
+           * ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ УВЕДОМЛЕНИЙ
+           **************************************************/
+          
+          const style = document.createElement("style");
+          style.textContent = `
+            @keyframes fadeIn {
+              from { opacity: 0; transform: translateY(20px); }
+              to { opacity: 1; transform: translateY(0); }
+            }
+            
+            @keyframes fadeOut {
+              from { opacity: 1; transform: translateY(0); }
+              to { opacity: 0; transform: translateY(20px); }
+            }
+          `;
+          document.head.appendChild(style);
+        
+          /**************************************************
+           * ЗАПУСК ПРИЛОЖЕНИЯ
+           **************************************************/
+          
+          // Запускаем приложение после загрузки DOM
+          document.addEventListener("DOMContentLoaded", initApp);
     </script>
 </body>
 </html>
