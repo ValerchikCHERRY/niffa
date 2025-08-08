@@ -1,77 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>Crypto Bundles App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* ========== BASIC RESET & FONTS ========== */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
+    /* === GLOBAL STYLES === */
     body {
-      background-color: #0d1117;
-      color: #e6e6e6;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #0e1015;
+      color: #e0e0e0;
     }
 
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    button {
-      cursor: pointer;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    /* ========== GLOBAL STYLES ========== */
     header {
-      background-color: #161b22;
-      padding: 1rem;
+      padding: 10px 20px;
+      background-color: #1c1f26;
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid #21262d;
+      align-items: center;
     }
 
     header h1 {
-      font-size: 1.2rem;
+      margin: 0;
+      font-size: 18px;
+      color: white;
     }
 
-    nav {
+    .tabs {
       display: flex;
       justify-content: space-around;
-      background-color: #161b22;
-      border-top: 1px solid #21262d;
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 60px;
+      background-color: #1c1f26;
     }
 
-    nav button {
-      background: none;
-      border: none;
-      color: #c9d1d9;
-      font-size: 1rem;
+    .tab {
       flex: 1;
+      text-align: center;
+      padding: 12px;
+      cursor: pointer;
+      color: #ccc;
+      border-bottom: 2px solid transparent;
     }
 
-    .active-tab {
-      color: #58a6ff;
+    .tab.active {
+      color: white;
+      border-color: #4f8dff;
     }
 
     main {
-      padding: 1rem;
-      padding-bottom: 70px;
+      padding: 15px;
     }
 
     .section {
@@ -82,367 +59,253 @@
       display: block;
     }
 
-    .card {
-      background-color: #161b22;
-      padding: 1rem;
-      margin-bottom: 1rem;
+    .balance-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #1e222b;
+      padding: 12px;
       border-radius: 8px;
-      border: 1px solid #21262d;
+      margin-bottom: 15px;
     }
 
-    .balance {
-      font-size: 1.5rem;
-      margin: 0.5rem 0;
+    .balance-box span {
+      font-size: 18px;
     }
 
-    .button-row {
-      display: flex;
-      gap: 1rem;
-      margin-top: 1rem;
-    }
-
-    .btn {
-      background-color: #238636;
+    button {
+      background-color: #4f8dff;
       border: none;
+      padding: 10px 15px;
+      border-radius: 6px;
       color: white;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      font-size: 0.9rem;
+      cursor: pointer;
     }
 
-    .btn.secondary {
-      background-color: #30363d;
+    .bundle-card {
+      background-color: #1c1f26;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 12px;
     }
 
-    .bundle-bar {
+    .bundle-assets {
       display: flex;
-      margin-top: 0.5rem;
       height: 20px;
+      margin-top: 8px;
       overflow: hidden;
-      border-radius: 4px;
+      border-radius: 5px;
     }
 
-    .bundle-bar div {
-      height: 100%;
-      color: #000;
-      font-size: 0.75rem;
+    .asset-block {
       text-align: center;
+      font-size: 12px;
       line-height: 20px;
-    }
-
-    .filter-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-    }
-
-    input, select {
-      background-color: #0d1117;
-      border: 1px solid #30363d;
-      padding: 0.5rem;
-      color: #e6e6e6;
-      border-radius: 4px;
+      color: white;
     }
 
     .modal {
       position: fixed;
-      top: 0; left: 0;
-      right: 0; bottom: 0;
-      background-color: rgba(0, 0, 0, 0.6);
-      display: flex;
-      align-items: center;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(0,0,0,0.7);
+      display: none;
       justify-content: center;
-      z-index: 10;
+      align-items: center;
     }
 
     .modal-content {
-      background-color: #161b22;
-      padding: 2rem;
-      border-radius: 8px;
-      border: 1px solid #30363d;
+      background-color: #2b2f38;
+      padding: 20px;
+      border-radius: 10px;
       max-width: 90%;
     }
 
-    .modal-content h2 {
-      margin-bottom: 1rem;
+    .modal h3 {
+      margin-top: 0;
     }
 
-    .modal-content button {
-      margin-top: 1rem;
+    .transaction-list {
+      margin-top: 20px;
     }
 
-    .language-toggle {
+    .transaction {
+      padding: 10px;
+      background-color: #1e222b;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+
+    input, select {
+      padding: 8px;
+      border-radius: 4px;
+      border: none;
+      margin: 5px 0;
+      width: 100%;
+    }
+
+    .filter-bar {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .filter-bar input, .filter-bar select {
+      flex: 1;
     }
   </style>
 </head>
 <body>
+
   <header>
     <h1>Crypto Bundles</h1>
-    <div>
-      <button id="toggle-balance" class="btn secondary">Hide</button>
-    </div>
+    <button onclick="toggleBalance()">👁️</button>
   </header>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('portfolio')">Portfolio</div>
+    <div class="tab" onclick="switchTab('marketplace')">Marketplace</div>
+    <div class="tab" onclick="switchTab('settings')">Settings</div>
+  </div>
 
   <main>
     <!-- Portfolio -->
-    <section id="portfolio" class="section active">
-      <div class="card">
-        <div>Balance:</div>
-        <div class="balance" id="balance-value">$1,200.00</div>
-        <div>24h Change: <span style="color: lightgreen">+1.3%</span></div>
-        <div class="button-row">
-          <button class="btn" onclick="openModal('deposit')">Deposit</button>
-          <button class="btn secondary" onclick="openModal('withdraw')">Withdraw</button>
+    <div class="section active" id="portfolio">
+      <div class="balance-box">
+        <span id="balanceLabel">Balance: $<span id="balance">1275.45</span></span>
+        <div>
+          <button onclick="openModal('depositModal')">Deposit</button>
+          <button onclick="openModal('withdrawModal')">Withdraw</button>
         </div>
       </div>
 
-      <div class="card">
-        <h3>Open Bundles</h3>
-        <div id="open-bundles-list"></div>
-      </div>
+      <h3>Open Bundles</h3>
+      <div id="openBundles"></div>
 
-      <div class="card">
-        <h3>Transactions</h3>
-        <div id="transaction-list"></div>
+      <h3>Transaction History</h3>
+      <div class="filter-bar">
+        <select id="txFilter" onchange="renderTransactions()">
+          <option value="all">All</option>
+          <option value="deposit">Deposit</option>
+          <option value="withdraw">Withdraw</option>
+          <option value="open">Open</option>
+          <option value="close">Close</option>
+        </select>
       </div>
-    </section>
+      <div class="transaction-list" id="transactions"></div>
+    </div>
 
     <!-- Marketplace -->
-    <section id="marketplace" class="section">
-      <div class="card">
-        <h3>Search Bundles</h3>
-        <div class="filter-group">
-          <input type="text" id="search-name" placeholder="Search by name">
-          <select id="filter-risk">
-            <option value="">Any Risk</option>
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-          </select>
-        </div>
+    <div class="section" id="marketplace">
+      <div class="filter-bar">
+        <input type="text" placeholder="Search bundles..." id="searchQuery">
+        <select>
+          <option>Any Risk</option>
+          <option>Low</option>
+          <option>Medium</option>
+          <option>High</option>
+        </select>
       </div>
-
-      <div class="card">
-        <h3>Recommended</h3>
-        <div id="bundle-market-list"></div>
-      </div>
-    </section>
+      <div id="marketBundles"></div>
+    </div>
 
     <!-- Settings -->
-    <section id="settings" class="section">
-      <div class="card">
-        <h3>Profile</h3>
-        <p>@User (Telegram)</p>
-      </div>
-
-      <div class="card">
-        <h3>Security</h3>
-        <div class="language-toggle">
-          <span>Hide Balance</span>
-          <input type="checkbox" id="hide-balance-toggle">
-        </div>
-        <div class="language-toggle">
-          <span>Language</span>
-          <select id="language-select">
-            <option value="en">English</option>
-            <option value="ru">Русский</option>
-          </select>
-        </div>
-      </div>
-    </section>
+    <div class="section" id="settings">
+      <h3>Settings</h3>
+      <p>Language: <select><option>English</option><option>Русский</option></select></p>
+      <p><button onclick="alert('Feature not implemented')">Connect Email</button></p>
+      <p><button onclick="alert('Balance Hidden!')">Hide Balance</button></p>
+    </div>
   </main>
 
-  <nav>
-    <button onclick="switchTab('portfolio')" class="active-tab">Portfolio</button>
-    <button onclick="switchTab('marketplace')">Marketplace</button>
-    <button onclick="switchTab('settings')">Settings</button>
-  </nav>
-
   <!-- Modals -->
-  <div id="modal" class="modal hidden">
-    <div class="modal-content" id="modal-content">
-      <!-- Dynamic modal content will go here -->
+  <div class="modal" id="depositModal">
+    <div class="modal-content">
+      <h3>Deposit</h3>
+      <input type="number" placeholder="Enter amount">
+      <button onclick="closeModal('depositModal')">Confirm</button>
     </div>
   </div>
 
+  <div class="modal" id="withdrawModal">
+    <div class="modal-content">
+      <h3>Withdraw</h3>
+      <input type="number" placeholder="Enter amount">
+      <button onclick="closeModal('withdrawModal')">Confirm</button>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
   <script>
-    // ========== GLOBAL STATE ==========
-    let balance = 1200;
-    let bundles = [];
-    let openInvestments = [];
-    let transactions = [];
+    let balanceVisible = true;
 
-    // ========== HELPERS ==========
+    const dummyBundles = [
+      {name: "Moonshot X", profit: "+30%", risk: "High", time: "3h", assets: [{name: "BTC", percent: 50, color: "#f7931a"}, {name: "ETH", percent: 30, color: "#3c3c3d"}, {name: "SOL", percent: 20, color: "#00ffa3"}]},
+      {name: "Stable Edge", profit: "+12%", risk: "Low", time: "24h", assets: [{name: "USDT", percent: 80, color: "#26a17b"}, {name: "DAI", percent: 20, color: "#f4b731"}]},
+    ];
+
+    const transactions = [
+      {type: "deposit", amount: 500, date: "08.08.2025"},
+      {type: "open", amount: 200, date: "08.08.2025"},
+      {type: "withdraw", amount: 100, date: "07.08.2025"},
+    ];
+
     function switchTab(tab) {
-      document.querySelectorAll(".section").forEach(el => el.classList.remove("active"));
-      document.getElementById(tab).classList.add("active");
+      document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
 
-      document.querySelectorAll("nav button").forEach(btn => btn.classList.remove("active-tab"));
-      document.querySelectorAll("nav button").forEach(btn => {
-        if (btn.innerText.toLowerCase() === tab) btn.classList.add("active-tab");
+      document.querySelector(`.tab[onclick="switchTab('${tab}')"]`).classList.add('active');
+      document.getElementById(tab).classList.add('active');
+    }
+
+    function toggleBalance() {
+      balanceVisible = !balanceVisible;
+      document.getElementById("balance").innerText = balanceVisible ? "1275.45" : "••••";
+    }
+
+    function openModal(id) {
+      document.getElementById(id).style.display = "flex";
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).style.display = "none";
+    }
+
+    function renderBundles() {
+      const container = document.getElementById("marketBundles");
+      dummyBundles.forEach(bundle => {
+        const div = document.createElement("div");
+        div.className = "bundle-card";
+        div.innerHTML = `
+          <strong>${bundle.name}</strong><br>
+          Profit: ${bundle.profit}, Risk: ${bundle.risk}, Time: ${bundle.time}
+          <div class="bundle-assets">
+            ${bundle.assets.map(asset => `
+              <div class="asset-block" style="background:${asset.color}; width:${asset.percent}%">${asset.name} ${asset.percent}%</div>
+            `).join("")}
+          </div>
+        `;
+        container.appendChild(div);
       });
-    }
-
-    function openModal(type, data = {}) {
-      const modal = document.getElementById("modal");
-      const modalContent = document.getElementById("modal-content");
-      modal.classList.remove("hidden");
-
-      if (type === "deposit") {
-        modalContent.innerHTML = `
-          <h2>Deposit USDT</h2>
-          <input type="number" id="deposit-amount" placeholder="Amount"/>
-          <button class="btn" onclick="confirmDeposit()">Confirm</button>
-        `;
-      } else if (type === "withdraw") {
-        modalContent.innerHTML = `
-          <h2>Withdraw USDT</h2>
-          <input type="number" id="withdraw-amount" placeholder="Amount"/>
-          <button class="btn secondary" onclick="confirmWithdraw()">Confirm</button>
-        `;
-      } else if (type === "invest") {
-        modalContent.innerHTML = `
-          <h2>Invest in ${data.name}</h2>
-          <input type="number" id="invest-amount" placeholder="Amount"/>
-          <button class="btn" onclick="confirmInvestment('${data.id}')">Confirm</button>
-        `;
-      }
-    }
-
-    function closeModal() {
-      document.getElementById("modal").classList.add("hidden");
-    }
-
-    document.getElementById("modal").addEventListener("click", (e) => {
-      if (e.target.id === "modal") closeModal();
-    });
-
-    // ========== BALANCE ==========
-    function updateBalance() {
-      const el = document.getElementById("balance-value");
-      el.textContent = `$${balance.toFixed(2)}`;
-    }
-
-    document.getElementById("toggle-balance").addEventListener("click", () => {
-      const el = document.getElementById("balance-value");
-      if (el.classList.contains("hidden")) {
-        el.classList.remove("hidden");
-        toggleBalance.textContent = "Hide";
-      } else {
-        el.classList.add("hidden");
-        toggleBalance.textContent = "Show";
-      }
-    });
-
-    // ========== TRANSACTIONS ==========
-    function addTransaction(type, amount) {
-      transactions.unshift({ type, amount, date: new Date().toLocaleString() });
-      renderTransactions();
     }
 
     function renderTransactions() {
-      const list = document.getElementById("transaction-list");
+      const filter = document.getElementById("txFilter").value;
+      const list = document.getElementById("transactions");
       list.innerHTML = "";
-      transactions.forEach(tx => {
-        const el = document.createElement("div");
-        el.innerText = `[${tx.date}] ${tx.type.toUpperCase()}: $${tx.amount}`;
-        list.appendChild(el);
-      });
+      transactions
+        .filter(tx => filter === "all" || tx.type === filter)
+        .forEach(tx => {
+          const div = document.createElement("div");
+          div.className = "transaction";
+          div.innerText = `${tx.type.toUpperCase()}: $${tx.amount} on ${tx.date}`;
+          list.appendChild(div);
+        });
     }
 
-    // ========== MODAL ACTIONS ==========
-    function confirmDeposit() {
-      const amount = parseFloat(document.getElementById("deposit-amount").value);
-      if (!isNaN(amount)) {
-        balance += amount;
-        addTransaction("deposit", amount);
-        updateBalance();
-        closeModal();
-      }
+    window.onload = function() {
+      renderBundles();
+      renderTransactions();
     }
-
-    function confirmWithdraw() {
-      const amount = parseFloat(document.getElementById("withdraw-amount").value);
-      if (!isNaN(amount) && amount <= balance) {
-        balance -= amount;
-        addTransaction("withdraw", amount);
-        updateBalance();
-        closeModal();
-      }
-    }
-
-    function confirmInvestment(id) {
-      const amount = parseFloat(document.getElementById("invest-amount").value);
-      const bundle = bundles.find(b => b.id === id);
-      if (!isNaN(amount) && amount <= balance && bundle) {
-        balance -= amount;
-        openInvestments.push({ ...bundle, invested: amount, date: new Date().toLocaleString() });
-        addTransaction("invest", amount);
-        updateBalance();
-        renderOpenInvestments();
-        closeModal();
-      }
-    }
-
-    // ========== BUNDLES ==========
-
-    function generateFakeBundles() {
-      const risks = ["low", "medium", "high"];
-      const cryptos = ["BTC", "ETH", "SOL", "XRP", "ADA"];
-      const newBundle = {
-        id: Math.random().toString(36).substr(2, 9),
-        name: "Bundle #" + Math.floor(Math.random() * 1000),
-        risk: risks[Math.floor(Math.random() * risks.length)],
-        assets: cryptos.sort(() => 0.5 - Math.random()).slice(0, 3).map(name => ({
-          name,
-          weight: Math.floor(Math.random() * 40) + 20
-        }))
-      };
-      bundles.unshift(newBundle);
-      renderMarketBundles();
-    }
-
-    function renderMarketBundles() {
-      const list = document.getElementById("bundle-market-list");
-      list.innerHTML = "";
-      bundles.slice(0, 5).forEach(bundle => {
-        const div = document.createElement("div");
-        div.classList.add("card");
-        div.innerHTML = `
-          <strong>${bundle.name}</strong> (${bundle.risk})
-          <div class="bundle-bar">
-            ${bundle.assets.map(asset => `
-              <div style="width:${asset.weight}%; background:#${Math.floor(Math.random()*16777215).toString(16)}">${asset.name}</div>
-            `).join("")}
-          </div>
-          <button class="btn" onclick="openModal('invest', ${JSON.stringify(bundle)})">Invest</button>
-        `;
-        list.appendChild(div);
-      });
-    }
-
-    function renderOpenInvestments() {
-      const list = document.getElementById("open-bundles-list");
-      list.innerHTML = "";
-      openInvestments.forEach(inv => {
-        const div = document.createElement("div");
-        div.classList.add("card");
-        div.innerHTML = `
-          <strong>${inv.name}</strong> - $${inv.invested} <br/>
-          Opened at: ${inv.date}
-        `;
-        list.appendChild(div);
-      });
-    }
-
-    // ========== INIT ==========
-    updateBalance();
-    generateFakeBundles();
-    setInterval(generateFakeBundles, 180000); // every 3 minutes
   </script>
 </body>
 </html>
