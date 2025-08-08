@@ -1,311 +1,1275 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Crypto Bundles App</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    /* === GLOBAL STYLES === */
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #0e1015;
-      color: #e0e0e0;
-    }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Crypto Bundles — MVP (Emulator)</title>
+<style>
+/* =========================
+   THEME — Stake-like (dark navy / dark gray)
+   ========================= */
+:root{
+  --bg:#071026;            /* deep navy */
+  --panel:#0d1622;         /* slightly lighter */
+  --muted:#9aa4b2;
+  --text:#e6eef6;
+  --accent:#2b6ef6;        /* blue accent */
+  --accent-2:#10b981;      /* green */
+  --danger:#ef4444;
+  --card:#0b1520;
+  --glass: rgba(255,255,255,0.03);
+  --radius:12px;
+  --mono: 'Roboto Mono', monospace;
+  --ui-gap:12px;
+  font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background: linear-gradient(180deg, var(--bg) 0%, #081225 100%);
+  color:var(--text);
+  font-size:14px;
+  line-height:1.3;
+  -webkit-tap-highlight-color: transparent;
+}
 
-    header {
-      padding: 10px 20px;
-      background-color: #1c1f26;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+/* App frame */
+.app {
+  width:100%;
+  max-width:1100px;
+  margin:24px auto;
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+  display:grid;
+  grid-template-columns: 320px 1fr;
+  min-height:640px;
+  background: linear-gradient(180deg, var(--panel), #081522);
+}
 
-    header h1 {
-      margin: 0;
-      font-size: 18px;
-      color: white;
-    }
+/* Sidebar */
+.sidebar {
+  padding:20px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+  border-right: 1px solid rgba(255,255,255,0.03);
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+.brand {
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+.logo {
+  width:48px;
+  height:48px;
+  border-radius:12px;
+  background:linear-gradient(135deg,var(--accent),#6c4cff);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:700;
+  color:white;
+  font-family:var(--mono);
+  font-size:18px;
+  box-shadow: 0 6px 18px rgba(43,110,246,0.16);
+}
+.brand h1 {
+  margin:0;
+  font-size:16px;
+  color:var(--text);
+}
+.brand p { margin:0; color:var(--muted); font-size:12px; }
 
-    .tabs {
-      display: flex;
-      justify-content: space-around;
-      background-color: #1c1f26;
-    }
+/* Nav */
+.nav {
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin-top:6px;
+}
+.nav button {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  border: none;
+  background:transparent;
+  color:var(--muted);
+  padding:10px;
+  border-radius:10px;
+  cursor:pointer;
+  text-align:left;
+  font-size:14px;
+}
+.nav button.active{
+  background: linear-gradient(90deg, rgba(43,110,246,0.12), rgba(16,185,129,0.04));
+  color:var(--text);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+}
 
-    .tab {
-      flex: 1;
-      text-align: center;
-      padding: 12px;
-      cursor: pointer;
-      color: #ccc;
-      border-bottom: 2px solid transparent;
-    }
+/* Small widgets in sidebar */
+.widget {
+  padding:12px;
+  background:var(--card);
+  border-radius:10px;
+  border: 1px solid rgba(255,255,255,0.02);
+}
+.widget h3 { margin:0 0 8px 0; font-size:13px; color:var(--muted); }
+.small {
+  font-size:13px;
+  color:var(--text);
+}
 
-    .tab.active {
-      color: white;
-      border-color: #4f8dff;
-    }
+/* Main content */
+.content {
+  padding:22px;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
 
-    main {
-      padding: 15px;
-    }
+/* Top row - header of main area */
+.topbar {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+}
+.left {
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+.controls { display:flex; gap:10px; align-items:center; }
 
-    .section {
-      display: none;
-    }
+/* Panel / card */
+.panel {
+  background: linear-gradient(180deg, rgba(255,255,255,0.015), transparent);
+  border-radius:12px;
+  padding:14px;
+  border:1px solid rgba(255,255,255,0.02);
+}
+.row { display:flex; gap:12px; align-items:center; }
+.col { display:flex; flex-direction:column; gap:8px; }
 
-    .section.active {
-      display: block;
-    }
+/* Balance */
+.balance-large {
+  font-size:28px;
+  font-weight:700;
+  color:var(--text);
+}
+.balance-sub { color:var(--muted); font-size:13px; }
 
-    .balance-box {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background-color: #1e222b;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 15px;
-    }
+/* Buttons */
+.btn {
+  border: none;
+  padding:10px 14px;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:600;
+  background:var(--accent);
+  color:white;
+  box-shadow: 0 8px 24px rgba(43,110,246,0.12);
+}
+.btn.secondary {
+  background:transparent;
+  border:1px solid rgba(255,255,255,0.04);
+  color:var(--text);
+}
+.icon-btn {
+  background:rgba(255,255,255,0.02);
+  border-radius:10px;
+  padding:8px;
+  border:none;
+  color:var(--muted);
+}
 
-    .balance-box span {
-      font-size: 18px;
-    }
+/* Bundles list / marketplace items */
+.bundle {
+  display:flex;
+  justify-content:space-between;
+  gap:16px;
+  padding:12px;
+  border-radius:10px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.01), transparent);
+  border:1px solid rgba(255,255,255,0.02);
+  align-items:center;
+}
+.bundle .meta { flex:1; }
+.bundle .actions { width:220px; display:flex; justify-content:flex-end; gap:10px; align-items:center; }
 
-    button {
-      background-color: #4f8dff;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 6px;
-      color: white;
-      cursor: pointer;
-    }
+/* Asset strip */
+.asset-strip {
+  height:18px;
+  border-radius:6px;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  gap:0;
+  border:1px solid rgba(255,255,255,0.02);
+}
+.asset {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:11px;
+  color:white;
+  padding:0 6px;
+  white-space:nowrap;
+}
 
-    .bundle-card {
-      background-color: #1c1f26;
-      border-radius: 10px;
-      padding: 15px;
-      margin-bottom: 12px;
-    }
+/* Chart area */
+.chart-wrap {
+  width:100%;
+  height:160px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+  border-radius:10px;
+  padding:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
 
-    .bundle-assets {
-      display: flex;
-      height: 20px;
-      margin-top: 8px;
-      overflow: hidden;
-      border-radius: 5px;
-    }
+/* Search & filters */
+.filters {
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+.input, select {
+  padding:10px;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,0.03);
+  background:rgba(255,255,255,0.01);
+  color:var(--text);
+}
 
-    .asset-block {
-      text-align: center;
-      font-size: 12px;
-      line-height: 20px;
-      color: white;
-    }
+/* Transactions */
+.tx-list { display:flex; flex-direction:column; gap:8px; max-height:300px; overflow:auto; padding-right:6px; }
+.tx-item { padding:10px; border-radius:8px; display:flex; justify-content:space-between; background:rgba(255,255,255,0.01); border:1px solid rgba(255,255,255,0.02); }
 
-    .modal {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: rgba(0,0,0,0.7);
-      display: none;
-      justify-content: center;
-      align-items: center;
-    }
+/* Modal */
+.modal {
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background: rgba(2,6,23,0.6);
+  z-index:1200;
+}
+.modal.show { display:flex; }
+.modal .card {
+  width:100%;
+  max-width:520px;
+  padding:18px;
+}
 
-    .modal-content {
-      background-color: #2b2f38;
-      padding: 20px;
-      border-radius: 10px;
-      max-width: 90%;
-    }
+/* small helpers */
+.kv { display:flex; justify-content:space-between; gap:8px; }
+.small-muted { color:var(--muted); font-size:12px; }
+.px { padding-left:12px; padding-right:12px; }
+.center { display:flex; align-items:center; justify-content:center; }
 
-    .modal h3 {
-      margin-top: 0;
-    }
-
-    .transaction-list {
-      margin-top: 20px;
-    }
-
-    .transaction {
-      padding: 10px;
-      background-color: #1e222b;
-      border-radius: 6px;
-      margin-bottom: 8px;
-    }
-
-    input, select {
-      padding: 8px;
-      border-radius: 4px;
-      border: none;
-      margin: 5px 0;
-      width: 100%;
-    }
-
-    .filter-bar {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 15px;
-    }
-
-    .filter-bar input, .filter-bar select {
-      flex: 1;
-    }
-  </style>
+/* Responsive */
+@media (max-width:880px){
+  .app{ grid-template-columns:1fr; margin:10px; min-height:100vh; }
+  .sidebar{ order:2; }
+  .content{ order:1; }
+  .bundle .actions{ width:auto; justify-content:flex-end; }
+}
+</style>
 </head>
 <body>
+<div class="app" id="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" aria-label="Sidebar">
+    <div class="brand">
+      <div class="logo">CB</div>
+      <div>
+        <h1>Crypto Bundles</h1>
+        <p>Invest — Automated Bundles (MVP)</p>
+      </div>
+    </div>
 
-  <header>
-    <h1>Crypto Bundles</h1>
-    <button onclick="toggleBalance()">👁️</button>
-  </header>
+    <nav class="nav" role="navigation" aria-label="Main navigation">
+      <button id="nav-portfolio" class="active" data-page="portfolio" title="Portfolio">Portfolio</button>
+      <button id="nav-market" data-page="marketplace" title="Marketplace">Marketplace</button>
+      <button id="nav-settings" data-page="settings" title="Settings">Settings</button>
+      <button id="nav-faq" data-page="faq" title="FAQ">FAQ</button>
+    </nav>
 
-  <div class="tabs">
-    <div class="tab active" onclick="switchTab('portfolio')">Portfolio</div>
-    <div class="tab" onclick="switchTab('marketplace')">Marketplace</div>
-    <div class="tab" onclick="switchTab('settings')">Settings</div>
-  </div>
+    <div class="widget">
+      <h3>Account</h3>
+      <div class="small">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:36px;height:36px;border-radius:8px;background:linear-gradient(90deg,#2b6ef6,#6c4cff);display:flex;align-items:center;justify-content:center;font-weight:700;">U</div>
+          <div>
+            <div style="font-weight:700">User123</div>
+            <div class="small-muted">@telegram</div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <main>
-    <!-- Portfolio -->
-    <div class="section active" id="portfolio">
-      <div class="balance-box">
-        <span id="balanceLabel">Balance: $<span id="balance">1275.45</span></span>
+    <div class="widget">
+      <h3>Quick stats</h3>
+      <div class="kv"><div class="small-muted">Balance</div><div id="sb-balance" class="small">—</div></div>
+      <div class="kv"><div class="small-muted">Open Bundles</div><div id="sb-open" class="small">0</div></div>
+      <div class="kv"><div class="small-muted">24h Change</div><div id="sb-change" class="small green">+0.0%</div></div>
+    </div>
+
+    <div style="flex:1"></div>
+
+    <div class="small muted" style="font-size:12px;color:var(--muted)">
+      MVP Demo • No external integrations • Data stored locally
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="content" id="main-content">
+    <!-- Top bar -->
+    <div class="topbar">
+      <div class="left">
+        <div style="font-size:18px;font-weight:700">Portfolio</div>
+        <div class="small-muted" id="top-sub">Overview of your balance and open bundles</div>
+      </div>
+      <div class="controls">
+        <button class="icon-btn" id="toggle-balance" title="Hide balance">👁</button>
+        <button class="btn" id="deposit-btn">Deposit</button>
+        <button class="btn secondary" id="withdraw-btn">Withdraw</button>
+      </div>
+    </div>
+
+    <!-- Balance & Chart -->
+    <section class="panel" aria-label="Balance panel">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:center">
         <div>
-          <button onclick="openModal('depositModal')">Deposit</button>
-          <button onclick="openModal('withdrawModal')">Withdraw</button>
+          <div class="balance-large" id="balance-display">$0.00</div>
+          <div class="balance-sub" id="balance-change">24h: <span id="balance-change-val" class="green">+0.0%</span></div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div style="text-align:right;">
+            <div class="small-muted">Available</div>
+            <div id="available-balance" style="font-weight:700">$0.00</div>
+          </div>
         </div>
       </div>
 
-      <h3>Open Bundles</h3>
-      <div id="openBundles"></div>
+      <div style="margin-top:12px; display:flex; gap:12px; align-items:center;">
+        <div style="flex:1">
+          <div class="chart-wrap panel" id="chart-wrap">
+            <canvas id="balance-chart" width="800" height="160"></canvas>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:8px;color:var(--muted);font-size:13px">
+            <div>Balance history</div>
+            <div><span id="chart-range">Last 24h</span></div>
+          </div>
+        </div>
 
-      <h3>Transaction History</h3>
-      <div class="filter-bar">
-        <select id="txFilter" onchange="renderTransactions()">
-          <option value="all">All</option>
-          <option value="deposit">Deposit</option>
-          <option value="withdraw">Withdraw</option>
-          <option value="open">Open</option>
-          <option value="close">Close</option>
-        </select>
+        <div style="width:320px;">
+          <div class="panel">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div><strong>Open Bundles</strong><div class="small-muted">Active investments</div></div>
+              <div><strong id="open-count">0</strong></div>
+            </div>
+            <div id="open-list" style="margin-top:12px; display:flex; flex-direction:column; gap:8px; max-height:220px; overflow:auto;"></div>
+          </div>
+        </div>
       </div>
-      <div class="transaction-list" id="transactions"></div>
-    </div>
+    </section>
 
     <!-- Marketplace -->
-    <div class="section" id="marketplace">
-      <div class="filter-bar">
-        <input type="text" placeholder="Search bundles..." id="searchQuery">
-        <select>
-          <option>Any Risk</option>
-          <option>Low</option>
-          <option>Medium</option>
-          <option>High</option>
-        </select>
+    <section class="panel" aria-label="Marketplace panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+        <div style="display:flex;gap:12px;align-items:center;width:100%">
+          <input id="search-input" class="input" placeholder="Search bundles by name" style="flex:1" />
+          <select id="filter-risk" class="input" style="width:120px">
+            <option value="any">Risk: Any</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+          <select id="filter-term" class="input" style="width:140px">
+            <option value="any">Term: Any</option>
+            <option value="1h">≤1h</option>
+            <option value="4h">≤4h</option>
+            <option value="12h">≤12h</option>
+            <option value="24h">≤24h</option>
+            <option value="72h">≤72h</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn" id="generate-now">Generate bundles</button>
+          <button class="btn secondary" id="open-market">Open Marketplace</button>
+        </div>
       </div>
-      <div id="marketBundles"></div>
-    </div>
 
-    <!-- Settings -->
-    <div class="section" id="settings">
-      <h3>Settings</h3>
-      <p>Language: <select><option>English</option><option>Русский</option></select></p>
-      <p><button onclick="alert('Feature not implemented')">Connect Email</button></p>
-      <p><button onclick="alert('Balance Hidden!')">Hide Balance</button></p>
-    </div>
-  </main>
+      <div id="market-list" style="margin-top:14px; display:flex; flex-direction:column; gap:10px; max-height:360px; overflow:auto;"></div>
+    </section>
 
-  <!-- Modals -->
-  <div class="modal" id="depositModal">
-    <div class="modal-content">
-      <h3>Deposit</h3>
-      <input type="number" placeholder="Enter amount">
-      <button onclick="closeModal('depositModal')">Confirm</button>
-    </div>
-  </div>
-
-  <div class="modal" id="withdrawModal">
-    <div class="modal-content">
-      <h3>Withdraw</h3>
-      <input type="number" placeholder="Enter amount">
-      <button onclick="closeModal('withdrawModal')">Confirm</button>
-    </div>
-  </div>
-
-  <!-- JavaScript -->
-  <script>
-    let balanceVisible = true;
-
-    const dummyBundles = [
-      {name: "Moonshot X", profit: "+30%", risk: "High", time: "3h", assets: [{name: "BTC", percent: 50, color: "#f7931a"}, {name: "ETH", percent: 30, color: "#3c3c3d"}, {name: "SOL", percent: 20, color: "#00ffa3"}]},
-      {name: "Stable Edge", profit: "+12%", risk: "Low", time: "24h", assets: [{name: "USDT", percent: 80, color: "#26a17b"}, {name: "DAI", percent: 20, color: "#f4b731"}]},
-    ];
-
-    const transactions = [
-      {type: "deposit", amount: 500, date: "08.08.2025"},
-      {type: "open", amount: 200, date: "08.08.2025"},
-      {type: "withdraw", amount: 100, date: "07.08.2025"},
-    ];
-
-    function switchTab(tab) {
-      document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
-
-      document.querySelector(`.tab[onclick="switchTab('${tab}')"]`).classList.add('active');
-      document.getElementById(tab).classList.add('active');
-    }
-
-    function toggleBalance() {
-      balanceVisible = !balanceVisible;
-      document.getElementById("balance").innerText = balanceVisible ? "1275.45" : "••••";
-    }
-
-    function openModal(id) {
-      document.getElementById(id).style.display = "flex";
-    }
-
-    function closeModal(id) {
-      document.getElementById(id).style.display = "none";
-    }
-
-    function renderBundles() {
-      const container = document.getElementById("marketBundles");
-      dummyBundles.forEach(bundle => {
-        const div = document.createElement("div");
-        div.className = "bundle-card";
-        div.innerHTML = `
-          <strong>${bundle.name}</strong><br>
-          Profit: ${bundle.profit}, Risk: ${bundle.risk}, Time: ${bundle.time}
-          <div class="bundle-assets">
-            ${bundle.assets.map(asset => `
-              <div class="asset-block" style="background:${asset.color}; width:${asset.percent}%">${asset.name} ${asset.percent}%</div>
-            `).join("")}
+    <!-- Transactions & Settings summary -->
+    <section style="display:flex;gap:12px;">
+      <div class="panel" style="flex:1; min-width:360px;">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div><strong>Transaction History</strong><div class="small-muted">All deposits, withdrawals, investments and closures</div></div>
+          <div>
+            <select id="tx-filter" class="input" style="width:160px">
+              <option value="all">All</option>
+              <option value="deposit">Deposit</option>
+              <option value="withdraw">Withdraw</option>
+              <option value="invest">Invest</option>
+              <option value="close">Close</option>
+            </select>
           </div>
-        `;
-        container.appendChild(div);
-      });
-    }
+        </div>
+        <div class="tx-list" id="tx-list" style="margin-top:12px;"></div>
+      </div>
 
-    function renderTransactions() {
-      const filter = document.getElementById("txFilter").value;
-      const list = document.getElementById("transactions");
-      list.innerHTML = "";
-      transactions
-        .filter(tx => filter === "all" || tx.type === filter)
-        .forEach(tx => {
-          const div = document.createElement("div");
-          div.className = "transaction";
-          div.innerText = `${tx.type.toUpperCase()}: $${tx.amount} on ${tx.date}`;
-          list.appendChild(div);
-        });
-    }
+      <div class="panel" style="width:320px;">
+        <div><strong>Settings (Summary)</strong></div>
+        <div style="margin-top:12px" class="small-muted">
+          <div class="kv"><div>Language</div><div id="st-lang">English</div></div>
+          <div class="kv"><div>2FA</div><div id="st-2fa">Disabled</div></div>
+          <div class="kv"><div>Notifications</div><div id="st-notif">Enabled</div></div>
+          <div style="margin-top:10px">
+            <button class="btn" id="open-settings">Open settings</button>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    window.onload = function() {
-      renderBundles();
-      renderTransactions();
+    <!-- Footer small -->
+    <footer style="text-align:center;color:var(--muted);font-size:12px;">
+      Demo build • No real trading • For development and UI testing only
+    </footer>
+  </main>
+</div>
+
+<!-- MODALS -->
+<div class="modal" id="modal">
+  <div class="card panel" id="modal-card">
+    <!-- dynamic -->
+  </div>
+</div>
+
+<script>
+/* =========================
+   App logic (JS)
+   - Local state & persistence via localStorage
+   - Bundle generation emulator
+   - Simple chart renderer (canvas)
+   - Transaction and investment flows emulated
+   ========================= */
+
+/* -------------------------
+   Utilities
+   ------------------------- */
+const fmtUSD = (n)=> {
+  if (n===null || n===undefined) return '-';
+  return '$' + Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+const uid = (len=8)=> Math.random().toString(36).slice(2,2+len);
+const nowISO = ()=> (new Date()).toISOString();
+const clamp = (v,min,max)=> Math.max(min,Math.min(max,v));
+
+/* -------------------------
+   Persistent store (localStorage wrapper)
+   ------------------------- */
+const STORE_KEY = 'cb_mvp_state_v1';
+const defaultState = {
+  profile: { username:'User123', tg_handle:'@telegram', email:null },
+  balance: 1000.00,        // USDT
+  available: 1000.00,      // free to invest
+  history: [],             // transactions
+  bundles: [],             // marketplace bundles (generated)
+  investments: [],         // user investments (open/closed)
+  balanceHistory: [],      // timestamps & amounts for chart
+  settings: { lang:'en', twofa:false, notif:true, hideBalance:false },
+  lastBundleGen: null
+};
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return JSON.parse(JSON.stringify(defaultState));
+    const st = JSON.parse(raw);
+    // simple migration: ensure keys exist
+    return Object.assign({}, JSON.parse(JSON.stringify(defaultState)), st);
+  }catch(e){
+    console.error('loadState error',e);
+    return JSON.parse(JSON.stringify(defaultState));
+  }
+}
+function saveState(){
+  try{
+    localStorage.setItem(STORE_KEY, JSON.stringify(state));
+  }catch(e){
+    console.error('saveState',e);
+  }
+}
+
+let state = loadState();
+
+/* Initialize balance history if empty */
+if (!state.balanceHistory || state.balanceHistory.length < 2) {
+  // seed last 24 points (hourly)
+  const base = state.balance || 1000;
+  const arr = [];
+  for (let i=23;i>=0;i--){
+    const time = new Date(Date.now() - i*60*60*1000).toISOString();
+    const jitter = (Math.random()-0.5)*10;
+    arr.push({ t: time, v: Math.max(1, base + jitter*(i/5)) });
+  }
+  state.balanceHistory = arr;
+  saveState();
+}
+
+/* -------------------------
+   UI bindings
+   ------------------------- */
+const els = {
+  sbBalance: document.getElementById('sb-balance'),
+  sbOpen: document.getElementById('sb-open'),
+  sbChange: document.getElementById('sb-change'),
+  balanceDisplay: document.getElementById('balance-display'),
+  balanceChangeVal: document.getElementById('balance-change-val'),
+  availableBalance: document.getElementById('available-balance'),
+  openList: document.getElementById('open-list'),
+  openCount: document.getElementById('open-count'),
+  marketList: document.getElementById('market-list'),
+  txList: document.getElementById('tx-list'),
+  modal: document.getElementById('modal'),
+  modalCard: document.getElementById('modal-card'),
+  chartCanvas: document.getElementById('balance-chart'),
+  navButtons: document.querySelectorAll('.nav button'),
+  chartRange: document.getElementById('chart-range'),
+  searchInput: document.getElementById('search-input'),
+  filterRisk: document.getElementById('filter-risk'),
+  filterTerm: document.getElementById('filter-term'),
+  txFilter: document.getElementById('tx-filter'),
+  depositBtn: document.getElementById('deposit-btn'),
+  withdrawBtn: document.getElementById('withdraw-btn'),
+  generateNowBtn: document.getElementById('generate-now'),
+  openSettingsBtn: document.getElementById('open-settings'),
+  toggleBalanceBtn: document.getElementById('toggle-balance'),
+  openMarketBtn: document.getElementById('open-market'),
+};
+
+/* -------------------------
+   Chart rendering (simple sparkline)
+   ------------------------- */
+const chartCtx = els.chartCanvas.getContext('2d');
+
+function drawChart(){
+  const w = els.chartCanvas.width = els.chartCanvas.clientWidth * devicePixelRatio;
+  const h = els.chartCanvas.height = els.chartCanvas.clientHeight * devicePixelRatio;
+  chartCtx.clearRect(0,0,w,h);
+  // get last 24 points
+  const data = state.balanceHistory.slice(-48); // may be more frequent
+  if (data.length === 0) return;
+  // values
+  const vals = data.map(d => d.v);
+  const min = Math.min(...vals);
+  const max = Math.max(...vals);
+  const pad = (max-min)*0.08 || 10;
+  const yMin = min - pad;
+  const yMax = max + pad;
+  // draw area gradient
+  chartCtx.save();
+  chartCtx.scale(devicePixelRatio,devicePixelRatio);
+  const W = els.chartCanvas.clientWidth;
+  const H = els.chartCanvas.clientHeight;
+  chartCtx.beginPath();
+  data.forEach((d,i)=>{
+    const x = (i/(data.length-1)) * W;
+    const y = H - ((d.v - yMin)/(yMax-yMin))*H;
+    if (i===0) chartCtx.moveTo(x,y); else chartCtx.lineTo(x,y);
+  });
+  chartCtx.lineTo(W,H);
+  chartCtx.lineTo(0,H);
+  chartCtx.closePath();
+  const g = chartCtx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0, 'rgba(43,110,246,0.14)');
+  g.addColorStop(1, 'rgba(43,110,246,0.02)');
+  chartCtx.fillStyle = g;
+  chartCtx.fill();
+  // draw line
+  chartCtx.beginPath();
+  data.forEach((d,i)=>{
+    const x = (i/(data.length-1)) * W;
+    const y = H - ((d.v - yMin)/(yMax-yMin))*H;
+    if (i===0) chartCtx.moveTo(x,y); else chartCtx.lineTo(x,y);
+  });
+  chartCtx.lineWidth = 2;
+  chartCtx.strokeStyle = '#60a0ff';
+  chartCtx.stroke();
+  // draw last point
+  const last = data[data.length-1];
+  const lx = W;
+  const ly = H - ((last.v - yMin)/(yMax-yMin))*H;
+  chartCtx.beginPath();
+  chartCtx.arc(lx,ly,3,0,Math.PI*2);
+  chartCtx.fillStyle = '#fff';
+  chartCtx.fill();
+  chartCtx.restore();
+}
+
+/* -------------------------
+   Bundle generation (emulator)
+   ------------------------- */
+const RISK_LEVELS = ['low','medium','high'];
+const SAMPLE_ASSETS = [
+  {symbol:'BTC', color:'#f7931a'},
+  {symbol:'ETH', color:'#627eea'},
+  {symbol:'SOL', color:'#66f9a1'},
+  {symbol:'ADA', color:'#0033ad'},
+  {symbol:'XRP', color:'#00a3e0'},
+  {symbol:'LUNA', color:'#ff8cb0'},
+  {symbol:'DOGE', color:'#c3a634'},
+  {symbol:'USDT', color:'#26a17b'}
+];
+
+function randomBundle(){
+  const id = uid(10);
+  const name = ['Alpha','Beta','Gamma','Delta','Epsilon','Zeta','Kappa','Sigma'][Math.floor(Math.random()*8)] + ' ' + (Math.floor(Math.random()*900)+100);
+  const risk = RISK_LEVELS[Math.floor(Math.random()*RISK_LEVELS.length)];
+  // profit target depends on risk
+  let profitTarget;
+  if (risk==='low') profitTarget = (Math.random()*8 + 5); // 5-13%
+  if (risk==='medium') profitTarget = (Math.random()*15 + 10); // 10-25%
+  if (risk==='high') profitTarget = (Math.random()*40 + 20); // 20-60%
+  profitTarget = Math.round(profitTarget*10)/10;
+  const termHours = [1,2,4,6,12,24,48,72][Math.floor(Math.random()*8)];
+  // assets: pick 3 unique
+  const assets = [];
+  let pool = [...SAMPLE_ASSETS];
+  for (let i=0;i<3;i++){
+    const idx = Math.floor(Math.random()*pool.length);
+    const a = pool.splice(idx,1)[0];
+    assets.push({symbol:a.symbol, color:a.color, share:0}); // share will be assigned
+  }
+  // assign shares proportional random
+  let r1 = Math.random(), r2 = Math.random(), r3 = Math.random();
+  let sum = r1+r2+r3;
+  assets[0].share = Math.round((r1/sum)*100);
+  assets[1].share = Math.round((r2/sum)*100);
+  assets[2].share = 100 - assets[0].share - assets[1].share;
+  const createdAt = new Date().toISOString();
+  const availableMinutes = 30 + Math.floor(Math.random()*120); // available window
+  const startAt = new Date(Date.now() + 1*60*1000).toISOString(); // starts in 1 minute
+  const availableUntil = new Date(Date.now() + availableMinutes*60*1000).toISOString();
+  const entryFee = Math.round((Math.random()*2 + 0.1)*100)/100; // small fee %
+  return {
+    id, name, risk, profitTarget, termHours,
+    assets, createdAt, availableUntil, entryFee, status:'available', totalInvested:0
+  };
+}
+
+function generateBundles(n=4){
+  const arr = [];
+  for (let i=0;i<n;i++) arr.push(randomBundle());
+  state.bundles = [...arr, ...state.bundles].slice(0,200); // keep recent
+  state.lastBundleGen = new Date().toISOString();
+  saveState();
+  renderMarket();
+  updateSidebar();
+}
+
+/* auto-generate periodically (emulator) */
+setInterval(()=>{
+  // occasionally generate 1-3 bundles
+  if (Math.random() < 0.35){
+    const count = 1 + Math.floor(Math.random()*3);
+    generateBundles(count);
+    console.log('Auto-generated', count, 'bundles');
+  }
+}, 60*1000); // every minute
+
+/* -------------------------
+   Investments & transactions (emulated)
+   ------------------------- */
+function addTransaction(type, amount, details){
+  const tx = { id: uid(10), type, amount, date: nowISO(), details };
+  state.history.unshift(tx);
+  saveState();
+  renderTx();
+}
+
+function investInBundle(bundleId, amount){
+  amount = Number(amount);
+  if (isNaN(amount) || amount <= 0) return {ok:false, reason:'Invalid amount'};
+  if (amount > state.available) return {ok:false, reason:'Insufficient funds'};
+  const bundle = state.bundles.find(b=>b.id===bundleId);
+  if (!bundle) return {ok:false, reason:'Bundle not found'};
+  if (new Date(bundle.availableUntil) < new Date()) return {ok:false, reason:'Bundle no longer available'};
+  // reserve funds (deduct available, add investment record)
+  state.available = Math.round((state.available - amount)*100)/100;
+  bundle.totalInvested = Math.round((bundle.totalInvested + amount)*100)/100;
+  const inv = {
+    id: uid(10),
+    bundleId: bundle.id,
+    bundleName: bundle.name,
+    amount,
+    investedAt: nowISO(),
+    status: 'active',
+    shares: null,
+    entryFee: bundle.entryFee,
+    simulatedOpenPrice: 1, // emulator
+  };
+  state.investments.push(inv);
+  addTransaction('invest', -amount, { bundleId: bundle.id, amount });
+  saveState();
+  renderPortfolio();
+  renderMarket();
+  updateSidebar();
+  return {ok:true, inv};
+}
+
+/* Simulate closing a bundle or user's early closure */
+function closeInvestment(investmentId, mode='early'){
+  const inv = state.investments.find(i=>i.id===investmentId);
+  if (!inv || inv.status !== 'active') return {ok:false, reason:'Investment not active'};
+  // simulate PnL: depends on bundle risk & time
+  const bundle = state.bundles.find(b=>b.id===inv.bundleId);
+  if (!bundle) return {ok:false, reason:'Bundle not found'};
+  let pnlPerc = 0;
+  // base: target profit * random factor depending on risk and mode
+  const target = bundle.profitTarget;
+  const risk = bundle.risk;
+  if (mode === 'term') {
+    // matured -> closer to target +/- volatility
+    const vol = (risk==='low'?6: risk==='medium'?14:28);
+    pnlPerc = target * (0.7 + Math.random()*0.6) - (Math.random()*vol - vol/2);
+  } else {
+    // early close -> more variance
+    const vol = (risk==='low'?10: risk==='medium'?25:50);
+    pnlPerc = target * (0.2 + Math.random()*1.2) - (Math.random()*vol - vol/2);
+  }
+  // clamp pnlPerc between -100% and +500%
+  pnlPerc = Math.round(clamp(pnlPerc, -100, 500) * 100)/100;
+  const pnlAmount = Math.round(inv.amount * (pnlPerc/100) * 100)/100;
+  const final = Math.round((inv.amount + pnlAmount) * 100)/100;
+  // update balances
+  state.available = Math.round((state.available + final) * 100)/100;
+  inv.status = 'closed';
+  inv.closedAt = nowISO();
+  inv.pnlPerc = pnlPerc;
+  inv.pnlAmount = pnlAmount;
+  inv.finalAmount = final;
+  addTransaction('close', final, { investmentId: inv.id, pnlPerc, pnlAmount, bundleId: bundle.id });
+  saveState();
+  renderPortfolio();
+  renderMarket();
+  updateSidebar();
+  return {ok:true, pnlPerc, final};
+}
+
+/* Close bundle entirely (simulate when bundle term finishes)
+   This will close all investments for that bundle with 'term' mode
+*/
+function settleBundle(bundleId){
+  const bundle = state.bundles.find(b=>b.id===bundleId);
+  if (!bundle) return;
+  // mark as closed
+  bundle.status = 'closed';
+  // close investments linked
+  const toClose = state.investments.filter(i=>i.bundleId===bundleId && i.status==='active');
+  toClose.forEach(inv=>{
+    // close with 'term' mode
+    closeInvestment(inv.id, 'term');
+  });
+  saveState();
+  renderPortfolio();
+  renderMarket();
+  updateSidebar();
+}
+
+/* -------------------------
+   Rendering functions
+   ------------------------- */
+function renderPortfolio(){
+  // balance display
+  const bal = state.balance;
+  const av = state.available;
+  els.balanceDisplay.textContent = fmtUSD(bal);
+  els.availableBalance.textContent = fmtUSD(av);
+  // change (simulate 24h)
+  const change = ((Math.random()-0.45)*3).toFixed(2); // small jitter for demo
+  els.balanceChangeVal.textContent = (change>0? '+' : '') + change + '%';
+  els.balanceChangeVal.className = change>0 ? 'green' : 'red';
+  // open investments list
+  const openInvs = state.investments.filter(i=>i.status==='active');
+  els.openList.innerHTML = openInvs.map(i=>{
+    const b = state.bundles.find(bb=>bb.id===i.bundleId);
+    const bn = b ? b.name : i.bundleName;
+    return `<div style="display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <div style="font-weight:700">${bn}</div>
+        <div class="small-muted">Invested ${fmtUSD(i.amount)} • ${i.investedAt ? new Date(i.investedAt).toLocaleString():''}</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn secondary" onclick="showInvDetail('${i.id}')">Details</button>
+        <button class="btn" onclick="confirmEarlyClose('${i.id}')">Close</button>
+      </div>
+    </div>`;
+  }).join('') || '<div class="small-muted">No active investments</div>';
+  els.openCount.textContent = openInvs.length;
+  // transactions
+  renderTx();
+  // update sidebar
+  updateSidebar();
+  // draw chart after updating balanceHistory
+  drawChart();
+}
+
+function renderMarket(){
+  // list bundles with filters
+  const text = (els.searchInput.value||'').trim().toLowerCase();
+  const risk = els.filterRisk.value;
+  const term = els.filterTerm.value;
+  const now = new Date();
+  const items = state.bundles.filter(b=>{
+    if (text && !b.name.toLowerCase().includes(text)) return false;
+    if (risk !== 'any' && b.risk !== risk) return false;
+    if (term !== 'any') {
+      const limit = parseInt(term.replace('h',''));
+      if (b.termHours > limit) return false;
     }
-  </script>
+    return true;
+  });
+  const list = els.marketList;
+  list.innerHTML = items.map(b=>{
+    const avail = (new Date(b.availableUntil) > now) && b.status==='available';
+    const invested = b.totalInvested || 0;
+    return `<div class="bundle" id="bundle-${b.id}">
+      <div class="meta">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-weight:700">${b.name}</div>
+            <div class="small-muted">${b.risk.toUpperCase()} • Target ${b.profitTarget}% • Term ${b.termHours}h</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-weight:700">${b.profitTarget}%</div>
+            <div class="small-muted">${invested ? fmtUSD(invested) + ' invested' : 'No investments'}</div>
+          </div>
+        </div>
+        <div style="margin-top:10px">
+          <div class="asset-strip">
+            ${b.assets.map(a=>`<div class="asset" style="background:${a.color}; width:${a.share}%">${a.symbol} ${a.share}%</div>`).join('')}
+          </div>
+        </div>
+      </div>
+      <div class="actions">
+        ${avail ? `<button class="btn" onclick="openInvestModal('${b.id}')">Invest</button>` : `<button class="btn secondary" disabled>Unavailable</button>`}
+        <button class="btn secondary" onclick="inspectBundle('${b.id}')">Inspect</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* transactions render */
+function renderTx(){
+  const filter = els.txFilter.value;
+  const items = state.history.filter(tx=> filter==='all' ? true : tx.type===filter);
+  els.txList.innerHTML = items.map(tx=>{
+    const sign = tx.amount>0 ? '+' : '';
+    const cls = tx.amount>0 ? 'green' : 'red';
+    return `<div class="tx-item" style="align-items:center">
+      <div>
+        <div style="font-weight:700">${tx.type.toUpperCase()}</div>
+        <div class="small-muted">${new Date(tx.date).toLocaleString()}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-weight:700" class="${cls}">${sign}${fmtUSD(tx.amount)}</div>
+        <div class="small-muted" style="max-width:220px">${tx.details && tx.details.bundleId ? tx.details.bundleId + ' • ' + (tx.details.note||'') : (tx.details && tx.details.address ? tx.details.address : '') }</div>
+      </div>
+    </div>`;
+  }).join('') || '<div class="small-muted">No transactions</div>';
+}
+
+/* Update summary sidebar */
+function updateSidebar(){
+  els.sbBalance.textContent = fmtUSD(state.balance);
+  els.sbOpen.textContent = (state.investments.filter(i=>i.status==='active')).length;
+  els.sbChange.textContent = (Math.random()*4-1.5).toFixed(2) + '%';
+  if (Number(els.sbChange.textContent.replace('%','')) >= 0) els.sbChange.className = 'small green'; else els.sbChange.className = 'small red';
+}
+
+/* -------------------------
+   Modal interactions
+   ------------------------- */
+function showModal(html){
+  els.modalCard.innerHTML = html;
+  els.modal.classList.add('show');
+}
+function closeModal(){
+  els.modal.classList.remove('show');
+}
+
+/* Deposit modal */
+els.depositBtn.addEventListener('click', ()=>{
+  showModal(`
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><h3>Deposit funds</h3><div class="small-muted">Emulated deposit (USDT)</div></div>
+      <div><button onclick="closeModal()" class="icon-btn">✖</button></div>
+    </div>
+    <div style="margin-top:12px">
+      <label class="small-muted">Amount (USDT)</label>
+      <input id="deposit-amount" class="input" placeholder="e.g. 200" />
+    </div>
+    <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn" onclick="confirmDeposit()">Confirm</button>
+    </div>
+  `);
+  document.getElementById('deposit-amount').focus();
+});
+
+function confirmDeposit(){
+  const el = document.getElementById('deposit-amount');
+  const amt = Number(el.value);
+  if (!amt || amt <=0) { alert('Invalid amount'); return; }
+  state.balance = Math.round((state.balance + amt)*100)/100;
+  state.available = Math.round((state.available + amt)*100)/100;
+  // add tx
+  addTransaction('deposit', amt, { note:'Deposit via emulator' });
+  // update balance history
+  state.balanceHistory.push({ t: new Date().toISOString(), v: state.balance });
+  saveState();
+  closeModal();
+  renderPortfolio();
+  renderMarket();
+}
+
+/* Withdraw modal */
+els.withdrawBtn.addEventListener('click', ()=>{
+  showModal(`
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><h3>Withdraw funds</h3><div class="small-muted">Emulated withdraw (USDT)</div></div>
+      <div><button onclick="closeModal()" class="icon-btn">✖</button></div>
+    </div>
+    <div style="margin-top:12px">
+      <label class="small-muted">Amount (USDT)</label>
+      <input id="withdraw-amount" class="input" placeholder="e.g. 100" />
+    </div>
+    <div style="margin-top:8px">
+      <label class="small-muted">Destination (wallet address)</label>
+      <input id="withdraw-address" class="input" placeholder="0x..." />
+    </div>
+    <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn" onclick="confirmWithdraw()">Confirm</button>
+    </div>
+  `);
+  document.getElementById('withdraw-amount').focus();
+});
+
+function confirmWithdraw(){
+  const amt = Number(document.getElementById('withdraw-amount').value);
+  const addr = document.getElementById('withdraw-address').value || '';
+  if (!amt || amt <=0) { alert('Invalid amount'); return; }
+  if (amt > state.available) { alert('Insufficient available funds'); return; }
+  state.available = Math.round((state.available - amt)*100)/100;
+  state.balance = Math.round((state.balance - amt)*100)/100;
+  addTransaction('withdraw', -amt, { address: addr });
+  saveState();
+  closeModal();
+  renderPortfolio();
+  renderMarket();
+  updateSidebar();
+}
+
+/* Inspect bundle */
+function inspectBundle(bundleId){
+  const b = state.bundles.find(x=>x.id===bundleId);
+  if (!b) { alert('Bundle not found'); return; }
+  showModal(`
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><h3>${b.name}</h3><div class="small-muted">${b.risk.toUpperCase()} • Target ${b.profitTarget}% • Term ${b.termHours} hours</div></div>
+      <div><button onclick="closeModal()" class="icon-btn">✖</button></div>
+    </div>
+    <div style="margin-top:12px" class="small-muted">Assets</div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      ${b.assets.map(a=>`<div style="flex:1; padding:8px; border-radius:8px; background:${a.color}; color:#fff; text-align:center">${a.symbol}<div style="font-size:12px">${a.share}%</div></div>`).join('')}
+    </div>
+    <div style="margin-top:12px">
+      <div class="small-muted">Fee</div>
+      <div>${b.entryFee}%</div>
+    </div>
+    <div style="margin-top:12px;display:flex;justify-content:flex-end;gap:8px">
+      <button class="btn secondary" onclick="closeModal()">Close</button>
+      <button class="btn" onclick="openInvestModal('${b.id}')">Invest</button>
+    </div>
+  `);
+}
+
+/* Invest modal */
+function openInvestModal(bundleId){
+  const b = state.bundles.find(x=>x.id===bundleId);
+  if (!b) { alert('Bundle not found'); return; }
+  const avail = (new Date(b.availableUntil) > new Date()) && b.status==='available';
+  if (!avail) { alert('Bundle no longer available'); return; }
+  showModal(`
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><h3>Invest in ${b.name}</h3><div class="small-muted">${b.risk.toUpperCase()} • Target ${b.profitTarget}% • Term ${b.termHours}h</div></div>
+      <div><button onclick="closeModal()" class="icon-btn">✖</button></div>
+    </div>
+    <div style="margin-top:8px" class="small-muted">Available until: ${new Date(b.availableUntil).toLocaleString()}</div>
+    <div style="margin-top:12px">
+      <label class="small-muted">Amount (USDT)</label>
+      <input id="invest-amount" class="input" placeholder="e.g. 50" />
+      <div class="small-muted" style="margin-top:8px">Available balance: ${fmtUSD(state.available)}</div>
+    </div>
+    <div style="margin-top:12px;display:flex;justify-content:flex-end;gap:8px">
+      <button class="btn secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn" onclick="confirmInvest('${b.id}')">Confirm Invest</button>
+    </div>
+  `);
+  document.getElementById('invest-amount').focus();
+}
+
+function confirmInvest(bundleId){
+  const amt = Number(document.getElementById('invest-amount').value);
+  if (!amt || amt<=0) { alert('Enter a valid amount'); return; }
+  const res = investInBundle(bundleId, amt);
+  if (!res.ok) { alert(res.reason); return; }
+  // deduct from balance? In this emulation, balance is total assets. We'll keep balance as total and available decreased.
+  // Optionally record pledge: done in investInBundle
+  closeModal();
+  alert('Investment successful (emulated).');
+}
+
+/* Show investment detail */
+function showInvDetail(invId){
+  const inv = state.investments.find(i=>i.id===invId);
+  if (!inv) return alert('Investment not found');
+  const b = state.bundles.find(bb=>bb.id===inv.bundleId) || {};
+  showModal(`
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><h3>${inv.bundleName}</h3><div class="small-muted">${b.risk? b.risk.toUpperCase() : ''} • Invested at ${new Date(inv.investedAt).toLocaleString()}</div></div>
+      <div><button onclick="closeModal()" class="icon-btn">✖</button></div>
+    </div>
+    <div style="margin-top:12px">
+      <div class="kv"><div class="small-muted">Invested</div><div>${fmtUSD(inv.amount)}</div></div>
+      <div class="kv"><div class="small-muted">Status</div><div>${inv.status}</div></div>
+      ${inv.status==='closed' ? `<div class="kv"><div class="small-muted">Final</div><div>${fmtUSD(inv.finalAmount)} (${inv.pnlPerc}% / ${fmtUSD(inv.pnlAmount)})</div></div>` : ''}
+    </div>
+    <div style="margin-top:12px;display:flex;justify-content:flex-end;gap:8px">
+      <button class="btn secondary" onclick="closeModal()">Close</button>
+      ${inv.status==='active' ? `<button class="btn" onclick="confirmEarlyClose('${inv.id}')">Close early</button>` : ''}
+    </div>
+  `);
+}
+
+/* Confirm early close */
+function confirmEarlyClose(invId){
+  if (!confirm('Are you sure you want to close this investment early? This will execute an emulated close and return funds with simulated PnL.')) return;
+  const res = closeInvestment(invId,'early');
+  if (!res.ok) alert('Close failed: '+res.reason);
+  else alert('Closed. PnL: '+res.pnlPerc+'%');
+  closeModal();
+}
+
+/* -------------------------
+   Inspect expired bundles & auto-settle (emulator)
+   ------------------------- */
+function autoSettleBundles(){
+  const now = new Date();
+  state.bundles.forEach(b=>{
+    // for demo, random chance to close when totalInvested > 0 and status available for a while
+    if (b.status==='available' && b.totalInvested > 0) {
+      // If bundle age has exceeded 2 * term hours in minutes, settle
+      const created = new Date(b.createdAt);
+      const ageHours = (now - created)/(1000*60*60);
+      if (ageHours > b.termHours * 0.9 && Math.random() < 0.3) {
+        settleBundle(b.id);
+      }
+    }
+  });
+}
+
+/* -------------------------
+   Navigation & event wiring
+   ------------------------- */
+document.querySelectorAll('.nav button').forEach(btn=>{
+  btn.addEventListener('click',(e)=>{
+    document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
+    btn.classList.add('active');
+    const page = btn.dataset.page;
+    // set main header/subtext
+    const topTitleEl = document.querySelector('.topbar .left div:first-child');
+    const subEl = document.getElementById('top-sub');
+    if (page==='portfolio') {
+      topTitleEl && (topTitleEl.textContent = 'Portfolio');
+      subEl && (subEl.textContent = 'Overview of your balance and open bundles');
+      document.querySelector('main .content').scrollTop = 0;
+    } else if (page==='marketplace') {
+      topTitleEl && (topTitleEl.textContent = 'Marketplace');
+      subEl && (subEl.textContent = 'Search and invest in generated bundles');
+      document.querySelector('main .content').scrollTop = 0;
+    } else if (page==='settings') {
+      topTitleEl && (topTitleEl.textContent = 'Settings');
+      subEl && (subEl.textContent = 'Account and security settings');
+      openSettings();
+    } else if (page==='faq') {
+      topTitleEl && (topTitleEl.textContent = 'FAQ');
+      subEl && (subEl.textContent = 'Frequently asked questions');
+      openFAQ();
+    }
+  });
+});
+
+els.searchInput.addEventListener('input', renderMarket);
+els.filterRisk.addEventListener('change', renderMarket);
+els.filterTerm.addEventListener('change', renderMarket);
+els.txFilter.addEventListener('change', renderTx);
+els.generateNowBtn.addEventListener('click', ()=> generateBundles(3));
+els.openSettingsBtn.addEventListener('click', openSettings);
+els.toggleBalanceBtn.addEventListener('click', ()=>{
+  state.settings.hideBalance = !state.settings.hideBalance;
+  saveState();
+  applySettings();
+});
+els.openMarketBtn.addEventListener('click', ()=>{
+  // activate marketplace nav button
+  document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
+  const n = document.querySelector('[data-page="marketplace"]');
+  n && n.classList.add('active');
+  // update main header
+  document.querySelector('.topbar .left div:first-child').textContent = 'Marketplace';
+  document.getElementById('top-sub').textContent = 'Search and invest in generated bundles';
+});
+
+/* Settings modal */
+function openSettings(){
+  showModal(`
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><h3>Settings</h3><div class="small-muted">Profile, security and preferences</div></div>
+      <div><button onclick="closeModal()" class="icon-btn">✖</button></div>
+    </div>
+    <div style="margin-top:12px">
+      <div class="kv"><div class="small-muted">Username</div><div>${state.profile.username}</div></div>
+      <div class="kv"><div class="small-muted">Telegram</div><div>${state.profile.tg_handle}</div></div>
+      <div style="margin-top:8px" class="kv"><div class="small-muted">Language</div>
+        <div>
+          <select id="set-lang" class="input">
+            <option value="en">English</option>
+            <option value="ru">Russian</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-top:8px" class="kv"><div class="small-muted">2FA</div>
+        <div><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="set-2fa" /> Enable</label></div>
+      </div>
+      <div style="margin-top:8px" class="kv"><div class="small-muted">Notifications</div>
+        <div><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="set-notif" /> Enabled</label></div>
+      </div>
+    </div>
+    <div style="margin-top:12px;display:flex;justify-content:flex-end;gap:8px">
+      <button class="btn secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn" onclick="saveSettings()">Save</button>
+    </div>
+  `);
+  document.getElementById('set-lang').value = state.settings.lang || 'en';
+  document.getElementById('set-2fa').checked = !!state.settings.twofa;
+  document.getElementById('set-notif').checked = !!state.settings.notif;
+}
+function saveSettings(){
+  state.settings.lang = document.getElementById('set-lang').value;
+  state.settings.twofa = document.getElementById('set-2fa').checked;
+  state.settings.notif = document.getElementById('set-notif').checked;
+  saveState();
+  closeModal();
+  applySettings();
+}
+
+/* FAQ modal */
+function openFAQ(){
+  showModal(`
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><h3>FAQ</h3><div class="small-muted">Frequently asked questions</div></div>
+      <div><button onclick="closeModal()" class="icon-btn">✖</button></div>
+    </div>
+    <div style="margin-top:12px">
+      <div><strong>Q:</strong> Is this trading real?<br><strong>A:</strong> No. This is an emulator for UI and MVP testing only.</div>
+      <div style="margin-top:8px"><strong>Q:</strong> Are funds stored centrally?<br><strong>A:</strong> No real funds are used. All data stored locally in your browser.</div>
+      <div style="margin-top:8px"><strong>Q:</strong> How are bundles generated?<br><strong>A:</strong> Randomized emulator algorithm. In production, replace with your algorithm.</div>
+    </div>
+    <div style="margin-top:12px;display:flex;justify-content:flex-end">
+      <button class="btn" onclick="closeModal()">Close</button>
+    </div>
+  `);
+}
+
+/* Inspect & periodic tasks */
+setInterval(()=>{
+  // emulate fluctuations in balance history
+  const last = state.balanceHistory[state.balanceHistory.length-1];
+  const base = last ? last.v : state.balance;
+  const jitter = (Math.random()-0.5) * 6;
+  const nv = Math.round((base + jitter) * 100)/100;
+  state.balanceHistory.push({ t: new Date().toISOString(), v: nv });
+  // keep last 48
+  if (state.balanceHistory.length > 48) state.balanceHistory.shift();
+  // occasionally settle bundles
+  autoSettleBundles();
+  saveState();
+  renderPortfolio();
+}, 30*1000); // every 30 seconds
+
+/* -------------------------
+   Init
+   ------------------------- */
+function init(){
+  // wire modal close on background click
+  els.modal.addEventListener('click', (e)=>{
+    if (e.target === els.modal) closeModal();
+  });
+  // initial data: ensure there are some bundles to show
+  if (!state.bundles || state.bundles.length < 6){
+    generateBundles(6);
+  }
+  // initial render
+  renderMarket();
+  renderPortfolio();
+  updateSidebar();
+  applySettings();
+}
+function applySettings(){
+  // hide balance
+  if (state.settings.hideBalance){
+    els.balanceDisplay.textContent = '••••••';
+    els.availableBalance.textContent = '••••';
+    els.toggleBalanceBtn.textContent = '🙈';
+  } else {
+    els.toggleBalanceBtn.textContent = '👁';
+    els.balanceDisplay.textContent = fmtUSD(state.balance);
+    els.availableBalance.textContent = fmtUSD(state.available);
+  }
+  // settings summary
+  document.getElementById('st-lang').textContent = state.settings.lang === 'en' ? 'English' : 'Russian';
+  document.getElementById('st-2fa').textContent = state.settings.twofa ? 'Enabled' : 'Disabled';
+  document.getElementById('st-notif').textContent = state.settings.notif ? 'Enabled' : 'Disabled';
+}
+
+/* public helpers used in inline onclick attributes */
+window.inspectBundle = inspectBundle;
+window.openInvestModal = openInvestModal;
+window.confirmEarlyClose = confirmEarlyClose;
+window.showInvDetail = showInvDetail;
+
+/* initial start */
+init();
+
+/* make chart responsive */
+window.addEventListener('resize', ()=> {
+  drawChart();
+});
+</script>
 </body>
 </html>
