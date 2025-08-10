@@ -358,7 +358,6 @@
         <div class="tabs">
             <div class="tab active" data-tab="portfolio">Portfolio</div>
             <div class="tab" data-tab="marketplace">Маркетплейс</div>
-            <div class="tab" data-tab="settings">Настройки</div>
         </div>
         
         <!-- Portfolio Tab -->
@@ -376,19 +375,6 @@
                 </div>
                 <button class="btn" id="deposit-btn">Пополнить баланс</button>
                 <button class="btn btn-outline" id="withdraw-btn">Вывести средства</button>
-            </div>
-            
-            <div class="card">
-                <div class="card-title">
-                    <span>График баланса</span>
-                </div>
-                <div style="height: 150px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: flex-end; padding: 10px;">
-                    <div style="flex: 1; height: 40%; background: #e9ecef; margin: 0 2px;"></div>
-                    <div style="flex: 1; height: 50%; background: #e9ecef; margin: 0 2px;"></div>
-                    <div style="flex: 1; height: 60%; background: #e9ecef; margin: 0 2px;"></div>
-                    <div style="flex: 1; height: 45%; background: #e9ecef; margin: 0 2px;"></div>
-                    <div style="flex: 1; height: 70%; background: #28a745; margin: 0 2px;"></div>
-                </div>
             </div>
             
             <div class="card">
@@ -449,77 +435,6 @@
                 
                 <div id="no-bundles" style="text-align: center; padding: 20px; color: #6c757d; display: none;">
                     Нет доступных сборок
-                </div>
-            </div>
-        </div>
-        
-        <!-- Settings Tab -->
-        <div class="tab-content" id="settings-tab">
-            <div class="card">
-                <div class="card-title">
-                    <span>Профиль</span>
-                </div>
-                <div style="display: flex; align-items: center; padding: 15px 0;">
-                    <div style="width: 60px; height: 60px; border-radius: 50%; background: #e9ecef; margin-right: 15px; display: flex; align-items: center; justify-content: center;">
-                        <span id="user-initials">U</span>
-                    </div>
-                    <div>
-                        <div id="user-name">Пользователь</div>
-                        <div style="color: #6c757d; font-size: 14px;">@username</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-title">
-                    <span>Безопасность</span>
-                </div>
-                <div class="settings-item">
-                    <div>Привязка email</div>
-                    <div style="color: #6c757d; font-size: 13px;">Не привязан</div>
-                </div>
-                <div class="settings-item">
-                    <div>Скрывать баланс</div>
-                    <div style="color: #6c757d; font-size: 13px;">Всегда показывать</div>
-                </div>
-                <div class="settings-item">
-                    <div>Код-пароль</div>
-                    <div style="color: #6c757d; font-size: 13px;">Не установлен</div>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-title">
-                    <span>Настройки приложения</span>
-                </div>
-                <div class="settings-item">
-                    <div>Язык интерфейса</div>
-                    <div style="color: #6c757d; font-size: 13px;">Русский</div>
-                </div>
-                <div class="settings-item">
-                    <div>Уведомления</div>
-                    <div style="color: #6c757d; font-size: 13px;">Включены</div>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-title">
-                    <span>Информация</span>
-                </div>
-                <div class="settings-item">
-                    <div>О нас</div>
-                </div>
-                <div class="settings-item">
-                    <div>FAQ</div>
-                </div>
-                <div class="settings-item">
-                    <div>Условия использования</div>
-                </div>
-                <div class="settings-item">
-                    <div>Политика конфиденциальности</div>
-                </div>
-                <div class="settings-item">
-                    <div>Обратная связь</div>
                 </div>
             </div>
         </div>
@@ -655,11 +570,7 @@
     <div class="notification" id="notification">Операция выполнена успешно!</div>
     
     <script>
-        // =============================================
-        // Глобальные переменные приложения
-        // =============================================
-        
-        // Пользовательские данные
+        // Глобальные переменные
         const userData = {
             id: 'user_123',
             name: 'Пользователь',
@@ -671,693 +582,49 @@
             openBundles: []
         };
         
-        // Данные о сборках
         let bundles = [];
-        let bundleGenerationInterval;
         
-        // =============================================
-        // Инициализация приложения
-        // =============================================
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            // Загрузка данных пользователя
-            loadUserData();
-            
-            // Инициализация интерфейса
-            initUI();
-            
-            // Генерация начальных сборок
-            generateInitialBundles();
-            
-            // Запуск периодической генерации сборок
-            startBundleGeneration();
-            
-            // Запуск обновления статуса сборок
-            startBundleStatusUpdates();
-            
-            // Запуск обновления баланса
-            startBalanceUpdates();
-            
-            // Настройка обработчиков событий
-            setupEventListeners();
-            
-            // Заполнение истории транзакций тестовыми данными
-            generateTestTransactions();
-            
-            // Проверка наличия открытых сборок
-            checkOpenBundles();
-        });
-        
-        // =============================================
-        // Функции инициализации
-        // =============================================
-        
-        function loadUserData() {
-            // В реальном приложении здесь будет загрузка данных из API
-            // Для MVP используем тестовые данные
-            
-            // Генерируем случайные инициалы
-            const initials = userData.name.split(' ').map(n => n[0]).join('').toUpperCase() || 'U';
-            document.getElementById('user-initials').textContent = initials;
-            
-            // Устанавливаем имя пользователя
-            document.getElementById('user-name').textContent = userData.name;
-            
-            // Устанавливаем username
-            document.querySelector('#settings-tab .settings-item:nth-child(1) div:last-child').textContent = userData.username;
+        // Функция для безопасного получения элемента
+        function getElement(id) {
+            return document.getElementById(id);
         }
         
-        function initUI() {
-            // Обновляем отображение баланса
-            updateBalanceDisplay();
-            
-            // Проверяем наличие открытых сборок
-            checkOpenBundles();
+        // Функция для добавления обработчика события
+        function addEvent(elementId, event, handler) {
+            const element = getElement(elementId);
+            if (element) {
+                element.addEventListener(event, handler);
+            }
         }
         
-        function setupEventListeners() {
-            // Переключение вкладок
-            const tabElements = document.querySelectorAll('.tab');
-            tabElements.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    // Удаляем активный класс со всех вкладок
-                    tabElements.forEach(t => t.classList.remove('active'));
-                    // Добавляем активный класс текущей вкладке
-                    this.classList.add('active');
-                    
-                    // Скрываем все содержимое
-                    document.querySelectorAll('.tab-content').forEach(content => {
-                        content.classList.remove('active');
-                    });
-                    
-                    // Показываем нужное содержимое
-                    const tabName = this.getAttribute('data-tab');
-                    document.getElementById(`${tabName}-tab`).classList.add('active');
-                });
-            });
-            
-            // Переключение видимости баланса
-            const toggleBalanceBtn = document.getElementById('toggle-balance');
-            if (toggleBalanceBtn) {
-                toggleBalanceBtn.addEventListener('click', function() {
-                    userData.balanceHidden = !userData.balanceHidden;
-                    updateBalanceDisplay();
-                    
-                    this.textContent = userData.balanceHidden ? 'Показать баланс' : 'Скрыть баланс';
-                });
-            }
-            
-            // Обработчики для модальных окон
-            setupModalHandlers();
-            
-            // Обработчики для фильтров маркетплейса
-            setupMarketplaceFilters();
-        }
-        
-        function setupModalHandlers() {
-            // Закрытие модальных окон по кнопке
-            const closeButtons = document.querySelectorAll('.close-modal');
-            closeButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    this.closest('.modal').style.display = 'none';
-                });
-            });
-            
-            // Закрытие модальных окон по клику вне контента
-            const modals = document.querySelectorAll('.modal');
-            modals.forEach(modal => {
-                modal.addEventListener('click', function(e) {
-                    if (e.target === this) {
-                        this.style.display = 'none';
-                    }
-                });
-            });
-            
-            // Пополнение баланса
-            const depositBtn = document.getElementById('deposit-btn');
-            if (depositBtn) {
-                depositBtn.addEventListener('click', function() {
-                    document.getElementById('deposit-modal').style.display = 'block';
-                    document.getElementById('deposit-amount').value = '';
-                });
-            }
-            
-            const confirmDeposit = document.getElementById('confirm-deposit');
-            if (confirmDeposit) {
-                confirmDeposit.addEventListener('click', function() {
-                    const amount = parseFloat(document.getElementById('deposit-amount').value);
-                    const method = document.getElementById('payment-method').value;
-                    
-                    if (isNaN(amount) || amount <= 0) {
-                        showNotification('Введите корректную сумму');
-                        return;
-                    }
-                    
-                    // В реальном приложении здесь будет вызов API для пополнения
-                    // Для MVP просто обновляем баланс
-                    
-                    const fee = 0; // В реальном приложении может быть комиссия
-                    const netAmount = amount - fee;
-                    
-                    // Обновляем баланс
-                    userData.balance += netAmount;
-                    userData.initialBalance += amount;
-                    
-                    // Добавляем транзакцию
-                    addTransaction({
-                        type: 'deposit',
-                        amount: amount,
-                        fee: fee,
-                        netAmount: netAmount,
-                        method: method,
-                        timestamp: new Date()
-                    });
-                    
-                    // Обновляем интерфейс
-                    updateBalanceDisplay();
-                    document.getElementById('deposit-modal').style.display = 'none';
-                    showNotification(`Баланс пополнен на ${amount.toFixed(2)} USDT`);
-                });
-            }
-            
-            // Вывод средств
-            const withdrawBtn = document.getElementById('withdraw-btn');
-            if (withdrawBtn) {
-                withdrawBtn.addEventListener('click', function() {
-                    document.getElementById('withdraw-modal').style.display = 'block';
-                    document.getElementById('withdraw-amount').value = '';
-                    document.getElementById('withdraw-address').value = '';
-                    updateWithdrawCalculations();
-                });
-            }
-            
-            const withdrawAmount = document.getElementById('withdraw-amount');
-            if (withdrawAmount) {
-                withdrawAmount.addEventListener('input', updateWithdrawCalculations);
-            }
-            
-            function updateWithdrawCalculations() {
-                const amount = parseFloat(document.getElementById('withdraw-amount').value) || 0;
-                const fee = 0.5; // Фиксированная комиссия сети
-                const systemFee = amount * 0.01; // 1% комиссия системы
+        // Функция показа уведомления
+        function showNotification(message) {
+            const notification = getElement('notification');
+            if (notification) {
+                notification.textContent = message;
+                notification.style.display = 'block';
                 
-                document.getElementById('withdraw-fee').textContent = systemFee.toFixed(2) + ' USDT';
-                document.getElementById('withdraw-total').textContent = (amount - systemFee - fee).toFixed(2) + ' USDT';
-            }
-            
-            const confirmWithdraw = document.getElementById('confirm-withdraw');
-            if (confirmWithdraw) {
-                confirmWithdraw.addEventListener('click', function() {
-                    const amount = parseFloat(document.getElementById('withdraw-amount').value);
-                    const address = document.getElementById('withdraw-address').value;
-                    
-                    if (isNaN(amount) || amount <= 0) {
-                        showNotification('Введите корректную сумму');
-                        return;
-                    }
-                    
-                    if (!address) {
-                        showNotification('Введите адрес кошелька');
-                        return;
-                    }
-                    
-                    if (amount > userData.balance) {
-                        showNotification('Недостаточно средств');
-                        return;
-                    }
-                    
-                    // В реальном приложении здесь будет вызов API для вывода
-                    // Для MVP просто обновляем баланс
-                    
-                    const fee = 0.5; // Фиксированная комиссия сети
-                    const systemFee = amount * 0.01; // 1% комиссия системы
-                    const totalFee = fee + systemFee;
-                    const netAmount = amount - totalFee;
-                    
-                    // Обновляем баланс
-                    userData.balance -= amount;
-                    
-                    // Добавляем транзакцию
-                    addTransaction({
-                        type: 'withdraw',
-                        amount: amount,
-                        fee: totalFee,
-                        netAmount: netAmount,
-                        address: address,
-                        timestamp: new Date()
-                    });
-                    
-                    // Обновляем интерфейс
-                    updateBalanceDisplay();
-                    document.getElementById('withdraw-modal').style.display = 'none';
-                    showNotification(`Запрос на вывод ${amount.toFixed(2)} USDT отправлен`);
-                });
-            }
-            
-            // Подтверждение инвестиции в сборку
-            const confirmBundle = document.getElementById('confirm-bundle');
-            if (confirmBundle) {
-                confirmBundle.addEventListener('click', function() {
-                    const bundleId = this.getAttribute('data-bundle-id');
-                    const amount = parseFloat(document.getElementById('bundle-amount').value);
-                    
-                    if (isNaN(amount) || amount <= 0) {
-                        showNotification('Введите корректную сумму');
-                        return;
-                    }
-                    
-                    if (amount > userData.balance) {
-                        showNotification('Недостаточно средств');
-                        return;
-                    }
-                    
-                    const bundle = bundles.find(b => b.id === bundleId);
-                    if (!bundle) {
-                        showNotification('Сборка не найдена');
-                        return;
-                    }
-                    
-                    if (bundle.status !== 'available') {
-                        showNotification('Сборка недоступна для инвестиций');
-                        return;
-                    }
-                    
-                    // В реальном приложении здесь будет вызов API для инвестирования
-                    // Для MVP просто создаем запись об инвестиции
-                    
-                    const fee = amount * 0.05; // 5% комиссия
-                    const netAmount = amount - fee;
-                    
-                    // Создаем инвестицию
-                    const investment = {
-                        id: 'inv_' + Date.now(),
-                        bundleId: bundleId,
-                        amount: amount,
-                        fee: fee,
-                        netAmount: netAmount,
-                        timestamp: new Date(),
-                        status: 'active'
-                    };
-                    
-                    // Обновляем баланс
-                    userData.balance -= amount;
-                    
-                    // Добавляем инвестицию в сборку
-                    bundle.investments.push(investment);
-                    
-                    // Добавляем сборку в открытые
-                    userData.openBundles.push({
-                        id: bundle.id,
-                        name: bundle.name,
-                        amount: amount,
-                        profit: 0,
-                        timestamp: new Date(),
-                        investmentId: investment.id
-                    });
-                    
-                    // Добавляем транзакцию
-                    addTransaction({
-                        type: 'bundle_open',
-                        amount: amount,
-                        fee: fee,
-                        netAmount: netAmount,
-                        bundleId: bundleId,
-                        bundleName: bundle.name,
-                        timestamp: new Date()
-                    });
-                    
-                    // Обновляем интерфейс
-                    updateBalanceDisplay();
-                    document.getElementById('bundle-confirm-modal').style.display = 'none';
-                    showNotification(`Инвестиция в сборку "${bundle.name}" подтверждена`);
-                    
-                    // Обновляем список сборок
-                    renderBundles();
-                    
-                    // Проверяем наличие открытых сборок
-                    checkOpenBundles();
-                });
-            }
-            
-            // Закрытие сборки
-            const closeBundleBtn = document.getElementById('close-bundle');
-            if (closeBundleBtn) {
-                closeBundleBtn.addEventListener('click', function() {
-                    document.getElementById('close-bundle-confirm-modal').style.display = 'block';
-                    
-                    const bundleId = this.getAttribute('data-bundle-id');
-                    const bundle = userData.openBundles.find(b => b.id === bundleId);
-                    if (!bundle) return;
-                    
-                    const investment = bundles.find(b => b.id === bundleId)?.investments.find(inv => 
-                        inv.id === bundle.investmentId);
-                    if (!investment) return;
-                    
-                    // Рассчитываем текущую стоимость
-                    const currentAmount = investment.netAmount * (1 + (bundle.profit / 100));
-                    const profit = currentAmount - investment.netAmount;
-                    
-                    // Обновляем отображение
-                    document.getElementById('close-bundle-amount').textContent = investment.amount.toFixed(2) + ' USDT';
-                    document.getElementById('close-bundle-current').textContent = currentAmount.toFixed(2) + ' USDT';
-                    document.getElementById('close-bundle-profit').textContent = profit.toFixed(2) + ' USDT';
-                    
-                    // Сохраняем данные для подтверждения
-                    document.getElementById('confirm-close-bundle').setAttribute('data-bundle-id', bundleId);
-                    document.getElementById('confirm-close-bundle').setAttribute('data-investment-id', investment.id);
-                });
-            }
-            
-            // Подтверждение закрытия сборки
-            const confirmCloseBundle = document.getElementById('confirm-close-bundle');
-            if (confirmCloseBundle) {
-                confirmCloseBundle.addEventListener('click', function() {
-                    const bundleId = this.getAttribute('data-bundle-id');
-                    const investmentId = this.getAttribute('data-investment-id');
-                    
-                    const bundle = userData.openBundles.find(b => b.id === bundleId);
-                    if (!bundle) return;
-                    
-                    const investment = bundles.find(b => b.id === bundleId)?.investments.find(inv => 
-                        inv.id === investmentId);
-                    if (!investment) return;
-                    
-                    // Рассчитываем текущую стоимость
-                    const currentAmount = investment.netAmount * (1 + (bundle.profit / 100));
-                    
-                    // Обновляем баланс
-                    userData.balance += currentAmount;
-                    
-                    // Обновляем статус инвестиции
-                    const bundleIndex = bundles.findIndex(b => b.id === bundleId);
-                    if (bundleIndex !== -1) {
-                        const investmentIndex = bundles[bundleIndex].investments.findIndex(inv => inv.id === investmentId);
-                        if (investmentIndex !== -1) {
-                            bundles[bundleIndex].investments[investmentIndex].status = 'closed';
-                            bundles[bundleIndex].investments[investmentIndex].closeTimestamp = new Date();
-                        }
-                    }
-                    
-                    // Удаляем сборку из открытых
-                    userData.openBundles = userData.openBundles.filter(b => b.id !== bundleId);
-                    
-                    // Добавляем транзакцию
-                    addTransaction({
-                        type: 'bundle_close',
-                        amount: currentAmount,
-                        fee: 0,
-                        netAmount: currentAmount,
-                        bundleId: bundleId,
-                        bundleName: bundle.name,
-                        profit: (currentAmount - investment.netAmount),
-                        timestamp: new Date()
-                    });
-                    
-                    // Обновляем интерфейс
-                    updateBalanceDisplay();
-                    document.getElementById('close-bundle-confirm-modal').style.display = 'none';
-                    showNotification(`Сборка "${bundle.name}" закрыта. Прибыль: ${(currentAmount - investment.netAmount).toFixed(2)} USDT`);
-                    
-                    // Проверяем наличие открытых сборок
-                    checkOpenBundles();
-                });
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 3000);
             }
         }
         
-        function setupMarketplaceFilters() {
-            // Фильтрация сборок по ожидаемой прибыли
-            const profitFilter = document.getElementById('profit-filter');
-            if (profitFilter) {
-                profitFilter.addEventListener('change', function() {
-                    renderBundles();
-                });
-            }
-            
-            // Фильтрация сборок по уровню риска
-            const riskFilter = document.getElementById('risk-filter');
-            if (riskFilter) {
-                riskFilter.addEventListener('change', function() {
-                    renderBundles();
-                });
-            }
-            
-            // Поиск сборок
-            const searchBundles = document.getElementById('search-bundles');
-            if (searchBundles) {
-                searchBundles.addEventListener('input', function() {
-                    renderBundles();
-                });
-            }
-        }
-        
-        // =============================================
-        // Функции работы с данными
-        // =============================================
-        
-        function generateInitialBundles() {
-            // Генерируем начальные сборки
-            for (let i = 0; i < 3; i++) {
-                bundles.push(generateBundle());
-            }
-            
-            // Отображаем сборки
-            renderBundles();
-        }
-        
-        function generateBundle() {
-            const now = new Date();
-            
-            // Генерируем случайные параметры
-            const targetPnl = Math.floor(Math.random() * 110) + 10; // от 10% до 120%
-            const riskLevel = ['low', 'medium', 'high'][Math.floor(Math.random() * 3)];
-            const duration = Math.floor(Math.random() * 420) + 60; // от 60 до 480 минут
-            const assets = generateAssets();
-            
-            // Статус сборки: доступна для инвестиций первые 30 минут
-            const status = now < new Date(now.getTime() + 30 * 60000) ? 'available' : 'active';
-            
-            // Генерируем уникальный ID
-            const id = 'bundle_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
-            
-            return {
-                id: id,
-                name: `Сборка ${riskLevel.charAt(0).toUpperCase() + riskLevel.slice(1)} ${targetPnl}%`,
-                targetPnl: targetPnl,
-                riskLevel: riskLevel,
-                duration: duration, // в минутах
-                assets: assets,
-                status: status,
-                investments: [],
-                createdAt: now,
-                expiresAt: new Date(now.getTime() + 30 * 60000), // 30 минут на инвестирование
-                activeAt: new Date(now.getTime() + 30 * 60000), // активируется через 30 минут
-                closedAt: new Date(now.getTime() + (30 + duration) * 60000), // закрывается через duration минут после активации
-                currentPnl: 0,
-                progress: 0,
-                investmentsCount: 0,
-                totalInvested: 0
-            };
-        }
-        
-        function generateAssets() {
-            // Генерируем случайные активы с суммой 100%
-            let btc = Math.floor(Math.random() * 60) + 20; // от 20% до 80%
-            let eth = Math.floor(Math.random() * (100 - btc - 10)) + 10; // от 10% до оставшегося
-            let sol = 100 - btc - eth; // оставшаяся доля
-            
-            return [
-                { name: 'BTC', symbol: 'BTC', percentage: btc, color: '#f7931a' },
-                { name: 'ETH', symbol: 'ETH', percentage: eth, color: '#627eea' },
-                { name: 'SOL', symbol: 'SOL', percentage: sol, color: '#9b5de5' }
-            ];
-        }
-        
-        function startBundleGeneration() {
-            // Генерируем новую сборку каждые 5-10 минут
-            const interval = Math.floor(Math.random() * 300000) + 300000; // от 5 до 10 минут в миллисекундах
-            
-            bundleGenerationInterval = setInterval(() => {
-                bundles.push(generateBundle());
-                renderBundles();
-                
-                // Следующая генерация через случайное время от 5 до 10 минут
-                clearInterval(bundleGenerationInterval);
-                startBundleGeneration();
-            }, interval);
-        }
-        
-        function startBundleStatusUpdates() {
-            // Обновляем статус сборок каждую секунду
-            setInterval(() => {
-                const now = new Date();
-                
-                bundles.forEach(bundle => {
-                    // Обновляем таймер
-                    if (bundle.status === 'available') {
-                        const timeLeft = bundle.expiresAt - now;
-                        if (timeLeft <= 0) {
-                            // Сборка становится активной
-                            bundle.status = 'active';
-                        }
-                    }
-                    
-                    // Обновляем прогресс
-                    if (bundle.status === 'active') {
-                        const totalTime = bundle.closedAt - bundle.activeAt;
-                        const timePassed = now - bundle.activeAt;
-                        bundle.progress = Math.min(100, (timePassed / totalTime) * 100);
-                        
-                        // Обновляем PnL на основе прогресса и целевого PnL
-                        // Используем кривую, чтобы имитировать реальные движения рынка
-                        const progressFactor = Math.sin((bundle.progress / 100) * Math.PI / 2);
-                        bundle.currentPnl = bundle.targetPnl * progressFactor * (Math.random() * 0.4 + 0.8);
-                        
-                        // Добавляем немного волатильности
-                        if (Math.random() > 0.7) {
-                            bundle.currentPnl += (Math.random() - 0.5) * 5;
-                        }
-                        
-                        // Ограничиваем максимальный убыток
-                        if (bundle.currentPnl < -80) {
-                            bundle.currentPnl = -80;
-                        }
-                    }
-                    
-                    // Проверяем, не пора ли закрыть сборку
-                    if (bundle.status === 'active' && now >= bundle.closedAt) {
-                        bundle.status = 'closed';
-                        bundle.currentPnl = bundle.targetPnl; // Фиксируем целевой PnL при закрытии
-                    }
-                });
-                
-                // Обновляем отображение сборок
-                renderBundles();
-                
-                // Обновляем открытые сборки пользователя
-                updateOpenBundles();
-            }, 1000);
-        }
-        
-        function startBalanceUpdates() {
-            // Обновляем отображение баланса каждую секунду
-            setInterval(() => {
-                updateBalanceDisplay();
-            }, 1000);
-        }
-        
-        function updateOpenBundles() {
-            // Обновляем данные об открытых сборках пользователя
-            userData.openBundles.forEach(bundle => {
-                const sourceBundle = bundles.find(b => b.id === bundle.id);
-                if (sourceBundle && sourceBundle.status === 'active') {
-                    bundle.profit = sourceBundle.currentPnl;
-                }
-            });
-        }
-        
-        function addTransaction(transaction) {
-            // Добавляем транзакцию в историю
-            userData.transactions.unshift({
-                id: 'tx_' + Date.now(),
-                type: transaction.type,
-                amount: transaction.amount,
-                fee: transaction.fee,
-                netAmount: transaction.netAmount,
-                timestamp: transaction.timestamp,
-                bundleId: transaction.bundleId,
-                bundleName: transaction.bundleName,
-                profit: transaction.profit
-            });
-            
-            // Ограничиваем историю 50 транзакциями
-            if (userData.transactions.length > 50) {
-                userData.transactions.pop();
-            }
-            
-            // Обновляем отображение истории
-            renderTransactionHistory();
-        }
-        
-        function generateTestTransactions() {
-            // Генерируем тестовые транзакции для демонстрации
-            const now = new Date();
-            
-            // Пополнение
-            addTransaction({
-                type: 'deposit',
-                amount: 100.00,
-                fee: 0,
-                netAmount: 100.00,
-                method: 'ton',
-                timestamp: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000) // 3 дня назад
-            });
-            
-            // Инвестиция в сборку
-            if (bundles.length > 0) {
-                addTransaction({
-                    type: 'bundle_open',
-                    amount: 50.00,
-                    fee: 2.50,
-                    netAmount: 47.50,
-                    bundleId: bundles[0].id,
-                    bundleName: bundles[0].name,
-                    timestamp: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000) // 2 дня назад
-                });
-                
-                // Закрытие сборки
-                addTransaction({
-                    type: 'bundle_close',
-                    amount: 55.00,
-                    fee: 0,
-                    netAmount: 55.00,
-                    bundleId: bundles[0].id,
-                    bundleName: bundles[0].name,
-                    profit: 7.50,
-                    timestamp: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000) // 1 день назад
-                });
-            }
-            
-            // Вывод средств
-            addTransaction({
-                type: 'withdraw',
-                amount: 20.00,
-                fee: 0.60,
-                netAmount: 19.40,
-                address: 'UQ...',
-                timestamp: new Date(now.getTime() - 12 * 60 * 60 * 1000) // 12 часов назад
-            });
-            
-            // Обновляем отображение
-            renderTransactionHistory();
-        }
-        
-        // =============================================
-        // Функции отображения
-        // =============================================
-        
+        // Функция обновления баланса
         function updateBalanceDisplay() {
-            // Обновляем отображение баланса
-            const balanceElement = document.getElementById('balance-amount');
-            const changeElement = document.getElementById('balance-change');
+            const balanceElement = getElement('balance-amount');
+            const changeElement = getElement('balance-change');
             
-            // Рассчитываем изменение баланса
-            let changePercent = 0;
-            if (userData.initialBalance > 0) {
-                changePercent = ((userData.balance - userData.initialBalance) / userData.initialBalance) * 100;
-            }
-            
-            // Обновляем элементы
             if (balanceElement) {
                 balanceElement.textContent = userData.balance.toFixed(2) + ' USDT';
             }
             
             if (changeElement) {
+                const changePercent = ((userData.balance - userData.initialBalance) / userData.initialBalance) * 100;
                 changeElement.textContent = `${changePercent >= 0 ? '+' : ''}${changePercent.toFixed(2)}% за 24ч`;
-                // Применяем цвет в зависимости от изменения
                 changeElement.style.color = changePercent >= 0 ? '#28a745' : '#dc3545';
             }
             
-            // Применяем эффект скрытия баланса
             if (balanceElement && userData.balanceHidden) {
                 balanceElement.classList.add('hidden');
             } else if (balanceElement) {
@@ -1365,26 +632,243 @@
             }
         }
         
+        // Переключение вкладок
+        function setupTabNavigation() {
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Удаляем активный класс со всех вкладок
+                    tabs.forEach(t => t.classList.remove('active'));
+                    // Добавляем активный класс текущей вкладке
+                    tab.classList.add('active');
+                    
+                    // Скрываем все содержимое
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    
+                    // Показываем нужное содержимое
+                    const tabName = tab.getAttribute('data-tab');
+                    getElement(`${tabName}-tab`).classList.add('active');
+                });
+            });
+        }
+        
+        // Переключение видимости баланса
+        function setupBalanceToggle() {
+            addEvent('toggle-balance', 'click', () => {
+                userData.balanceHidden = !userData.balanceHidden;
+                updateBalanceDisplay();
+                
+                const button = getElement('toggle-balance');
+                if (button) {
+                    button.textContent = userData.balanceHidden ? 'Показать баланс' : 'Скрыть баланс';
+                }
+            });
+        }
+        
+        // Закрытие модальных окон
+        function setupModalClose() {
+            // Закрытие по кнопке
+            document.querySelectorAll('.close-modal').forEach(button => {
+                button.addEventListener('click', () => {
+                    button.closest('.modal').style.display = 'none';
+                });
+            });
+            
+            // Закрытие по клику вне контента
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            });
+        }
+        
+        // Пополнение баланса
+        function setupDeposit() {
+            addEvent('deposit-btn', 'click', () => {
+                getElement('deposit-modal').style.display = 'block';
+                if (getElement('deposit-amount')) {
+                    getElement('deposit-amount').value = '';
+                }
+            });
+            
+            addEvent('confirm-deposit', 'click', () => {
+                const amount = parseFloat(getElement('deposit-amount').value);
+                const method = getElement('payment-method').value;
+                
+                if (isNaN(amount) || amount <= 0) {
+                    showNotification('Введите корректную сумму');
+                    return;
+                }
+                
+                // Обновляем баланс
+                userData.balance += amount;
+                userData.initialBalance += amount;
+                
+                // Добавляем транзакцию
+                userData.transactions.unshift({
+                    id: 'tx_' + Date.now(),
+                    type: 'deposit',
+                    amount: amount,
+                    fee: 0,
+                    netAmount: amount,
+                    method: method,
+                    timestamp: new Date()
+                });
+                
+                // Ограничиваем историю 50 транзакциями
+                if (userData.transactions.length > 50) {
+                    userData.transactions.pop();
+                }
+                
+                // Обновляем интерфейс
+                updateBalanceDisplay();
+                getElement('deposit-modal').style.display = 'none';
+                renderTransactionHistory();
+                showNotification(`Баланс пополнен на ${amount.toFixed(2)} USDT`);
+            });
+        }
+        
+        // Вывод средств
+        function setupWithdraw() {
+            addEvent('withdraw-btn', 'click', () => {
+                getElement('withdraw-modal').style.display = 'block';
+                if (getElement('withdraw-amount')) {
+                    getElement('withdraw-amount').value = '';
+                }
+                if (getElement('withdraw-address')) {
+                    getElement('withdraw-address').value = '';
+                }
+                updateWithdrawCalculations();
+            });
+            
+            // Обновление расчетов при вводе суммы
+            if (getElement('withdraw-amount')) {
+                getElement('withdraw-amount').addEventListener('input', updateWithdrawCalculations);
+            }
+            
+            function updateWithdrawCalculations() {
+                const amount = parseFloat(getElement('withdraw-amount').value) || 0;
+                const fee = 0.5; // Фиксированная комиссия сети
+                const systemFee = amount * 0.01; // 1% комиссия системы
+                
+                if (getElement('withdraw-fee')) {
+                    getElement('withdraw-fee').textContent = systemFee.toFixed(2) + ' USDT';
+                }
+                if (getElement('withdraw-total')) {
+                    getElement('withdraw-total').textContent = (amount - systemFee - fee).toFixed(2) + ' USDT';
+                }
+            }
+            
+            addEvent('confirm-withdraw', 'click', () => {
+                const amount = parseFloat(getElement('withdraw-amount').value);
+                const address = getElement('withdraw-address').value;
+                
+                if (isNaN(amount) || amount <= 0) {
+                    showNotification('Введите корректную сумму');
+                    return;
+                }
+                
+                if (!address) {
+                    showNotification('Введите адрес кошелька');
+                    return;
+                }
+                
+                if (amount > userData.balance) {
+                    showNotification('Недостаточно средств');
+                    return;
+                }
+                
+                const fee = 0.5; // Фиксированная комиссия сети
+                const systemFee = amount * 0.01; // 1% комиссия системы
+                const totalFee = fee + systemFee;
+                const netAmount = amount - totalFee;
+                
+                // Обновляем баланс
+                userData.balance -= amount;
+                
+                // Добавляем транзакцию
+                userData.transactions.unshift({
+                    id: 'tx_' + Date.now(),
+                    type: 'withdraw',
+                    amount: amount,
+                    fee: totalFee,
+                    netAmount: netAmount,
+                    address: address,
+                    timestamp: new Date()
+                });
+                
+                // Ограничиваем историю 50 транзакциями
+                if (userData.transactions.length > 50) {
+                    userData.transactions.pop();
+                }
+                
+                // Обновляем интерфейс
+                updateBalanceDisplay();
+                getElement('withdraw-modal').style.display = 'none';
+                renderTransactionHistory();
+                showNotification(`Запрос на вывод ${amount.toFixed(2)} USDT отправлен`);
+            });
+        }
+        
+        // Генерация тестовых сборок
+        function generateBundles() {
+            bundles = [];
+            
+            // Генерируем 3 тестовые сборки
+            for (let i = 0; i < 3; i++) {
+                const riskLevel = ['low', 'medium', 'high'][Math.floor(Math.random() * 3)];
+                const targetPnl = Math.floor(Math.random() * 110) + 10; // от 10% до 120%
+                const duration = Math.floor(Math.random() * 420) + 60; // от 60 до 480 минут
+                
+                // Генерируем случайные активы
+                let btc = Math.floor(Math.random() * 60) + 20; // от 20% до 80%
+                let eth = Math.floor(Math.random() * (100 - btc - 10)) + 10; // от 10% до оставшегося
+                let sol = 100 - btc - eth; // оставшаяся доля
+                
+                bundles.push({
+                    id: 'bundle_' + i,
+                    name: `Сборка ${riskLevel === 'low' ? 'Низкий' : riskLevel === 'medium' ? 'Средний' : 'Высокий'} ${targetPnl}%`,
+                    targetPnl: targetPnl,
+                    riskLevel: riskLevel,
+                    duration: duration,
+                    assets: [
+                        { name: 'BTC', symbol: 'BTC', percentage: btc, color: '#f7931a' },
+                        { name: 'ETH', symbol: 'ETH', percentage: eth, color: '#627eea' },
+                        { name: 'SOL', symbol: 'SOL', percentage: sol, color: '#9b5de5' }
+                    ],
+                    status: 'available',
+                    investments: [],
+                    createdAt: new Date(),
+                    expiresAt: new Date(Date.now() + 30 * 60000), // 30 минут на инвестирование
+                    activeAt: new Date(Date.now() + 30 * 60000),
+                    closedAt: new Date(Date.now() + (30 + duration) * 60000),
+                    currentPnl: 0,
+                    progress: 0
+                });
+            }
+            
+            renderBundles();
+        }
+        
+        // Отображение сборок
         function renderBundles() {
-            const bundlesList = document.getElementById('bundles-list');
-            const loadingIndicator = document.getElementById('loading-bundles');
-            const noBundles = document.getElementById('no-bundles');
+            const bundlesList = getElement('bundles-list');
+            const noBundles = getElement('no-bundles');
             
             if (!bundlesList) return;
             
-            // Показываем индикатор загрузки
-            if (loadingIndicator) {
-                loadingIndicator.style.display = 'block';
-            }
             bundlesList.innerHTML = '';
-            
-            // Получаем фильтры
-            const profitFilter = document.getElementById('profit-filter')?.value || '';
-            const riskFilter = document.getElementById('risk-filter')?.value || '';
-            const searchQuery = document.getElementById('search-bundles')?.value.toLowerCase() || '';
             
             // Фильтруем сборки
             let filteredBundles = bundles.filter(bundle => {
+                const profitFilter = getElement('profit-filter')?.value || '';
+                const riskFilter = getElement('risk-filter')?.value || '';
+                const searchQuery = (getElement('search-bundles')?.value || '').toLowerCase();
+                
                 // Фильтр по ожидаемой прибыли
                 if (profitFilter && bundle.targetPnl < parseInt(profitFilter)) {
                     return false;
@@ -1403,7 +887,7 @@
                 return true;
             });
             
-            // Сортируем по дате создания (новые сверху)
+            // Сортируем по дате создания
             filteredBundles.sort((a, b) => b.createdAt - a.createdAt);
             
             // Отображаем сборки
@@ -1416,19 +900,17 @@
                     const bundleElement = document.createElement('div');
                     bundleElement.className = 'bundle-item';
                     
-                    // Статус сборки
-                    let statusText = '';
-                    let statusClass = '';
+                    // Таймер для сборок в статусе "available"
+                    let timerElement = '';
                     if (bundle.status === 'available') {
-                        const timeLeft = Math.max(0, Math.floor((bundle.expiresAt - new Date()) / 60000));
-                        statusText = `Доступно ${timeLeft} мин`;
-                        statusClass = 'bundle-timer';
-                    } else if (bundle.status === 'active') {
-                        statusText = 'Активна';
-                        statusClass = 'bundle-timer' + (bundle.currentPnl >= 0 ? ' positive' : ' negative');
-                    } else {
-                        statusText = 'Закрыта';
-                        statusClass = 'bundle-timer';
+                        const timeLeft = bundle.expiresAt - new Date();
+                        if (timeLeft > 0) {
+                            const minutes = Math.floor(timeLeft / 60000);
+                            const seconds = Math.floor((timeLeft % 60000) / 1000);
+                            timerElement = `<span class="timer">${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}</span>`;
+                        } else {
+                            timerElement = `<span class="timer">00:00</span>`;
+                        }
                     }
                     
                     // Прогресс бар
@@ -1441,21 +923,13 @@
                         `;
                     }
                     
-                    // Таймер для сборок в статусе "available"
-                    let timerElement = '';
-                    if (bundle.status === 'available') {
-                        const minutes = Math.floor((bundle.expiresAt - new Date()) / 60000);
-                        const seconds = Math.floor(((bundle.expiresAt - new Date()) % 60000) / 1000);
-                        timerElement = `<span class="timer">${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}</span>`;
-                    }
-                    
                     bundleElement.innerHTML = `
                         <div class="bundle-header">
                             <div class="bundle-profit">${bundle.targetPnl >= 0 ? '+' : ''}${bundle.targetPnl}%</div>
                             <div class="bundle-risk">${bundle.riskLevel === 'low' ? 'Низкий' : bundle.riskLevel === 'medium' ? 'Средний' : 'Высокий'}</div>
                         </div>
                         <div>${bundle.name}</div>
-                        <div class="${statusClass}">Срок: ${bundle.duration} мин ${timerElement}</div>
+                        <div class="bundle-timer">Срок: ${bundle.duration} мин ${timerElement}</div>
                         
                         ${progressBar}
                         
@@ -1479,23 +953,17 @@
                 
                 // Добавляем обработчики для кнопок "Инвестировать"
                 document.querySelectorAll('.invest-btn').forEach(button => {
-                    button.addEventListener('click', function() {
-                        const bundleId = this.getAttribute('data-bundle-id');
+                    button.addEventListener('click', () => {
+                        const bundleId = button.getAttribute('data-bundle-id');
                         const bundle = bundles.find(b => b.id === bundleId);
                         
                         if (!bundle) return;
                         
-                        // Проверяем статус сборки
-                        if (bundle.status !== 'available') {
-                            showNotification('Сборка недоступна для инвестиций');
-                            return;
-                        }
-                        
                         // Отображаем модальное окно подтверждения
-                        document.getElementById('bundle-confirm-modal').style.display = 'block';
+                        getElement('bundle-confirm-modal').style.display = 'block';
                         
                         // Заполняем детали сборки
-                        const detailsElement = document.getElementById('bundle-confirm-details');
+                        const detailsElement = getElement('bundle-confirm-details');
                         if (detailsElement) {
                             detailsElement.innerHTML = `
                                 <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
@@ -1520,25 +988,25 @@
                         }
                         
                         // Устанавливаем обработчик для ввода суммы
-                        const bundleAmount = document.getElementById('bundle-amount');
+                        const bundleAmount = getElement('bundle-amount');
                         if (bundleAmount) {
-                            bundleAmount.addEventListener('input', function() {
-                                const amount = parseFloat(this.value) || 0;
+                            bundleAmount.addEventListener('input', () => {
+                                const amount = parseFloat(bundleAmount.value) || 0;
                                 const fee = amount * 0.05;
                                 const total = amount + fee;
                                 
-                                document.getElementById('bundle-fee').textContent = fee.toFixed(2) + ' USDT';
-                                document.getElementById('bundle-total').textContent = total.toFixed(2) + ' USDT';
+                                getElement('bundle-fee').textContent = fee.toFixed(2) + ' USDT';
+                                getElement('bundle-total').textContent = total.toFixed(2) + ' USDT';
                             });
                         }
                         
                         // Сохраняем ID сборки для подтверждения
-                        document.getElementById('confirm-bundle').setAttribute('data-bundle-id', bundleId);
+                        getElement('confirm-bundle').setAttribute('data-bundle-id', bundleId);
                         
                         // Устанавливаем фокус на поле ввода
                         setTimeout(() => {
-                            if (document.getElementById('bundle-amount')) {
-                                document.getElementById('bundle-amount').focus();
+                            if (getElement('bundle-amount')) {
+                                getElement('bundle-amount').focus();
                             }
                         }, 300);
                     });
@@ -1548,23 +1016,97 @@
                     noBundles.style.display = 'block';
                 }
             }
-            
-            // Скрываем индикатор загрузки
-            if (loadingIndicator) {
-                loadingIndicator.style.display = 'none';
-            }
         }
         
+        // Инвестиция в сборку
+        function setupBundleInvestment() {
+            addEvent('confirm-bundle', 'click', () => {
+                const bundleId = getElement('confirm-bundle').getAttribute('data-bundle-id');
+                const amount = parseFloat(getElement('bundle-amount').value);
+                
+                if (isNaN(amount) || amount <= 0) {
+                    showNotification('Введите корректную сумму');
+                    return;
+                }
+                
+                if (amount > userData.balance) {
+                    showNotification('Недостаточно средств');
+                    return;
+                }
+                
+                const bundle = bundles.find(b => b.id === bundleId);
+                if (!bundle) {
+                    showNotification('Сборка не найдена');
+                    return;
+                }
+                
+                // 5% комиссия
+                const fee = amount * 0.05;
+                const netAmount = amount - fee;
+                
+                // Создаем инвестицию
+                const investment = {
+                    id: 'inv_' + Date.now(),
+                    bundleId: bundleId,
+                    amount: amount,
+                    fee: fee,
+                    netAmount: netAmount,
+                    timestamp: new Date(),
+                    status: 'active'
+                };
+                
+                // Обновляем баланс
+                userData.balance -= amount;
+                
+                // Добавляем инвестицию в сборку
+                bundle.investments.push(investment);
+                
+                // Добавляем сборку в открытые
+                userData.openBundles.push({
+                    id: bundle.id,
+                    name: bundle.name,
+                    amount: amount,
+                    profit: 0,
+                    timestamp: new Date(),
+                    investmentId: investment.id
+                });
+                
+                // Добавляем транзакцию
+                userData.transactions.unshift({
+                    id: 'tx_' + Date.now(),
+                    type: 'bundle_open',
+                    amount: amount,
+                    fee: fee,
+                    netAmount: netAmount,
+                    bundleId: bundleId,
+                    bundleName: bundle.name,
+                    timestamp: new Date()
+                });
+                
+                // Ограничиваем историю 50 транзакциями
+                if (userData.transactions.length > 50) {
+                    userData.transactions.pop();
+                }
+                
+                // Обновляем интерфейс
+                updateBalanceDisplay();
+                getElement('bundle-confirm-modal').style.display = 'none';
+                renderBundles();
+                renderTransactionHistory();
+                checkOpenBundles();
+                showNotification(`Инвестиция в сборку "${bundle.name}" подтверждена`);
+            });
+        }
+        
+        // Отображение истории транзакций
         function renderTransactionHistory() {
-            const transactionHistory = document.getElementById('transaction-history');
-            const noTransactions = document.getElementById('no-transactions');
+            const transactionHistory = getElement('transaction-history');
+            const noTransactions = getElement('no-transactions');
             
             if (!transactionHistory) return;
             
-            // Очищаем историю
             transactionHistory.innerHTML = '';
             
-            // Отображаем транзакции
             if (userData.transactions.length > 0) {
                 if (noTransactions) {
                     noTransactions.style.display = 'none';
@@ -1606,8 +1148,7 @@
                         </div>
                     `;
                     
-                    // Добавляем обработчик для детального просмотра
-                    transactionElement.addEventListener('click', function() {
+                    transactionElement.addEventListener('click', () => {
                         showTransactionDetails(transaction);
                     });
                     
@@ -1620,8 +1161,27 @@
             }
         }
         
+        function getTransactionTypeLabel(type) {
+            switch (type) {
+                case 'deposit': return 'Пополнение баланса';
+                case 'withdraw': return 'Вывод средств';
+                case 'bundle_open': return 'Инвестиция в сборку';
+                case 'bundle_close': return 'Закрытие сборки';
+                default: return 'Неизвестная операция';
+            }
+        }
+        
+        function formatDate(date) {
+            return new Date(date).toLocaleDateString('ru-RU', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
         function showTransactionDetails(transaction) {
-            // В MVP просто показываем алерт с деталями
             let details = `Тип: ${getTransactionTypeLabel(transaction.type)}\n`;
             details += `Дата: ${formatDate(transaction.timestamp)}\n`;
             details += `Сумма: ${transaction.amount.toFixed(2)} USDT\n`;
@@ -1647,29 +1207,10 @@
             alert(details);
         }
         
-        function getTransactionTypeLabel(type) {
-            switch (type) {
-                case 'deposit': return 'Пополнение баланса';
-                case 'withdraw': return 'Вывод средств';
-                case 'bundle_open': return 'Инвестиция в сборку';
-                case 'bundle_close': return 'Закрытие сборки';
-                default: return 'Неизвестная операция';
-            }
-        }
-        
-        function formatDate(date) {
-            return new Date(date).toLocaleDateString('ru-RU', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        }
-        
+        // Открытые сборки
         function checkOpenBundles() {
-            const openBundles = document.getElementById('open-bundles');
-            const noOpenBundles = document.getElementById('no-open-bundles');
+            const openBundles = getElement('open-bundles');
+            const noOpenBundles = getElement('no-open-bundles');
             
             if (!openBundles) return;
             
@@ -1680,11 +1221,11 @@
                 openBundles.innerHTML = '';
                 
                 userData.openBundles.forEach(bundle => {
-                    const bundleElement = document.createElement('div');
-                    bundleElement.className = 'bundle-item';
-                    
                     const sourceBundle = bundles.find(b => b.id === bundle.id);
                     const currentProfit = sourceBundle ? sourceBundle.currentPnl : bundle.profit;
+                    
+                    const bundleElement = document.createElement('div');
+                    bundleElement.className = 'bundle-item';
                     
                     bundleElement.innerHTML = `
                         <div class="bundle-header">
@@ -1714,21 +1255,20 @@
                 
                 // Добавляем обработчики для кнопок "Закрыть"
                 document.querySelectorAll('.close-bundle-btn').forEach(button => {
-                    button.addEventListener('click', function() {
-                        const bundleId = this.getAttribute('data-bundle-id');
+                    button.addEventListener('click', () => {
+                        const bundleId = button.getAttribute('data-bundle-id');
                         const bundle = userData.openBundles.find(b => b.id === bundleId);
                         
                         if (!bundle) return;
                         
-                        // Отображаем детали сборки
-                        document.getElementById('bundle-details-modal').style.display = 'block';
-                        
-                        // Заполняем детали сборки
-                        const detailsElement = document.getElementById('bundle-details-content');
-                        
                         const sourceBundle = bundles.find(b => b.id === bundleId);
                         const currentProfit = sourceBundle ? sourceBundle.currentPnl : bundle.profit;
                         
+                        // Отображаем детали сборки
+                        getElement('bundle-details-modal').style.display = 'block';
+                        
+                        // Заполняем детали сборки
+                        const detailsElement = getElement('bundle-details-content');
                         if (detailsElement) {
                             detailsElement.innerHTML = `
                                 <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
@@ -1761,7 +1301,7 @@
                         }
                         
                         // Устанавливаем обработчик для кнопки "Закрыть"
-                        const closeBundleBtn = document.getElementById('close-bundle');
+                        const closeBundleBtn = getElement('close-bundle');
                         if (closeBundleBtn) {
                             closeBundleBtn.setAttribute('data-bundle-id', bundleId);
                         }
@@ -1775,42 +1315,253 @@
             }
         }
         
-        function showNotification(message) {
-            const notification = document.getElementById('notification');
-            if (!notification) return;
+        // Закрытие сборки
+        function setupBundleClosure() {
+            addEvent('close-bundle', 'click', () => {
+                const bundleId = getElement('close-bundle').getAttribute('data-bundle-id');
+                const bundle = userData.openBundles.find(b => b.id === bundleId);
+                
+                if (!bundle) return;
+                
+                const sourceBundle = bundles.find(b => b.id === bundleId);
+                const currentProfit = sourceBundle ? sourceBundle.currentPnl : bundle.profit;
+                
+                // Рассчитываем текущую стоимость
+                const currentAmount = bundle.amount * (1 + (currentProfit / 100));
+                const profit = currentAmount - bundle.amount;
+                
+                // Обновляем отображение
+                getElement('close-bundle-amount').textContent = bundle.amount.toFixed(2) + ' USDT';
+                getElement('close-bundle-current').textContent = currentAmount.toFixed(2) + ' USDT';
+                getElement('close-bundle-profit').textContent = profit.toFixed(2) + ' USDT';
+                
+                // Сохраняем данные для подтверждения
+                getElement('confirm-close-bundle').setAttribute('data-bundle-id', bundleId);
+                
+                // Показываем модальное окно подтверждения
+                getElement('close-bundle-confirm-modal').style.display = 'block';
+            });
             
-            notification.textContent = message;
-            notification.style.display = 'block';
-            
-            // Скрываем уведомление через 3 секунды
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, 3000);
+            addEvent('confirm-close-bundle', 'click', () => {
+                const bundleId = getElement('confirm-close-bundle').getAttribute('data-bundle-id');
+                
+                const bundle = userData.openBundles.find(b => b.id === bundleId);
+                if (!bundle) return;
+                
+                const sourceBundle = bundles.find(b => b.id === bundleId);
+                const currentProfit = sourceBundle ? sourceBundle.currentPnl : bundle.profit;
+                
+                // Рассчитываем текущую стоимость
+                const currentAmount = bundle.amount * (1 + (currentProfit / 100));
+                
+                // Обновляем баланс
+                userData.balance += currentAmount;
+                
+                // Удаляем сборку из открытых
+                userData.openBundles = userData.openBundles.filter(b => b.id !== bundleId);
+                
+                // Добавляем транзакцию
+                userData.transactions.unshift({
+                    id: 'tx_' + Date.now(),
+                    type: 'bundle_close',
+                    amount: currentAmount,
+                    fee: 0,
+                    netAmount: currentAmount,
+                    bundleId: bundleId,
+                    bundleName: bundle.name,
+                    profit: currentAmount - bundle.amount,
+                    timestamp: new Date()
+                });
+                
+                // Ограничиваем историю 50 транзакциями
+                if (userData.transactions.length > 50) {
+                    userData.transactions.pop();
+                }
+                
+                // Обновляем интерфейс
+                updateBalanceDisplay();
+                getElement('close-bundle-confirm-modal').style.display = 'none';
+                renderTransactionHistory();
+                checkOpenBundles();
+                showNotification(`Сборка "${bundle.name}" закрыта. Прибыль: ${(currentAmount - bundle.amount).toFixed(2)} USDT`);
+            });
         }
         
-        // =============================================
-        // Запуск приложения
-        // =============================================
+        // Настройка фильтров
+        function setupFilters() {
+            const profitFilter = getElement('profit-filter');
+            if (profitFilter) {
+                profitFilter.addEventListener('change', renderBundles);
+            }
+            
+            const riskFilter = getElement('risk-filter');
+            if (riskFilter) {
+                riskFilter.addEventListener('change', renderBundles);
+            }
+            
+            const searchBundles = getElement('search-bundles');
+            if (searchBundles) {
+                searchBundles.addEventListener('input', renderBundles);
+            }
+        }
         
-        // Инициализируем Telegram WebApp (эмуляция)
-        if (typeof window.Telegram === 'undefined') {
-            window.Telegram = {
-                WebApp: {
-                    ready: function() {},
-                    expand: function() {},
-                    MainButton: {
-                        setText: function(text) {},
-                        show: function() {},
-                        hide: function() {},
-                        onClick: function(callback) {}
+        // Обновление статуса сборок
+        function startBundleStatusUpdates() {
+            setInterval(() => {
+                const now = new Date();
+                
+                bundles.forEach(bundle => {
+                    // Обновляем статус
+                    if (bundle.status === 'available' && now >= bundle.expiresAt) {
+                        bundle.status = 'active';
                     }
-                }
+                    
+                    // Обновляем прогресс для активных сборок
+                    if (bundle.status === 'active') {
+                        const totalTime = bundle.closedAt - bundle.activeAt;
+                        const timePassed = now - bundle.activeAt;
+                        bundle.progress = Math.min(100, (timePassed / totalTime) * 100);
+                        
+                        // Обновляем PnL на основе прогресса и целевого PnL
+                        // Используем кривую, чтобы имитировать реальные движения рынка
+                        const progressFactor = Math.sin((bundle.progress / 100) * Math.PI / 2);
+                        bundle.currentPnl = bundle.targetPnl * progressFactor * (Math.random() * 0.4 + 0.8);
+                        
+                        // Добавляем немного волатильности
+                        if (Math.random() > 0.7) {
+                            bundle.currentPnl += (Math.random() - 0.5) * 5;
+                        }
+                        
+                        // Ограничиваем максимальный убыток
+                        if (bundle.currentPnl < -80) {
+                            bundle.currentPnl = -80;
+                        }
+                    }
+                    
+                    // Проверяем, не пора ли закрыть сборку
+                    if (bundle.status === 'active' && now >= bundle.closedAt) {
+                        bundle.status = 'closed';
+                        bundle.currentPnl = bundle.targetPnl; // Фиксируем целевой PnL при закрытии
+                    }
+                });
+                
+                // Обновляем отображение сборок
+                renderBundles();
+                
+                // Обновляем открытые сборки пользователя
+                userData.openBundles.forEach(userBundle => {
+                    const sourceBundle = bundles.find(b => b.id === userBundle.id);
+                    if (sourceBundle) {
+                        userBundle.profit = sourceBundle.currentPnl;
+                    }
+                });
+                
+                // Обновляем отображение открытых сборок
+                checkOpenBundles();
+            }, 1000);
+        }
+        
+        // Генерация новых сборок
+        function startBundleGeneration() {
+            // Генерируем новую сборку каждые 5-10 минут
+            const interval = Math.floor(Math.random() * 300000) + 300000; // от 5 до 10 минут в миллисекундах
+            
+            setTimeout(() => {
+                bundles.push(generateRandomBundle());
+                renderBundles();
+                
+                // Следующая генерация через случайное время от 5 до 10 минут
+                startBundleGeneration();
+            }, interval);
+        }
+        
+        // Генерация случайной сборки
+        function generateRandomBundle() {
+            const now = new Date();
+            
+            // Генерируем случайные параметры
+            const targetPnl = Math.floor(Math.random() * 110) + 10; // от 10% до 120%
+            const riskLevel = ['low', 'medium', 'high'][Math.floor(Math.random() * 3)];
+            const duration = Math.floor(Math.random() * 420) + 60; // от 60 до 480 минут
+            
+            // Генерируем случайные активы
+            let btc = Math.floor(Math.random() * 60) + 20; // от 20% до 80%
+            let eth = Math.floor(Math.random() * (100 - btc - 10)) + 10; // от 10% до оставшегося
+            let sol = 100 - btc - eth; // оставшаяся доля
+            
+            return {
+                id: 'bundle_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+                name: `Сборка ${riskLevel.charAt(0).toUpperCase() + riskLevel.slice(1)} ${targetPnl}%`,
+                targetPnl: targetPnl,
+                riskLevel: riskLevel,
+                duration: duration,
+                assets: [
+                    { name: 'BTC', symbol: 'BTC', percentage: btc, color: '#f7931a' },
+                    { name: 'ETH', symbol: 'ETH', percentage: eth, color: '#627eea' },
+                    { name: 'SOL', symbol: 'SOL', percentage: sol, color: '#9b5de5' }
+                ],
+                status: 'available',
+                investments: [],
+                createdAt: now,
+                expiresAt: new Date(now.getTime() + 30 * 60000), // 30 минут на инвестирование
+                activeAt: new Date(now.getTime() + 30 * 60000),
+                closedAt: new Date(now.getTime() + (30 + duration) * 60000),
+                currentPnl: 0,
+                progress: 0
             };
         }
         
-        // Готовим приложение к работе
-        Telegram.WebApp.ready();
-        Telegram.WebApp.expand();
+        // Инициализация приложения
+        function initApp() {
+            // Устанавливаем инициалы пользователя
+            const initials = userData.name.split(' ').map(n => n[0]).join('').toUpperCase() || 'U';
+            const userInitials = getElement('user-initials');
+            if (userInitials) {
+                userInitials.textContent = initials;
+            }
+            
+            const userName = getElement('user-name');
+            if (userName) {
+                userName.textContent = userData.name;
+            }
+            
+            // Генерируем начальные сборки
+            for (let i = 0; i < 3; i++) {
+                bundles.push(generateRandomBundle());
+            }
+            
+            // Инициализируем интерфейс
+            updateBalanceDisplay();
+            renderBundles();
+            renderTransactionHistory();
+            checkOpenBundles();
+            
+            // Настраиваем обработчики событий
+            setupTabNavigation();
+            setupBalanceToggle();
+            setupModalClose();
+            setupDeposit();
+            setupWithdraw();
+            setupBundleInvestment();
+            setupBundleClosure();
+            setupFilters();
+            
+            // Запускаем обновление статуса сборок
+            startBundleStatusUpdates();
+            
+            // Запускаем генерацию новых сборок
+            startBundleGeneration();
+        }
+        
+        // Запускаем приложение после загрузки DOM
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                initApp();
+            } catch (error) {
+                console.error('Ошибка инициализации приложения:', error);
+                alert('Произошла ошибка при загрузке приложения. Пожалуйста, перезагрузите страницу.');
+            }
+        });
     </script>
 </body>
 </html>
