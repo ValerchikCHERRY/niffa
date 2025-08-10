@@ -843,9 +843,9 @@
                     status: 'available',
                     investments: [],
                     createdAt: new Date(),
-                    expiresAt: new Date(Date.now() + 30 * 6000), // 30 минут на инвестирование
-                    activeAt: new Date(Date.now() + 30 * 6000),
-                    closedAt: new Date(Date.now() + (30 + duration) * 6000),//NIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGENIGGERNIGGERNIGGER
+                    expiresAt: new Date(Date.now() + 3 * 60000), // 30 минут на инвестирование
+                    activeAt: new Date(Date.now() + 3 * 60000),
+                    closedAt: new Date(Date.now() + (3 + duration) * 60000),//NIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGENIGGERNIGGERNIGGER
                     currentPnl: 0,
                     progress: 0
                 });
@@ -905,8 +905,8 @@
                     if (bundle.status === 'available') {
                         const timeLeft = bundle.expiresAt - new Date();
                         if (timeLeft > 0) {
-                            const minutes = Math.floor(timeLeft / 60000);
-                            const seconds = Math.floor((timeLeft % 60000) / 1000);
+                            const minutes = Math.floor(timeLeft / 600);
+                            const seconds = Math.floor((timeLeft % 600) / 1000);
                             timerElement = `<span class="timer">${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}</span>`;
                         } else {
                             timerElement = `<span class="timer">00:00</span>`;
@@ -1565,4 +1565,5 @@
     </script>
 </body>
 </html>
+
 
