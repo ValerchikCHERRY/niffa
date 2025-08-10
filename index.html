@@ -822,7 +822,7 @@
             for (let i = 0; i < 3; i++) {
                 const riskLevel = ['low', 'medium', 'high'][Math.floor(Math.random() * 3)];
                 const targetPnl = Math.floor(Math.random() * 110) + 10; // от 10% до 120%
-                const duration = Math.floor(Math.random() * 420) + 60; // от 60 до 480 минут
+                const duration = Math.floor(Math.random() * 420) + 40; // от 60 до 480 минут
                 
                 // Генерируем случайные активы
                 let btc = Math.floor(Math.random() * 60) + 20; // от 20% до 80%
@@ -843,9 +843,9 @@
                     status: 'available',
                     investments: [],
                     createdAt: new Date(),
-                    expiresAt: new Date(Date.now() + 30 * 60000), // 30 минут на инвестирование
-                    activeAt: new Date(Date.now() + 30 * 60000),
-                    closedAt: new Date(Date.now() + (30 + duration) * 60000),
+                    expiresAt: new Date(Date.now() + 30 * 6000), // 30 минут на инвестирование
+                    activeAt: new Date(Date.now() + 30 * 6000),
+                    closedAt: new Date(Date.now() + (30 + duration) * 6000),//NIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGENIGGERNIGGERNIGGER
                     currentPnl: 0,
                     progress: 0
                 });
@@ -1565,3 +1565,4 @@
     </script>
 </body>
 </html>
+
