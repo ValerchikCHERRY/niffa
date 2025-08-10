@@ -814,44 +814,40 @@
             });
         }
         
-        // Генерация тестовых сборок
-        function generateBundles() {
-            bundles = [];
+        // Генерация случайной сборки
+        function generateRandomBundle() {
+            const now = new Date();
             
-            // Генерируем 3 тестовые сборки
-            for (let i = 0; i < 3; i++) {
-                const riskLevel = ['low', 'medium', 'high'][Math.floor(Math.random() * 3)];
-                const targetPnl = Math.floor(Math.random() * 110) + 10; // от 10% до 120%
-                const duration = Math.floor(Math.random() * 420) + 40; // от 60 до 480 минут
-                
-                // Генерируем случайные активы
-                let btc = Math.floor(Math.random() * 60) + 20; // от 20% до 80%
-                let eth = Math.floor(Math.random() * (100 - btc - 10)) + 10; // от 10% до оставшегося
-                let sol = 100 - btc - eth; // оставшаяся доля
-                
-                bundles.push({
-                    id: 'bundle_' + i,
-                    name: `Сборка ${riskLevel === 'low' ? 'Низкий' : riskLevel === 'medium' ? 'Средний' : 'Высокий'} ${targetPnl}%`,
-                    targetPnl: targetPnl,
-                    riskLevel: riskLevel,
-                    duration: duration,
-                    assets: [
-                        { name: 'BTC', symbol: 'BTC', percentage: btc, color: '#f7931a' },
-                        { name: 'ETH', symbol: 'ETH', percentage: eth, color: '#627eea' },
-                        { name: 'SOL', symbol: 'SOL', percentage: sol, color: '#9b5de5' }
-                    ],
-                    status: 'available',
-                    investments: [],
-                    createdAt: new Date(),
-                    expiresAt: new Date(Date.now() + 3 * 60000), // 30 минут на инвестирование
-                    activeAt: new Date(Date.now() + 3 * 60000),
-                    closedAt: new Date(Date.now() + (3 + duration) * 60000),//NIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGENIGGERNIGGERNIGGER
-                    currentPnl: 0,
-                    progress: 0
-                });
-            }
+            // Генерируем случайные параметры
+            const targetPnl = Math.floor(Math.random() * 110) + 10; // от 10% до 120%
+            const riskLevel = ['low', 'medium', 'high'][Math.floor(Math.random() * 3)];
+            const duration = Math.floor(Math.random() * 420) + 60; // от 60 до 480 минут
             
-            renderBundles();
+            // Генерируем случайные активы
+            let btc = Math.floor(Math.random() * 60) + 20; // от 20% до 80%
+            let eth = Math.floor(Math.random() * (100 - btc - 10)) + 10; // от 10% до оставшегося
+            let sol = 100 - btc - eth; // оставшаяся доля
+            
+            return {
+                id: 'bundle_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+                name: `Сборка ${riskLevel.charAt(0).toUpperCase() + riskLevel.slice(1)} ${targetPnl}%`,
+                targetPnl: targetPnl,
+                riskLevel: riskLevel,
+                duration: duration,
+                assets: [
+                    { name: 'BTC', symbol: 'BTC', percentage: btc, color: '#f7931a' },
+                    { name: 'ETH', symbol: 'ETH', percentage: eth, color: '#627eea' },
+                    { name: 'SOL', symbol: 'SOL', percentage: sol, color: '#9b5de5' }
+                ],
+                status: 'available',
+                investments: [],
+                createdAt: now,
+                expiresAt: new Date(now.getTime() + 60000), // ВРЕМЯ ДОСТУПНОСТИ УМЕНЬШЕНО С 30 МИНУТ ДО 1 МИНУТЫ
+                activeAt: new Date(now.getTime() + 60000),
+                closedAt: new Date(now.getTime() + (60 + duration) * 60000),
+                currentPnl: 0,
+                progress: 0
+            };
         }
         
         // Отображение сборок
@@ -905,8 +901,8 @@
                     if (bundle.status === 'available') {
                         const timeLeft = bundle.expiresAt - new Date();
                         if (timeLeft > 0) {
-                            const minutes = Math.floor(timeLeft / 600);
-                            const seconds = Math.floor((timeLeft % 600) / 1000);
+                            const minutes = Math.floor(timeLeft / 60000);
+                            const seconds = Math.floor((timeLeft % 60000) / 1000);
                             timerElement = `<span class="timer">${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}</span>`;
                         } else {
                             timerElement = `<span class="timer">00:00</span>`;
@@ -1405,15 +1401,23 @@
             }
         }
         
-        // Обновление статуса сборок
+        // Обновление статуса сборок и автоматическая генерация новых
         function startBundleStatusUpdates() {
             setInterval(() => {
                 const now = new Date();
+                let hadAvailableBundles = false;
+                let becameUnavailable = false;
                 
                 bundles.forEach(bundle => {
-                    // Обновляем статус
-                    if (bundle.status === 'available' && now >= bundle.expiresAt) {
-                        bundle.status = 'active';
+                    // Проверяем, была ли сборка доступна
+                    if (bundle.status === 'available') {
+                        hadAvailableBundles = true;
+                        
+                        // Обновляем статус
+                        if (now >= bundle.expiresAt) {
+                            bundle.status = 'active';
+                            becameUnavailable = true;
+                        }
                     }
                     
                     // Обновляем прогресс для активных сборок
@@ -1445,6 +1449,13 @@
                     }
                 });
                 
+                // Если были доступные сборки, но теперь их нет, генерируем новую
+                if (hadAvailableBundles && !bundles.some(b => b.status === 'available')) {
+                    bundles.push(generateRandomBundle());
+                    renderBundles();
+                    showNotification('Новые сборки доступны для инвестиций!');
+                }
+                
                 // Обновляем отображение сборок
                 renderBundles();
                 
@@ -1459,56 +1470,6 @@
                 // Обновляем отображение открытых сборок
                 checkOpenBundles();
             }, 1000);
-        }
-        
-        // Генерация новых сборок
-        function startBundleGeneration() {
-            // Генерируем новую сборку каждые 5-10 минут
-            const interval = Math.floor(Math.random() * 300000) + 300000; // от 5 до 10 минут в миллисекундах
-            
-            setTimeout(() => {
-                bundles.push(generateRandomBundle());
-                renderBundles();
-                
-                // Следующая генерация через случайное время от 5 до 10 минут
-                startBundleGeneration();
-            }, interval);
-        }
-        
-        // Генерация случайной сборки
-        function generateRandomBundle() {
-            const now = new Date();
-            
-            // Генерируем случайные параметры
-            const targetPnl = Math.floor(Math.random() * 110) + 10; // от 10% до 120%
-            const riskLevel = ['low', 'medium', 'high'][Math.floor(Math.random() * 3)];
-            const duration = Math.floor(Math.random() * 420) + 60; // от 60 до 480 минут
-            
-            // Генерируем случайные активы
-            let btc = Math.floor(Math.random() * 60) + 20; // от 20% до 80%
-            let eth = Math.floor(Math.random() * (100 - btc - 10)) + 10; // от 10% до оставшегося
-            let sol = 100 - btc - eth; // оставшаяся доля
-            
-            return {
-                id: 'bundle_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
-                name: `Сборка ${riskLevel.charAt(0).toUpperCase() + riskLevel.slice(1)} ${targetPnl}%`,
-                targetPnl: targetPnl,
-                riskLevel: riskLevel,
-                duration: duration,
-                assets: [
-                    { name: 'BTC', symbol: 'BTC', percentage: btc, color: '#f7931a' },
-                    { name: 'ETH', symbol: 'ETH', percentage: eth, color: '#627eea' },
-                    { name: 'SOL', symbol: 'SOL', percentage: sol, color: '#9b5de5' }
-                ],
-                status: 'available',
-                investments: [],
-                createdAt: now,
-                expiresAt: new Date(now.getTime() + 30 * 60000), // 30 минут на инвестирование
-                activeAt: new Date(now.getTime() + 30 * 60000),
-                closedAt: new Date(now.getTime() + (30 + duration) * 60000),
-                currentPnl: 0,
-                progress: 0
-            };
         }
         
         // Инициализация приложения
@@ -1548,9 +1509,6 @@
             
             // Запускаем обновление статуса сборок
             startBundleStatusUpdates();
-            
-            // Запускаем генерацию новых сборок
-            startBundleGeneration();
         }
         
         // Запускаем приложение после загрузки DOM
@@ -1565,5 +1523,3 @@
     </script>
 </body>
 </html>
-
-
