@@ -107,14 +107,27 @@
             cursor: pointer;
         }
         
+        .btn:active {
+            background: #0069d9;
+            transform: translateY(1px);
+        }
+        
         .btn-outline {
             background: transparent;
             border: 1px solid #007bff;
             color: #007bff;
         }
         
+        .btn-outline:active {
+            background: rgba(0, 123, 255, 0.1);
+        }
+        
         .btn-danger {
             background: #dc3545;
+        }
+        
+        .btn-danger:active {
+            background: #c82333;
         }
         
         .bundle-item {
@@ -724,10 +737,11 @@
         
         function setupEventListeners() {
             // Переключение вкладок
-            document.querySelectorAll('.tab').forEach(tab => {
+            const tabElements = document.querySelectorAll('.tab');
+            tabElements.forEach(tab => {
                 tab.addEventListener('click', function() {
                     // Удаляем активный класс со всех вкладок
-                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    tabElements.forEach(t => t.classList.remove('active'));
                     // Добавляем активный класс текущей вкладке
                     this.classList.add('active');
                     
@@ -743,12 +757,15 @@
             });
             
             // Переключение видимости баланса
-            document.getElementById('toggle-balance').addEventListener('click', function() {
-                userData.balanceHidden = !userData.balanceHidden;
-                updateBalanceDisplay();
-                
-                this.textContent = userData.balanceHidden ? 'Показать баланс' : 'Скрыть баланс';
-            });
+            const toggleBalanceBtn = document.getElementById('toggle-balance');
+            if (toggleBalanceBtn) {
+                toggleBalanceBtn.addEventListener('click', function() {
+                    userData.balanceHidden = !userData.balanceHidden;
+                    updateBalanceDisplay();
+                    
+                    this.textContent = userData.balanceHidden ? 'Показать баланс' : 'Скрыть баланс';
+                });
+            }
             
             // Обработчики для модальных окон
             setupModalHandlers();
@@ -759,14 +776,16 @@
         
         function setupModalHandlers() {
             // Закрытие модальных окон по кнопке
-            document.querySelectorAll('.close-modal').forEach(button => {
+            const closeButtons = document.querySelectorAll('.close-modal');
+            closeButtons.forEach(button => {
                 button.addEventListener('click', function() {
                     this.closest('.modal').style.display = 'none';
                 });
             });
             
             // Закрытие модальных окон по клику вне контента
-            document.querySelectorAll('.modal').forEach(modal => {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
                 modal.addEventListener('click', function(e) {
                     if (e.target === this) {
                         this.style.display = 'none';
@@ -775,55 +794,67 @@
             });
             
             // Пополнение баланса
-            document.getElementById('deposit-btn').addEventListener('click', function() {
-                document.getElementById('deposit-modal').style.display = 'block';
-                document.getElementById('deposit-amount').value = '';
-            });
-            
-            document.getElementById('confirm-deposit').addEventListener('click', function() {
-                const amount = parseFloat(document.getElementById('deposit-amount').value);
-                const method = document.getElementById('payment-method').value;
-                
-                if (isNaN(amount) || amount <= 0) {
-                    showNotification('Введите корректную сумму');
-                    return;
-                }
-                
-                // В реальном приложении здесь будет вызов API для пополнения
-                // Для MVP просто обновляем баланс
-                
-                const fee = 0; // В реальном приложении может быть комиссия
-                const netAmount = amount - fee;
-                
-                // Обновляем баланс
-                userData.balance += netAmount;
-                userData.initialBalance += amount;
-                
-                // Добавляем транзакцию
-                addTransaction({
-                    type: 'deposit',
-                    amount: amount,
-                    fee: fee,
-                    netAmount: netAmount,
-                    method: method,
-                    timestamp: new Date()
+            const depositBtn = document.getElementById('deposit-btn');
+            if (depositBtn) {
+                depositBtn.addEventListener('click', function() {
+                    document.getElementById('deposit-modal').style.display = 'block';
+                    document.getElementById('deposit-amount').value = '';
                 });
-                
-                // Обновляем интерфейс
-                updateBalanceDisplay();
-                document.getElementById('deposit-modal').style.display = 'none';
-                showNotification(`Баланс пополнен на ${amount.toFixed(2)} USDT`);
-            });
+            }
+            
+            const confirmDeposit = document.getElementById('confirm-deposit');
+            if (confirmDeposit) {
+                confirmDeposit.addEventListener('click', function() {
+                    const amount = parseFloat(document.getElementById('deposit-amount').value);
+                    const method = document.getElementById('payment-method').value;
+                    
+                    if (isNaN(amount) || amount <= 0) {
+                        showNotification('Введите корректную сумму');
+                        return;
+                    }
+                    
+                    // В реальном приложении здесь будет вызов API для пополнения
+                    // Для MVP просто обновляем баланс
+                    
+                    const fee = 0; // В реальном приложении может быть комиссия
+                    const netAmount = amount - fee;
+                    
+                    // Обновляем баланс
+                    userData.balance += netAmount;
+                    userData.initialBalance += amount;
+                    
+                    // Добавляем транзакцию
+                    addTransaction({
+                        type: 'deposit',
+                        amount: amount,
+                        fee: fee,
+                        netAmount: netAmount,
+                        method: method,
+                        timestamp: new Date()
+                    });
+                    
+                    // Обновляем интерфейс
+                    updateBalanceDisplay();
+                    document.getElementById('deposit-modal').style.display = 'none';
+                    showNotification(`Баланс пополнен на ${amount.toFixed(2)} USDT`);
+                });
+            }
             
             // Вывод средств
-            document.getElementById('withdraw-btn').addEventListener('click', function() {
-                document.getElementById('withdraw-modal').style.display = 'block';
-                document.getElementById('withdraw-amount').value = '';
-                document.getElementById('withdraw-address').value = '';
-                updateWithdrawCalculations();
-            });
+            const withdrawBtn = document.getElementById('withdraw-btn');
+            if (withdrawBtn) {
+                withdrawBtn.addEventListener('click', function() {
+                    document.getElementById('withdraw-modal').style.display = 'block';
+                    document.getElementById('withdraw-amount').value = '';
+                    document.getElementById('withdraw-address').value = '';
+                    updateWithdrawCalculations();
+                });
+            }
             
-            document.getElementById('withdraw-amount').addEventListener('input', updateWithdrawCalculations);
+            const withdrawAmount = document.getElementById('withdraw-amount');
+            if (withdrawAmount) {
+                withdrawAmount.addEventListener('input', updateWithdrawCalculations);
+            }
             
             function updateWithdrawCalculations() {
                 const amount = parseFloat(document.getElementById('withdraw-amount').value) || 0;
@@ -834,228 +865,249 @@
                 document.getElementById('withdraw-total').textContent = (amount - systemFee - fee).toFixed(2) + ' USDT';
             }
             
-            document.getElementById('confirm-withdraw').addEventListener('click', function() {
-                const amount = parseFloat(document.getElementById('withdraw-amount').value);
-                const address = document.getElementById('withdraw-address').value;
-                
-                if (isNaN(amount) || amount <= 0) {
-                    showNotification('Введите корректную сумму');
-                    return;
-                }
-                
-                if (!address) {
-                    showNotification('Введите адрес кошелька');
-                    return;
-                }
-                
-                if (amount > userData.balance) {
-                    showNotification('Недостаточно средств');
-                    return;
-                }
-                
-                // В реальном приложении здесь будет вызов API для вывода
-                // Для MVP просто обновляем баланс
-                
-                const fee = 0.5; // Фиксированная комиссия сети
-                const systemFee = amount * 0.01; // 1% комиссия системы
-                const totalFee = fee + systemFee;
-                const netAmount = amount - totalFee;
-                
-                // Обновляем баланс
-                userData.balance -= amount;
-                
-                // Добавляем транзакцию
-                addTransaction({
-                    type: 'withdraw',
-                    amount: amount,
-                    fee: totalFee,
-                    netAmount: netAmount,
-                    address: address,
-                    timestamp: new Date()
+            const confirmWithdraw = document.getElementById('confirm-withdraw');
+            if (confirmWithdraw) {
+                confirmWithdraw.addEventListener('click', function() {
+                    const amount = parseFloat(document.getElementById('withdraw-amount').value);
+                    const address = document.getElementById('withdraw-address').value;
+                    
+                    if (isNaN(amount) || amount <= 0) {
+                        showNotification('Введите корректную сумму');
+                        return;
+                    }
+                    
+                    if (!address) {
+                        showNotification('Введите адрес кошелька');
+                        return;
+                    }
+                    
+                    if (amount > userData.balance) {
+                        showNotification('Недостаточно средств');
+                        return;
+                    }
+                    
+                    // В реальном приложении здесь будет вызов API для вывода
+                    // Для MVP просто обновляем баланс
+                    
+                    const fee = 0.5; // Фиксированная комиссия сети
+                    const systemFee = amount * 0.01; // 1% комиссия системы
+                    const totalFee = fee + systemFee;
+                    const netAmount = amount - totalFee;
+                    
+                    // Обновляем баланс
+                    userData.balance -= amount;
+                    
+                    // Добавляем транзакцию
+                    addTransaction({
+                        type: 'withdraw',
+                        amount: amount,
+                        fee: totalFee,
+                        netAmount: netAmount,
+                        address: address,
+                        timestamp: new Date()
+                    });
+                    
+                    // Обновляем интерфейс
+                    updateBalanceDisplay();
+                    document.getElementById('withdraw-modal').style.display = 'none';
+                    showNotification(`Запрос на вывод ${amount.toFixed(2)} USDT отправлен`);
                 });
-                
-                // Обновляем интерфейс
-                updateBalanceDisplay();
-                document.getElementById('withdraw-modal').style.display = 'none';
-                showNotification(`Запрос на вывод ${amount.toFixed(2)} USDT отправлен`);
-            });
+            }
             
             // Подтверждение инвестиции в сборку
-            document.getElementById('confirm-bundle').addEventListener('click', function() {
-                const bundleId = this.getAttribute('data-bundle-id');
-                const amount = parseFloat(document.getElementById('bundle-amount').value);
-                
-                if (isNaN(amount) || amount <= 0) {
-                    showNotification('Введите корректную сумму');
-                    return;
-                }
-                
-                if (amount > userData.balance) {
-                    showNotification('Недостаточно средств');
-                    return;
-                }
-                
-                const bundle = bundles.find(b => b.id === bundleId);
-                if (!bundle) {
-                    showNotification('Сборка не найдена');
-                    return;
-                }
-                
-                if (bundle.status !== 'available') {
-                    showNotification('Сборка недоступна для инвестиций');
-                    return;
-                }
-                
-                // В реальном приложении здесь будет вызов API для инвестирования
-                // Для MVP просто создаем запись об инвестиции
-                
-                const fee = amount * 0.05; // 5% комиссия
-                const netAmount = amount - fee;
-                
-                // Создаем инвестицию
-                const investment = {
-                    id: 'inv_' + Date.now(),
-                    bundleId: bundleId,
-                    amount: amount,
-                    fee: fee,
-                    netAmount: netAmount,
-                    timestamp: new Date(),
-                    status: 'active'
-                };
-                
-                // Обновляем баланс
-                userData.balance -= amount;
-                
-                // Добавляем инвестицию в сборку
-                bundle.investments.push(investment);
-                
-                // Добавляем сборку в открытые
-                userData.openBundles.push({
-                    id: bundle.id,
-                    name: bundle.name,
-                    amount: amount,
-                    profit: 0,
-                    timestamp: new Date(),
-                    investmentId: investment.id
+            const confirmBundle = document.getElementById('confirm-bundle');
+            if (confirmBundle) {
+                confirmBundle.addEventListener('click', function() {
+                    const bundleId = this.getAttribute('data-bundle-id');
+                    const amount = parseFloat(document.getElementById('bundle-amount').value);
+                    
+                    if (isNaN(amount) || amount <= 0) {
+                        showNotification('Введите корректную сумму');
+                        return;
+                    }
+                    
+                    if (amount > userData.balance) {
+                        showNotification('Недостаточно средств');
+                        return;
+                    }
+                    
+                    const bundle = bundles.find(b => b.id === bundleId);
+                    if (!bundle) {
+                        showNotification('Сборка не найдена');
+                        return;
+                    }
+                    
+                    if (bundle.status !== 'available') {
+                        showNotification('Сборка недоступна для инвестиций');
+                        return;
+                    }
+                    
+                    // В реальном приложении здесь будет вызов API для инвестирования
+                    // Для MVP просто создаем запись об инвестиции
+                    
+                    const fee = amount * 0.05; // 5% комиссия
+                    const netAmount = amount - fee;
+                    
+                    // Создаем инвестицию
+                    const investment = {
+                        id: 'inv_' + Date.now(),
+                        bundleId: bundleId,
+                        amount: amount,
+                        fee: fee,
+                        netAmount: netAmount,
+                        timestamp: new Date(),
+                        status: 'active'
+                    };
+                    
+                    // Обновляем баланс
+                    userData.balance -= amount;
+                    
+                    // Добавляем инвестицию в сборку
+                    bundle.investments.push(investment);
+                    
+                    // Добавляем сборку в открытые
+                    userData.openBundles.push({
+                        id: bundle.id,
+                        name: bundle.name,
+                        amount: amount,
+                        profit: 0,
+                        timestamp: new Date(),
+                        investmentId: investment.id
+                    });
+                    
+                    // Добавляем транзакцию
+                    addTransaction({
+                        type: 'bundle_open',
+                        amount: amount,
+                        fee: fee,
+                        netAmount: netAmount,
+                        bundleId: bundleId,
+                        bundleName: bundle.name,
+                        timestamp: new Date()
+                    });
+                    
+                    // Обновляем интерфейс
+                    updateBalanceDisplay();
+                    document.getElementById('bundle-confirm-modal').style.display = 'none';
+                    showNotification(`Инвестиция в сборку "${bundle.name}" подтверждена`);
+                    
+                    // Обновляем список сборок
+                    renderBundles();
+                    
+                    // Проверяем наличие открытых сборок
+                    checkOpenBundles();
                 });
-                
-                // Добавляем транзакцию
-                addTransaction({
-                    type: 'bundle_open',
-                    amount: amount,
-                    fee: fee,
-                    netAmount: netAmount,
-                    bundleId: bundleId,
-                    bundleName: bundle.name,
-                    timestamp: new Date()
-                });
-                
-                // Обновляем интерфейс
-                updateBalanceDisplay();
-                document.getElementById('bundle-confirm-modal').style.display = 'none';
-                showNotification(`Инвестиция в сборку "${bundle.name}" подтверждена`);
-                
-                // Обновляем список сборок
-                renderBundles();
-                
-                // Проверяем наличие открытых сборок
-                checkOpenBundles();
-            });
+            }
             
             // Закрытие сборки
-            document.getElementById('close-bundle').addEventListener('click', function() {
-                document.getElementById('close-bundle-confirm-modal').style.display = 'block';
-                
-                const bundleId = this.getAttribute('data-bundle-id');
-                const bundle = userData.openBundles.find(b => b.id === bundleId);
-                if (!bundle) return;
-                
-                const investment = bundles.find(b => b.id === bundleId)?.investments.find(inv => 
-                    inv.id === bundle.investmentId);
-                if (!investment) return;
-                
-                // Рассчитываем текущую стоимость
-                const currentAmount = investment.netAmount * (1 + (bundle.profit / 100));
-                const profit = currentAmount - investment.netAmount;
-                
-                // Обновляем отображение
-                document.getElementById('close-bundle-amount').textContent = investment.amount.toFixed(2) + ' USDT';
-                document.getElementById('close-bundle-current').textContent = currentAmount.toFixed(2) + ' USDT';
-                document.getElementById('close-bundle-profit').textContent = profit.toFixed(2) + ' USDT';
-                
-                // Сохраняем данные для подтверждения
-                document.getElementById('confirm-close-bundle').setAttribute('data-bundle-id', bundleId);
-                document.getElementById('confirm-close-bundle').setAttribute('data-investment-id', investment.id);
-            });
+            const closeBundleBtn = document.getElementById('close-bundle');
+            if (closeBundleBtn) {
+                closeBundleBtn.addEventListener('click', function() {
+                    document.getElementById('close-bundle-confirm-modal').style.display = 'block';
+                    
+                    const bundleId = this.getAttribute('data-bundle-id');
+                    const bundle = userData.openBundles.find(b => b.id === bundleId);
+                    if (!bundle) return;
+                    
+                    const investment = bundles.find(b => b.id === bundleId)?.investments.find(inv => 
+                        inv.id === bundle.investmentId);
+                    if (!investment) return;
+                    
+                    // Рассчитываем текущую стоимость
+                    const currentAmount = investment.netAmount * (1 + (bundle.profit / 100));
+                    const profit = currentAmount - investment.netAmount;
+                    
+                    // Обновляем отображение
+                    document.getElementById('close-bundle-amount').textContent = investment.amount.toFixed(2) + ' USDT';
+                    document.getElementById('close-bundle-current').textContent = currentAmount.toFixed(2) + ' USDT';
+                    document.getElementById('close-bundle-profit').textContent = profit.toFixed(2) + ' USDT';
+                    
+                    // Сохраняем данные для подтверждения
+                    document.getElementById('confirm-close-bundle').setAttribute('data-bundle-id', bundleId);
+                    document.getElementById('confirm-close-bundle').setAttribute('data-investment-id', investment.id);
+                });
+            }
             
             // Подтверждение закрытия сборки
-            document.getElementById('confirm-close-bundle').addEventListener('click', function() {
-                const bundleId = this.getAttribute('data-bundle-id');
-                const investmentId = this.getAttribute('data-investment-id');
-                
-                const bundle = userData.openBundles.find(b => b.id === bundleId);
-                if (!bundle) return;
-                
-                const investment = bundles.find(b => b.id === bundleId)?.investments.find(inv => 
-                    inv.id === investmentId);
-                if (!investment) return;
-                
-                // Рассчитываем текущую стоимость
-                const currentAmount = investment.netAmount * (1 + (bundle.profit / 100));
-                
-                // Обновляем баланс
-                userData.balance += currentAmount;
-                
-                // Обновляем статус инвестиции
-                const bundleIndex = bundles.findIndex(b => b.id === bundleId);
-                if (bundleIndex !== -1) {
-                    const investmentIndex = bundles[bundleIndex].investments.findIndex(inv => inv.id === investmentId);
-                    if (investmentIndex !== -1) {
-                        bundles[bundleIndex].investments[investmentIndex].status = 'closed';
-                        bundles[bundleIndex].investments[investmentIndex].closeTimestamp = new Date();
+            const confirmCloseBundle = document.getElementById('confirm-close-bundle');
+            if (confirmCloseBundle) {
+                confirmCloseBundle.addEventListener('click', function() {
+                    const bundleId = this.getAttribute('data-bundle-id');
+                    const investmentId = this.getAttribute('data-investment-id');
+                    
+                    const bundle = userData.openBundles.find(b => b.id === bundleId);
+                    if (!bundle) return;
+                    
+                    const investment = bundles.find(b => b.id === bundleId)?.investments.find(inv => 
+                        inv.id === investmentId);
+                    if (!investment) return;
+                    
+                    // Рассчитываем текущую стоимость
+                    const currentAmount = investment.netAmount * (1 + (bundle.profit / 100));
+                    
+                    // Обновляем баланс
+                    userData.balance += currentAmount;
+                    
+                    // Обновляем статус инвестиции
+                    const bundleIndex = bundles.findIndex(b => b.id === bundleId);
+                    if (bundleIndex !== -1) {
+                        const investmentIndex = bundles[bundleIndex].investments.findIndex(inv => inv.id === investmentId);
+                        if (investmentIndex !== -1) {
+                            bundles[bundleIndex].investments[investmentIndex].status = 'closed';
+                            bundles[bundleIndex].investments[investmentIndex].closeTimestamp = new Date();
+                        }
                     }
-                }
-                
-                // Удаляем сборку из открытых
-                userData.openBundles = userData.openBundles.filter(b => b.id !== bundleId);
-                
-                // Добавляем транзакцию
-                addTransaction({
-                    type: 'bundle_close',
-                    amount: currentAmount,
-                    fee: 0,
-                    netAmount: currentAmount,
-                    bundleId: bundleId,
-                    bundleName: bundle.name,
-                    profit: (currentAmount - investment.netAmount),
-                    timestamp: new Date()
+                    
+                    // Удаляем сборку из открытых
+                    userData.openBundles = userData.openBundles.filter(b => b.id !== bundleId);
+                    
+                    // Добавляем транзакцию
+                    addTransaction({
+                        type: 'bundle_close',
+                        amount: currentAmount,
+                        fee: 0,
+                        netAmount: currentAmount,
+                        bundleId: bundleId,
+                        bundleName: bundle.name,
+                        profit: (currentAmount - investment.netAmount),
+                        timestamp: new Date()
+                    });
+                    
+                    // Обновляем интерфейс
+                    updateBalanceDisplay();
+                    document.getElementById('close-bundle-confirm-modal').style.display = 'none';
+                    showNotification(`Сборка "${bundle.name}" закрыта. Прибыль: ${(currentAmount - investment.netAmount).toFixed(2)} USDT`);
+                    
+                    // Проверяем наличие открытых сборок
+                    checkOpenBundles();
                 });
-                
-                // Обновляем интерфейс
-                updateBalanceDisplay();
-                document.getElementById('close-bundle-confirm-modal').style.display = 'none';
-                showNotification(`Сборка "${bundle.name}" закрыта. Прибыль: ${(currentAmount - investment.netAmount).toFixed(2)} USDT`);
-                
-                // Проверяем наличие открытых сборок
-                checkOpenBundles();
-            });
+            }
         }
         
         function setupMarketplaceFilters() {
             // Фильтрация сборок по ожидаемой прибыли
-            document.getElementById('profit-filter').addEventListener('change', function() {
-                renderBundles();
-            });
+            const profitFilter = document.getElementById('profit-filter');
+            if (profitFilter) {
+                profitFilter.addEventListener('change', function() {
+                    renderBundles();
+                });
+            }
             
             // Фильтрация сборок по уровню риска
-            document.getElementById('risk-filter').addEventListener('change', function() {
-                renderBundles();
-            });
+            const riskFilter = document.getElementById('risk-filter');
+            if (riskFilter) {
+                riskFilter.addEventListener('change', function() {
+                    renderBundles();
+                });
+            }
             
             // Поиск сборок
-            document.getElementById('search-bundles').addEventListener('input', function() {
-                renderBundles();
-            });
+            const searchBundles = document.getElementById('search-bundles');
+            if (searchBundles) {
+                searchBundles.addEventListener('input', function() {
+                    renderBundles();
+                });
+            }
         }
         
         // =============================================
@@ -1295,16 +1347,20 @@
             }
             
             // Обновляем элементы
-            balanceElement.textContent = userData.balance.toFixed(2) + ' USDT';
-            changeElement.textContent = `${changePercent >= 0 ? '+' : ''}${changePercent.toFixed(2)}% за 24ч`;
+            if (balanceElement) {
+                balanceElement.textContent = userData.balance.toFixed(2) + ' USDT';
+            }
             
-            // Применяем цвет в зависимости от изменения
-            changeElement.style.color = changePercent >= 0 ? '#28a745' : '#dc3545';
+            if (changeElement) {
+                changeElement.textContent = `${changePercent >= 0 ? '+' : ''}${changePercent.toFixed(2)}% за 24ч`;
+                // Применяем цвет в зависимости от изменения
+                changeElement.style.color = changePercent >= 0 ? '#28a745' : '#dc3545';
+            }
             
             // Применяем эффект скрытия баланса
-            if (userData.balanceHidden) {
+            if (balanceElement && userData.balanceHidden) {
                 balanceElement.classList.add('hidden');
-            } else {
+            } else if (balanceElement) {
                 balanceElement.classList.remove('hidden');
             }
         }
@@ -1314,14 +1370,18 @@
             const loadingIndicator = document.getElementById('loading-bundles');
             const noBundles = document.getElementById('no-bundles');
             
+            if (!bundlesList) return;
+            
             // Показываем индикатор загрузки
-            loadingIndicator.style.display = 'block';
+            if (loadingIndicator) {
+                loadingIndicator.style.display = 'block';
+            }
             bundlesList.innerHTML = '';
             
             // Получаем фильтры
-            const profitFilter = document.getElementById('profit-filter').value;
-            const riskFilter = document.getElementById('risk-filter').value;
-            const searchQuery = document.getElementById('search-bundles').value.toLowerCase();
+            const profitFilter = document.getElementById('profit-filter')?.value || '';
+            const riskFilter = document.getElementById('risk-filter')?.value || '';
+            const searchQuery = document.getElementById('search-bundles')?.value.toLowerCase() || '';
             
             // Фильтруем сборки
             let filteredBundles = bundles.filter(bundle => {
@@ -1348,7 +1408,9 @@
             
             // Отображаем сборки
             if (filteredBundles.length > 0) {
-                noBundles.style.display = 'none';
+                if (noBundles) {
+                    noBundles.style.display = 'none';
+                }
                 
                 filteredBundles.forEach(bundle => {
                     const bundleElement = document.createElement('div');
@@ -1425,7 +1487,7 @@
                         
                         // Проверяем статус сборки
                         if (bundle.status !== 'available') {
-                            showNotification('Сборка недостаточно для инвестиций');
+                            showNotification('Сборка недоступна для инвестиций');
                             return;
                         }
                         
@@ -1434,64 +1496,79 @@
                         
                         // Заполняем детали сборки
                         const detailsElement = document.getElementById('bundle-confirm-details');
-                        detailsElement.innerHTML = `
-                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                    <span>Сборка:</span>
-                                    <span>${bundle.name}</span>
+                        if (detailsElement) {
+                            detailsElement.innerHTML = `
+                                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                        <span>Сборка:</span>
+                                        <span>${bundle.name}</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                        <span>Целевой PnL:</span>
+                                        <span class="bundle-profit">+${bundle.targetPnl}%</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                        <span>Срок:</span>
+                                        <span>${bundle.duration} минут</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                        <span>Уровень риска:</span>
+                                        <span>${bundle.riskLevel === 'low' ? 'Низкий' : bundle.riskLevel === 'medium' ? 'Средний' : 'Высокий'}</span>
+                                    </div>
                                 </div>
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                    <span>Целевой PnL:</span>
-                                    <span class="bundle-profit">+${bundle.targetPnl}%</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                    <span>Срок:</span>
-                                    <span>${bundle.duration} минут</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                    <span>Уровень риска:</span>
-                                    <span>${bundle.riskLevel === 'low' ? 'Низкий' : bundle.riskLevel === 'medium' ? 'Средний' : 'Высокий'}</span>
-                                </div>
-                            </div>
-                        `;
+                            `;
+                        }
                         
                         // Устанавливаем обработчик для ввода суммы
-                        document.getElementById('bundle-amount').addEventListener('input', function() {
-                            const amount = parseFloat(this.value) || 0;
-                            const fee = amount * 0.05;
-                            const total = amount + fee;
-                            
-                            document.getElementById('bundle-fee').textContent = fee.toFixed(2) + ' USDT';
-                            document.getElementById('bundle-total').textContent = total.toFixed(2) + ' USDT';
-                        });
+                        const bundleAmount = document.getElementById('bundle-amount');
+                        if (bundleAmount) {
+                            bundleAmount.addEventListener('input', function() {
+                                const amount = parseFloat(this.value) || 0;
+                                const fee = amount * 0.05;
+                                const total = amount + fee;
+                                
+                                document.getElementById('bundle-fee').textContent = fee.toFixed(2) + ' USDT';
+                                document.getElementById('bundle-total').textContent = total.toFixed(2) + ' USDT';
+                            });
+                        }
                         
                         // Сохраняем ID сборки для подтверждения
                         document.getElementById('confirm-bundle').setAttribute('data-bundle-id', bundleId);
                         
                         // Устанавливаем фокус на поле ввода
                         setTimeout(() => {
-                            document.getElementById('bundle-amount').focus();
+                            if (document.getElementById('bundle-amount')) {
+                                document.getElementById('bundle-amount').focus();
+                            }
                         }, 300);
                     });
                 });
             } else {
-                noBundles.style.display = 'block';
+                if (noBundles) {
+                    noBundles.style.display = 'block';
+                }
             }
             
             // Скрываем индикатор загрузки
-            loadingIndicator.style.display = 'none';
+            if (loadingIndicator) {
+                loadingIndicator.style.display = 'none';
+            }
         }
         
         function renderTransactionHistory() {
             const transactionHistory = document.getElementById('transaction-history');
             const noTransactions = document.getElementById('no-transactions');
             
+            if (!transactionHistory) return;
+            
             // Очищаем историю
             transactionHistory.innerHTML = '';
             
             // Отображаем транзакции
             if (userData.transactions.length > 0) {
-                noTransactions.style.display = 'none';
+                if (noTransactions) {
+                    noTransactions.style.display = 'none';
+                }
                 
                 userData.transactions.forEach(transaction => {
                     const transactionElement = document.createElement('div');
@@ -1537,7 +1614,9 @@
                     transactionHistory.appendChild(transactionElement);
                 });
             } else {
-                noTransactions.style.display = 'block';
+                if (noTransactions) {
+                    noTransactions.style.display = 'block';
+                }
             }
         }
         
@@ -1592,8 +1671,12 @@
             const openBundles = document.getElementById('open-bundles');
             const noOpenBundles = document.getElementById('no-open-bundles');
             
+            if (!openBundles) return;
+            
             if (userData.openBundles.length > 0) {
-                noOpenBundles.style.display = 'none';
+                if (noOpenBundles) {
+                    noOpenBundles.style.display = 'none';
+                }
                 openBundles.innerHTML = '';
                 
                 userData.openBundles.forEach(bundle => {
@@ -1646,47 +1729,56 @@
                         const sourceBundle = bundles.find(b => b.id === bundleId);
                         const currentProfit = sourceBundle ? sourceBundle.currentPnl : bundle.profit;
                         
-                        detailsElement.innerHTML = `
-                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                    <span>Сборка:</span>
-                                    <span>${bundle.name}</span>
+                        if (detailsElement) {
+                            detailsElement.innerHTML = `
+                                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                        <span>Сборка:</span>
+                                        <span>${bundle.name}</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                        <span>Текущий PnL:</span>
+                                        <span class="bundle-profit ${currentProfit >= 0 ? 'positive' : 'negative'}">${currentProfit >= 0 ? '+' : ''}${currentProfit.toFixed(1)}%</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                        <span>Инвестировано:</span>
+                                        <span>${bundle.amount.toFixed(2)} USDT</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: bold;">
+                                        <span>Текущая стоимость:</span>
+                                        <span>${(bundle.amount * (1 + currentProfit/100)).toFixed(2)} USDT</span>
+                                    </div>
                                 </div>
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                    <span>Текущий PnL:</span>
-                                    <span class="bundle-profit ${currentProfit >= 0 ? 'positive' : 'negative'}">${currentProfit >= 0 ? '+' : ''}${currentProfit.toFixed(1)}%</span>
+                                
+                                <div class="progress" style="margin-bottom: 15px;">
+                                    <div class="progress-bar" style="width: ${Math.min(100, Math.abs(currentProfit))}%"></div>
                                 </div>
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                    <span>Инвестировано:</span>
-                                    <span>${bundle.amount.toFixed(2)} USDT</span>
+                                
+                                <div style="margin-bottom: 15px; color: #6c757d; font-size: 12px;">
+                                    ${sourceBundle ? `Срок: ${sourceBundle.duration} минут | Уровень риска: ${sourceBundle.riskLevel === 'low' ? 'Низкий' : sourceBundle.riskLevel === 'medium' ? 'Средний' : 'Высокий'}` : ''}
                                 </div>
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: bold;">
-                                    <span>Текущая стоимость:</span>
-                                    <span>${(bundle.amount * (1 + currentProfit/100)).toFixed(2)} USDT</span>
-                                </div>
-                            </div>
-                            
-                            <div class="progress" style="margin-bottom: 15px;">
-                                <div class="progress-bar" style="width: ${Math.min(100, Math.abs(currentProfit))}%"></div>
-                            </div>
-                            
-                            <div style="margin-bottom: 15px; color: #6c757d; font-size: 12px;">
-                                ${sourceBundle ? `Срок: ${sourceBundle.duration} минут | Уровень риска: ${sourceBundle.riskLevel === 'low' ? 'Низкий' : sourceBundle.riskLevel === 'medium' ? 'Средний' : 'Высокий'}` : ''}
-                            </div>
-                        `;
+                            `;
+                        }
                         
                         // Устанавливаем обработчик для кнопки "Закрыть"
-                        document.getElementById('close-bundle').setAttribute('data-bundle-id', bundleId);
+                        const closeBundleBtn = document.getElementById('close-bundle');
+                        if (closeBundleBtn) {
+                            closeBundleBtn.setAttribute('data-bundle-id', bundleId);
+                        }
                     });
                 });
             } else {
-                noOpenBundles.style.display = 'block';
+                if (noOpenBundles) {
+                    noOpenBundles.style.display = 'block';
+                }
                 openBundles.innerHTML = '';
             }
         }
         
         function showNotification(message) {
             const notification = document.getElementById('notification');
+            if (!notification) return;
+            
             notification.textContent = message;
             notification.style.display = 'block';
             
@@ -1699,9 +1791,6 @@
         // =============================================
         // Запуск приложения
         // =============================================
-        
-        // В реальном приложении здесь будет инициализация Telegram WebApp
-        // Для MVP просто эмулируем работу
         
         // Инициализируем Telegram WebApp (эмуляция)
         if (typeof window.Telegram === 'undefined') {
