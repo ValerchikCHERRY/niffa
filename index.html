@@ -90,8 +90,16 @@
         }
         
         .balance-change {
-            color: #28a745;
             font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .balance-change.positive {
+            color: #28a745;
+        }
+        
+        .balance-change.negative {
+            color: #dc3545;
         }
         
         .btn {
@@ -145,7 +153,14 @@
         
         .bundle-profit {
             font-weight: bold;
+        }
+        
+        .bundle-profit.positive {
             color: #28a745;
+        }
+        
+        .bundle-profit.negative {
+            color: #dc3545;
         }
         
         .bundle-risk {
@@ -215,6 +230,10 @@
             padding: 20px;
             width: 90%;
             max-width: 400px;
+            /* Центрирование модального окна */
+            position: relative;
+            transform: none;
+            margin: 0;
         }
         
         .modal-header {
@@ -347,6 +366,12 @@
             z-index: 1000;
             display: none;
         }
+        
+        .commission-info {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -356,7 +381,7 @@
         </div>
         
         <div class="tabs">
-            <div class="tab active" data-tab="portfolio">Portfolio</div>
+            <div class="tab active" data-tab="portfolio">Портфель</div>
             <div class="tab" data-tab="marketplace">Маркетплейс</div>
         </div>
         
@@ -514,9 +539,10 @@
                 <label>Комиссия</label>
                 <div style="background: #f8f9fa; padding: 10px; border-radius: 5px; margin-top: 5px;">
                     <div style="display: flex; justify-content: space-between;">
-                        <span>Комиссия системы (5%):</span>
+                        <span>Комиссия системы (0.5%):</span>
                         <span id="bundle-fee">0.00 USDT</span>
                     </div>
+                    <div class="commission-info">Комиссия взимается единоразово при открытии сборки</div>
                     <div style="display: flex; justify-content: space-between; margin-top: 5px; font-weight: bold; border-top: 1px solid #eee; padding-top: 5px;">
                         <span>Итого к списанию:</span>
                         <span id="bundle-total">0.00 USDT</span>
@@ -558,8 +584,12 @@
                     <span>Текущая стоимость:</span>
                     <span id="close-bundle-current">0.00 USDT</span>
                 </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>Комиссия с прибыли (1%):</span>
+                    <span id="close-bundle-fee">0.00 USDT</span>
+                </div>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: bold;">
-                    <span>Прибыль/убыток:</span>
+                    <span>Итоговая сумма:</span>
                     <span id="close-bundle-profit">0.00 USDT</span>
                 </div>
             </div>
@@ -612,17 +642,34 @@
         
         // Функция обновления баланса
         function updateBalanceDisplay() {
+            // Рассчитываем текущую стоимость открытых сборок
+            let totalOpenBundlesValue = 0;
+            userData.openBundles.forEach(bundle => {
+                const sourceBundle = bundles.find(b => b.id === bundle.id);
+                if (sourceBundle && sourceBundle.status === 'active') {
+                    const currentProfit = sourceBundle.currentPnl;
+                    const currentValue = bundle.amount * (1 + (currentProfit / 100));
+                    totalOpenBundlesValue += currentValue;
+                }
+            });
+            
+            // Общий баланс = наличные средства + стоимость открытых сборок
+            const totalBalance = userData.balance + totalOpenBundlesValue;
+            
+            // Обновляем отображение
             const balanceElement = getElement('balance-amount');
             const changeElement = getElement('balance-change');
             
             if (balanceElement) {
-                balanceElement.textContent = userData.balance.toFixed(2) + ' USDT';
+                balanceElement.textContent = totalBalance.toFixed(2) + ' USDT';
             }
             
             if (changeElement) {
-                const changePercent = ((userData.balance - userData.initialBalance) / userData.initialBalance) * 100;
-                changeElement.textContent = `${changePercent >= 0 ? '+' : ''}${changePercent.toFixed(2)}% за 24ч`;
-                changeElement.style.color = changePercent >= 0 ? '#28a745' : '#dc3545';
+                const changePercent = ((totalBalance - userData.initialBalance) / userData.initialBalance) * 100;
+                const changeText = `${changePercent >= 0 ? '+' : ''}${changePercent.toFixed(2)}% за 24ч`;
+                
+                changeElement.textContent = changeText;
+                changeElement.className = 'balance-change ' + (changePercent >= 0 ? 'positive' : 'negative');
             }
             
             if (balanceElement && userData.balanceHidden) {
@@ -842,7 +889,7 @@
                 status: 'available',
                 investments: [],
                 createdAt: now,
-                expiresAt: new Date(now.getTime() + 60000), // ВРЕМЯ ДОСТУПНОСТИ УМЕНЬШЕНО С 30 МИНУТ ДО 1 МИНУТЫ
+                expiresAt: new Date(now.getTime() + 60000), // 1 минута на инвестирование
                 activeAt: new Date(now.getTime() + 60000),
                 closedAt: new Date(now.getTime() + (60 + duration) * 60000),
                 currentPnl: 0,
@@ -909,6 +956,17 @@
                         }
                     }
                     
+                    // Таймер до экспирации для активных сборок
+                    let expirationTimer = '';
+                    if (bundle.status === 'active') {
+                        const timeLeft = bundle.closedAt - new Date();
+                        if (timeLeft > 0) {
+                            const hours = Math.floor(timeLeft / 3600000);
+                            const minutes = Math.floor((timeLeft % 3600000) / 60000);
+                            expirationTimer = `<div class="bundle-timer">До экспирации: ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}</div>`;
+                        }
+                    }
+                    
                     // Прогресс бар
                     let progressBar = '';
                     if (bundle.status === 'active') {
@@ -921,11 +979,12 @@
                     
                     bundleElement.innerHTML = `
                         <div class="bundle-header">
-                            <div class="bundle-profit">${bundle.targetPnl >= 0 ? '+' : ''}${bundle.targetPnl}%</div>
+                            <div class="bundle-profit ${bundle.targetPnl >= 0 ? 'positive' : 'negative'}">${bundle.targetPnl >= 0 ? '+' : ''}${bundle.targetPnl}%</div>
                             <div class="bundle-risk">${bundle.riskLevel === 'low' ? 'Низкий' : bundle.riskLevel === 'medium' ? 'Средний' : 'Высокий'}</div>
                         </div>
                         <div>${bundle.name}</div>
                         <div class="bundle-timer">Срок: ${bundle.duration} мин ${timerElement}</div>
+                        ${expirationTimer}
                         
                         ${progressBar}
                         
@@ -969,7 +1028,7 @@
                                     </div>
                                     <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
                                         <span>Целевой PnL:</span>
-                                        <span class="bundle-profit">+${bundle.targetPnl}%</span>
+                                        <span class="bundle-profit ${bundle.targetPnl >= 0 ? 'positive' : 'negative'}">+${bundle.targetPnl}%</span>
                                     </div>
                                     <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
                                         <span>Срок:</span>
@@ -988,7 +1047,7 @@
                         if (bundleAmount) {
                             bundleAmount.addEventListener('input', () => {
                                 const amount = parseFloat(bundleAmount.value) || 0;
-                                const fee = amount * 0.05;
+                                const fee = amount * 0.005; // 0.5% комиссия
                                 const total = amount + fee;
                                 
                                 getElement('bundle-fee').textContent = fee.toFixed(2) + ' USDT';
@@ -1036,8 +1095,8 @@
                     return;
                 }
                 
-                // 5% комиссия
-                const fee = amount * 0.05;
+                // 0.5% комиссия
+                const fee = amount * 0.005;
                 const netAmount = amount - fee;
                 
                 // Создаем инвестицию
@@ -1114,29 +1173,40 @@
                     
                     let amountClass = '';
                     let amountText = '';
+                    let transactionType = '';
                     
                     switch (transaction.type) {
                         case 'deposit':
                             amountClass = 'positive';
                             amountText = `+${transaction.netAmount.toFixed(2)} USDT`;
+                            transactionType = 'Пополнение баланса';
                             break;
                         case 'withdraw':
                             amountClass = 'negative';
                             amountText = `-${transaction.amount.toFixed(2)} USDT`;
+                            transactionType = 'Вывод средств';
                             break;
                         case 'bundle_open':
                             amountClass = 'negative';
                             amountText = `-${transaction.amount.toFixed(2)} USDT`;
+                            transactionType = 'Инвестиция в сборку';
                             break;
                         case 'bundle_close':
-                            amountClass = transaction.profit >= 0 ? 'positive' : 'negative';
-                            amountText = `${transaction.profit >= 0 ? '+' : ''}${transaction.netAmount.toFixed(2)} USDT`;
+                            if (transaction.profit >= 0) {
+                                amountClass = 'positive';
+                                amountText = `+${transaction.netAmount.toFixed(2)} USDT`;
+                                transactionType = 'Закрытие сборки (прибыль)';
+                            } else {
+                                amountClass = 'negative';
+                                amountText = `${transaction.netAmount.toFixed(2)} USDT`;
+                                transactionType = 'Закрытие сборки (убыток)';
+                            }
                             break;
                     }
                     
                     transactionElement.innerHTML = `
                         <div class="transaction-header">
-                            <div>${getTransactionTypeLabel(transaction.type)}</div>
+                            <div>${transactionType}</div>
                             <div class="transaction-amount ${amountClass}">${amountText}</div>
                         </div>
                         <div style="color: #6c757d; font-size: 12px;">
@@ -1193,7 +1263,11 @@
             }
             
             if (transaction.profit !== undefined) {
-                details += `Прибыль: ${transaction.profit.toFixed(2)} USDT\n`;
+                if (transaction.profit >= 0) {
+                    details += `Прибыль: ${transaction.profit.toFixed(2)} USDT\n`;
+                } else {
+                    details += `Убыток: ${Math.abs(transaction.profit).toFixed(2)} USDT\n`;
+                }
             }
             
             if (transaction.address) {
@@ -1223,13 +1297,25 @@
                     const bundleElement = document.createElement('div');
                     bundleElement.className = 'bundle-item';
                     
+                    // Таймер до экспирации
+                    let expirationTimer = '';
+                    if (sourceBundle && sourceBundle.status === 'active') {
+                        const timeLeft = sourceBundle.closedAt - new Date();
+                        if (timeLeft > 0) {
+                            const hours = Math.floor(timeLeft / 3600000);
+                            const minutes = Math.floor((timeLeft % 3600000) / 60000);
+                            expirationTimer = `<div class="bundle-timer">До экспирации: ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}</div>`;
+                        }
+                    }
+                    
                     bundleElement.innerHTML = `
                         <div class="bundle-header">
-                            <div class="bundle-profit">${currentProfit >= 0 ? '+' : ''}${currentProfit.toFixed(1)}%</div>
+                            <div class="bundle-profit ${currentProfit >= 0 ? 'positive' : 'negative'}">${currentProfit >= 0 ? '+' : ''}${currentProfit.toFixed(1)}%</div>
                             <div class="bundle-risk">${sourceBundle ? (sourceBundle.riskLevel === 'low' ? 'Низкий' : sourceBundle.riskLevel === 'medium' ? 'Средний' : 'Высокий') : 'Средний'}</div>
                         </div>
                         <div>${bundle.name}</div>
                         <div>Срок: ${sourceBundle ? sourceBundle.duration : 'N/A'} мин</div>
+                        ${expirationTimer}
                         
                         <div class="bundle-assets">
                             ${sourceBundle ? sourceBundle.assets.map(asset => `
@@ -1282,7 +1368,7 @@
                                     </div>
                                     <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: bold;">
                                         <span>Текущая стоимость:</span>
-                                        <span>${(bundle.amount * (1 + currentProfit/100)).toFixed(2)} USDT</span>
+                                        <span class="${currentProfit >= 0 ? 'positive' : 'negative'}">${(bundle.amount * (1 + currentProfit/100)).toFixed(2)} USDT</span>
                                     </div>
                                 </div>
                                 
@@ -1326,13 +1412,22 @@
                 const currentAmount = bundle.amount * (1 + (currentProfit / 100));
                 const profit = currentAmount - bundle.amount;
                 
+                // Рассчитываем комиссию с прибыли (1%)
+                const profitFee = profit > 0 ? profit * 0.01 : 0;
+                const finalAmount = currentAmount - profitFee;
+                
                 // Обновляем отображение
                 getElement('close-bundle-amount').textContent = bundle.amount.toFixed(2) + ' USDT';
                 getElement('close-bundle-current').textContent = currentAmount.toFixed(2) + ' USDT';
-                getElement('close-bundle-profit').textContent = profit.toFixed(2) + ' USDT';
+                getElement('close-bundle-fee').textContent = profitFee.toFixed(2) + ' USDT';
+                
+                // Отображаем итоговую сумму с учетом комиссии
+                getElement('close-bundle-profit').textContent = finalAmount.toFixed(2) + ' USDT';
                 
                 // Сохраняем данные для подтверждения
                 getElement('confirm-close-bundle').setAttribute('data-bundle-id', bundleId);
+                getElement('confirm-close-bundle').setAttribute('data-profit', profit);
+                getElement('confirm-close-bundle').setAttribute('data-profit-fee', profitFee);
                 
                 // Показываем модальное окно подтверждения
                 getElement('close-bundle-confirm-modal').style.display = 'block';
@@ -1340,6 +1435,8 @@
             
             addEvent('confirm-close-bundle', 'click', () => {
                 const bundleId = getElement('confirm-close-bundle').getAttribute('data-bundle-id');
+                const profit = parseFloat(getElement('confirm-close-bundle').getAttribute('data-profit'));
+                const profitFee = parseFloat(getElement('confirm-close-bundle').getAttribute('data-profit-fee'));
                 
                 const bundle = userData.openBundles.find(b => b.id === bundleId);
                 if (!bundle) return;
@@ -1350,8 +1447,11 @@
                 // Рассчитываем текущую стоимость
                 const currentAmount = bundle.amount * (1 + (currentProfit / 100));
                 
+                // Рассчитываем комиссию с прибыли (1%)
+                const finalAmount = currentAmount - profitFee;
+                
                 // Обновляем баланс
-                userData.balance += currentAmount;
+                userData.balance += finalAmount;
                 
                 // Удаляем сборку из открытых
                 userData.openBundles = userData.openBundles.filter(b => b.id !== bundleId);
@@ -1360,12 +1460,12 @@
                 userData.transactions.unshift({
                     id: 'tx_' + Date.now(),
                     type: 'bundle_close',
-                    amount: currentAmount,
-                    fee: 0,
-                    netAmount: currentAmount,
+                    amount: finalAmount,
+                    fee: profitFee,
+                    netAmount: finalAmount,
                     bundleId: bundleId,
                     bundleName: bundle.name,
-                    profit: currentAmount - bundle.amount,
+                    profit: profit,
                     timestamp: new Date()
                 });
                 
@@ -1379,7 +1479,16 @@
                 getElement('close-bundle-confirm-modal').style.display = 'none';
                 renderTransactionHistory();
                 checkOpenBundles();
-                showNotification(`Сборка "${bundle.name}" закрыта. Прибыль: ${(currentAmount - bundle.amount).toFixed(2)} USDT`);
+                
+                // Формируем сообщение об убытке/прибыли
+                let message = '';
+                if (profit >= 0) {
+                    message = `Сборка "${bundle.name}" закрыта. Прибыль: ${(profit - profitFee).toFixed(2)} USDT`;
+                } else {
+                    message = `Сборка "${bundle.name}" закрыта. Убыток: ${Math.abs(profit).toFixed(2)} USDT`;
+                }
+                
+                showNotification(message);
             });
         }
         
@@ -1408,7 +1517,8 @@
                 let hadAvailableBundles = false;
                 let becameUnavailable = false;
                 
-                bundles.forEach(bundle => {
+                // Сначала обновляем статусы существующих сборок
+                bundles = bundles.filter(bundle => {
                     // Проверяем, была ли сборка доступна
                     if (bundle.status === 'available') {
                         hadAvailableBundles = true;
@@ -1447,6 +1557,9 @@
                         bundle.status = 'closed';
                         bundle.currentPnl = bundle.targetPnl; // Фиксируем целевой PnL при закрытии
                     }
+                    
+                    // Удаляем сборки, которые больше не доступны для инвестирования и уже закрыты
+                    return bundle.status !== 'closed' || bundle.investments.length > 0;
                 });
                 
                 // Если были доступные сборки, но теперь их нет, генерируем новую
@@ -1469,6 +1582,9 @@
                 
                 // Обновляем отображение открытых сборок
                 checkOpenBundles();
+                
+                // Обновляем баланс
+                updateBalanceDisplay();
             }, 1000);
         }
         
