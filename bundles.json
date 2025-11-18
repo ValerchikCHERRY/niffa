@@ -1,22 +1,130 @@
 {
-  "lastUpdated": "2025-11-18T09:17:46.683813Z",
+  "lastUpdated": "2025-11-18T09:36:50.138005Z",
   "bundles": [
     {
-      "id": 9344,
-      "name": "BNB/SHIB Bundle",
-      "profit": "+22.2%",
-      "duration": "24h",
+      "id": 8323,
+      "name": "DOGE/ADA Bundle",
+      "profit": "+12.4%",
+      "duration": "19h",
+      "risk": "Low",
+      "assets": [
+        {
+          "name": "DOGE",
+          "percentage": 33,
+          "color": "#d07c16"
+        },
+        {
+          "name": "ADA",
+          "percentage": 37,
+          "color": "#0033ad"
+        },
+        {
+          "name": "XRP",
+          "percentage": 30,
+          "color": "#23292f"
+        }
+      ],
+      "currentInvested": 3.62,
+      "timeRemaining": 1658,
+      "generatedAt": "2025-11-18T09:36:50.137902Z"
+    },
+    {
+      "id": 3928,
+      "name": "SHIB/BNB Bundle",
+      "profit": "+15.5%",
+      "duration": "9h",
+      "risk": "High",
+      "assets": [
+        {
+          "name": "SHIB",
+          "percentage": 44,
+          "color": "#ffc000"
+        },
+        {
+          "name": "BNB",
+          "percentage": 43,
+          "color": "#f3ba2f"
+        },
+        {
+          "name": "ADA",
+          "percentage": 13,
+          "color": "#0033ad"
+        }
+      ],
+      "currentInvested": 2.96,
+      "timeRemaining": 1129,
+      "generatedAt": "2025-11-18T09:36:50.137928Z"
+    },
+    {
+      "id": 6917,
+      "name": "BNB/XRP Bundle",
+      "profit": "+20.9%",
+      "duration": "2h",
       "risk": "Low",
       "assets": [
         {
           "name": "BNB",
-          "percentage": 22,
+          "percentage": 30,
           "color": "#f3ba2f"
         },
         {
+          "name": "XRP",
+          "percentage": 33,
+          "color": "#23292f"
+        },
+        {
+          "name": "BTC",
+          "percentage": 37,
+          "color": "#f7931a"
+        }
+      ],
+      "currentInvested": 5.62,
+      "timeRemaining": 1541,
+      "generatedAt": "2025-11-18T09:36:50.137948Z"
+    },
+    {
+      "id": 5893,
+      "name": "SHIB/DOGE Bundle",
+      "profit": "+7.1%",
+      "duration": "20h",
+      "risk": "High",
+      "assets": [
+        {
           "name": "SHIB",
-          "percentage": 34,
+          "percentage": 32,
           "color": "#ffc000"
+        },
+        {
+          "name": "DOGE",
+          "percentage": 32,
+          "color": "#d07c16"
+        },
+        {
+          "name": "SOL",
+          "percentage": 36,
+          "color": "#00d395"
+        }
+      ],
+      "currentInvested": 14.15,
+      "timeRemaining": 565,
+      "generatedAt": "2025-11-18T09:36:50.137967Z"
+    },
+    {
+      "id": 4564,
+      "name": "BNB/BTC Bundle",
+      "profit": "+17.9%",
+      "duration": "1h",
+      "risk": "High",
+      "assets": [
+        {
+          "name": "BNB",
+          "percentage": 26,
+          "color": "#f3ba2f"
+        },
+        {
+          "name": "BTC",
+          "percentage": 30,
+          "color": "#f7931a"
         },
         {
           "name": "USDT",
@@ -24,144 +132,36 @@
           "color": "#26a17b"
         }
       ],
-      "currentInvested": 13.92,
-      "timeRemaining": 1071,
-      "generatedAt": "2025-11-18T09:17:46.683710Z"
+      "currentInvested": 6.21,
+      "timeRemaining": 374,
+      "generatedAt": "2025-11-18T09:36:50.137986Z"
     },
     {
-      "id": 9584,
-      "name": "DOGE/DOT Bundle",
-      "profit": "+13.4%",
-      "duration": "8h",
-      "risk": "High",
-      "assets": [
-        {
-          "name": "DOGE",
-          "percentage": 19,
-          "color": "#d07c16"
-        },
-        {
-          "name": "DOT",
-          "percentage": 56,
-          "color": "#5d78ff"
-        },
-        {
-          "name": "ADA",
-          "percentage": 25,
-          "color": "#0033ad"
-        }
-      ],
-      "currentInvested": 7.05,
-      "timeRemaining": 640,
-      "generatedAt": "2025-11-18T09:17:46.683740Z"
-    },
-    {
-      "id": 9190,
-      "name": "ADA/DOGE Bundle",
-      "profit": "+14.5%",
-      "duration": "19h",
-      "risk": "High",
-      "assets": [
-        {
-          "name": "ADA",
-          "percentage": 32,
-          "color": "#0033ad"
-        },
-        {
-          "name": "DOGE",
-          "percentage": 16,
-          "color": "#d07c16"
-        },
-        {
-          "name": "ETH",
-          "percentage": 52,
-          "color": "#627eea"
-        }
-      ],
-      "currentInvested": 8.27,
-      "timeRemaining": 346,
-      "generatedAt": "2025-11-18T09:17:46.683759Z"
-    },
-    {
-      "id": 3866,
-      "name": "XRP/DOT Bundle",
-      "profit": "+24.7%",
-      "duration": "6h",
+      "id": 5932,
+      "name": "USDT/ETH Bundle",
+      "profit": "+6.6%",
+      "duration": "18h",
       "risk": "Low",
       "assets": [
         {
-          "name": "XRP",
-          "percentage": 29,
-          "color": "#23292f"
-        },
-        {
-          "name": "DOT",
-          "percentage": 41,
-          "color": "#5d78ff"
-        },
-        {
           "name": "USDT",
-          "percentage": 30,
+          "percentage": 28,
           "color": "#26a17b"
-        }
-      ],
-      "currentInvested": 8.72,
-      "timeRemaining": 119,
-      "generatedAt": "2025-11-18T09:17:46.683777Z"
-    },
-    {
-      "id": 3080,
-      "name": "ETH/DOGE Bundle",
-      "profit": "+22.5%",
-      "duration": "17h",
-      "risk": "High",
-      "assets": [
+        },
         {
           "name": "ETH",
-          "percentage": 29,
+          "percentage": 39,
           "color": "#627eea"
         },
         {
-          "name": "DOGE",
-          "percentage": 29,
-          "color": "#d07c16"
-        },
-        {
-          "name": "SHIB",
-          "percentage": 42,
-          "color": "#ffc000"
+          "name": "BTC",
+          "percentage": 33,
+          "color": "#f7931a"
         }
       ],
-      "currentInvested": 9.6,
-      "timeRemaining": 1564,
-      "generatedAt": "2025-11-18T09:17:46.683794Z"
-    },
-    {
-      "id": 5279,
-      "name": "ETH/SHIB Bundle",
-      "profit": "+13.8%",
-      "duration": "18h",
-      "risk": "High",
-      "assets": [
-        {
-          "name": "ETH",
-          "percentage": 22,
-          "color": "#627eea"
-        },
-        {
-          "name": "SHIB",
-          "percentage": 43,
-          "color": "#ffc000"
-        },
-        {
-          "name": "DOGE",
-          "percentage": 35,
-          "color": "#d07c16"
-        }
-      ],
-      "currentInvested": 3.45,
-      "timeRemaining": 937,
-      "generatedAt": "2025-11-18T09:17:46.683811Z"
+      "currentInvested": 6.62,
+      "timeRemaining": 1266,
+      "generatedAt": "2025-11-18T09:36:50.138003Z"
     }
   ]
 }
