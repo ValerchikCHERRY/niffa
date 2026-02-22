@@ -1,98 +1,71 @@
 {
-  "lastUpdated": "2026-02-22T01:09:37.933061Z",
+  "lastUpdated": "2026-02-22T03:43:04.815114Z",
   "bundles": [
     {
-      "id": 9120,
-      "name": "SOL/BTC Bundle",
-      "profit": "+11.7%",
-      "duration": "16h",
-      "risk": "Medium",
+      "id": 3548,
+      "name": "ADA/BTC Bundle",
+      "profit": "+19.2%",
+      "duration": "12h",
+      "risk": "Low",
       "assets": [
         {
-          "name": "SOL",
-          "percentage": 18,
-          "color": "#00d395"
+          "name": "ADA",
+          "percentage": 27,
+          "color": "#0033ad"
         },
         {
           "name": "BTC",
-          "percentage": 38,
-          "color": "#f7931a"
-        },
-        {
-          "name": "DOT",
-          "percentage": 44,
-          "color": "#5d78ff"
-        }
-      ],
-      "currentInvested": 3.18,
-      "timeRemaining": 1631,
-      "generatedAt": "2026-02-22T01:09:37.932959Z"
-    },
-    {
-      "id": 3146,
-      "name": "ETH/BTC Bundle",
-      "profit": "+15.0%",
-      "duration": "3h",
-      "risk": "High",
-      "assets": [
-        {
-          "name": "ETH",
-          "percentage": 38,
-          "color": "#627eea"
-        },
-        {
-          "name": "BTC",
-          "percentage": 31,
+          "percentage": 34,
           "color": "#f7931a"
         },
         {
           "name": "USDT",
-          "percentage": 31,
+          "percentage": 39,
           "color": "#26a17b"
         }
       ],
-      "currentInvested": 1.45,
-      "timeRemaining": 1501,
-      "generatedAt": "2026-02-22T01:09:37.932985Z"
+      "currentInvested": 3.59,
+      "timeRemaining": 885,
+      "generatedAt": "2026-02-22T03:43:04.814983Z"
     },
     {
-      "id": 7201,
-      "name": "ETH/DOGE Bundle",
-      "profit": "+10.0%",
-      "duration": "15h",
+      "id": 6320,
+      "name": "DOT/ADA Bundle",
+      "profit": "+11.0%",
+      "duration": "8h",
       "risk": "High",
       "assets": [
         {
-          "name": "ETH",
-          "percentage": 26,
-          "color": "#627eea"
-        },
-        {
-          "name": "DOGE",
-          "percentage": 30,
-          "color": "#d07c16"
+          "name": "DOT",
+          "percentage": 47,
+          "color": "#5d78ff"
         },
         {
           "name": "ADA",
-          "percentage": 44,
+          "percentage": 26,
           "color": "#0033ad"
+        },
+        {
+          "name": "SOL",
+          "percentage": 27,
+          "color": "#00d395"
         }
       ],
-      "currentInvested": 9.81,
-      "timeRemaining": 1307,
-      "generatedAt": "2026-02-22T01:09:37.933005Z"
+      "currentInvested": 7.34,
+      "timeRemaining": 1206,
+      "generatedAt": "2026-02-22T03:43:04.815015Z"
     },
     {
-      "id": 2949,
-      "name": "DOGE/ADA Bundle",
-      "profit": "+15.0%",
-      "duration": "16h",
+      "id": 3560,
+      "name": "XRP/ADA Bundle",
+      "profit": "+10.8%",
+      "duration": "21h",
       "risk": "High",
       "assets": [
         {
-          "name": "DOGE",
-          "percentage": 20,
-          "color": "#d07c16"
+          "name": "XRP",
+          "percentage": 26,
+          "color": "#23292f"
         },
         {
           "name": "ADA",
@@ -101,67 +74,94 @@
         },
         {
           "name": "BTC",
-          "percentage": 34,
+          "percentage": 28,
           "color": "#f7931a"
         }
       ],
-      "currentInvested": 9.09,
-      "timeRemaining": 1599,
-      "generatedAt": "2026-02-22T01:09:37.933024Z"
+      "currentInvested": 12.51,
+      "timeRemaining": 1645,
+      "generatedAt": "2026-02-22T03:43:04.815037Z"
     },
     {
-      "id": 6502,
+      "id": 5051,
       "name": "ETH/BTC Bundle",
-      "profit": "+11.3%",
-      "duration": "11h",
-      "risk": "Low",
+      "profit": "+19.0%",
+      "duration": "8h",
+      "risk": "High",
       "assets": [
         {
           "name": "ETH",
-          "percentage": 24,
+          "percentage": 30,
           "color": "#627eea"
         },
         {
           "name": "BTC",
-          "percentage": 39,
+          "percentage": 37,
           "color": "#f7931a"
         },
         {
           "name": "XRP",
-          "percentage": 37,
+          "percentage": 33,
           "color": "#23292f"
         }
       ],
-      "currentInvested": 2.1,
-      "timeRemaining": 1787,
-      "generatedAt": "2026-02-22T01:09:37.933042Z"
+      "currentInvested": 13.86,
+      "timeRemaining": 246,
+      "generatedAt": "2026-02-22T03:43:04.815073Z"
     },
     {
-      "id": 6621,
-      "name": "BTC/XRP Bundle",
-      "profit": "+21.0%",
-      "duration": "21h",
+      "id": 9150,
+      "name": "XRP/SOL Bundle",
+      "profit": "+19.5%",
+      "duration": "18h",
+      "risk": "Medium",
+      "assets": [
+        {
+          "name": "XRP",
+          "percentage": 31,
+          "color": "#23292f"
+        },
+        {
+          "name": "SOL",
+          "percentage": 37,
+          "color": "#00d395"
+        },
+        {
+          "name": "DOGE",
+          "percentage": 32,
+          "color": "#d07c16"
+        }
+      ],
+      "currentInvested": 6.28,
+      "timeRemaining": 1477,
+      "generatedAt": "2026-02-22T03:43:04.815094Z"
+    },
+    {
+      "id": 7421,
+      "name": "XRP/BNB Bundle",
+      "profit": "+13.2%",
+      "duration": "10h",
       "risk": "Low",
       "assets": [
         {
-          "name": "BTC",
-          "percentage": 58,
-          "color": "#f7931a"
-        },
-        {
           "name": "XRP",
-          "percentage": 17,
+          "percentage": 36,
           "color": "#23292f"
         },
         {
           "name": "BNB",
-          "percentage": 25,
+          "percentage": 32,
           "color": "#f3ba2f"
+        },
+        {
+          "name": "ETH",
+          "percentage": 32,
+          "color": "#627eea"
         }
       ],
-      "currentInvested": 9.37,
-      "timeRemaining": 1304,
-      "generatedAt": "2026-02-22T01:09:37.933059Z"
+      "currentInvested": 12.51,
+      "timeRemaining": 119,
+      "generatedAt": "2026-02-22T03:43:04.815112Z"
     }
   ]
 }
